@@ -1,0 +1,287 @@
+/**
+ * Define fonts
+ */
+ @font-face {
+  font-family: "btb";
+  src: url("assets/fonts/Battambang/Battambang-Regular.ttf");
+}
+.font-btb {
+font-family: "btb";
+}
+@font-face {
+  font-family: "btb-black";
+  src: url("assets/fonts/Battambang/Battambang-Black.ttf");
+}
+.font-btb-black {
+font-family: "btb-black";
+}
+@font-face {
+  font-family: "btb-bold";
+  src: url("assets/fonts/Battambang/Battambang-Bold.ttf");
+}
+.font-btb-bold {
+font-family: "btb-bold";
+}
+@font-face {
+  font-family: "btb-light";
+  src: url("assets/fonts/Battambang/Battambang-Light.ttf");
+}
+.font-btb-light {
+font-family: "btb-light";
+}
+@font-face {
+  font-family: "btb-thin";
+  src: url("assets/fonts/Battambang/Battambang-Thin.ttf");
+}
+.font-btb-thin {
+font-family: "btb-thin";
+}
+/** Angkor */
+@font-face {
+  font-family: "angkor";
+  src: url("assets/fonts/Angkor/Angkor-Regular.ttf");
+}
+.font-angkor {
+font-family: "angkor";
+}
+/** End Angkor */
+@font-face {
+    font-family: "by";
+    src: url("assets/fonts/Bayon/Bayon-Regular.ttf");
+}
+.font-by {
+  font-family: "by";
+}
+@font-face {
+  font-family: "bk";
+  src: url("assets/fonts/Bokor/Bokor-Regular.ttf");
+}
+.font-bk {
+font-family: "bk";
+}
+@font-face {
+  font-family: "cl";
+  src: url("assets/fonts/Chenla/Chenla-Regular.ttf");
+}
+.font-cl {
+font-family: "cl";
+}
+@font-face {
+  font-family: "ct";
+  src: url("assets/fonts/Content/Content-Regular.ttf");
+}
+.font-ct {
+font-family: "ct";
+}
+@font-face {
+  font-family: "dr";
+  src: url("assets/fonts/Dangrek/Dangrek-Regular.ttf");
+}
+.font-dr {
+font-family: "dr";
+}
+@font-face {
+  font-family: "fh";
+  src: url("assets/fonts/Freehand/Freehand-Regular.ttf");
+}
+.font-fh {
+font-family: "fh";
+}
+@font-face {
+  font-family: "hnm";
+  src: url("assets/fonts/Hanuman/Hanuman-Regular.ttf");
+}
+.font-hnm {
+font-family: "hnm";
+}
+@font-face {
+  font-family: "ktr";
+  src: url("assets/fonts/Kantumruy_Pro/KantumruyPro-VariableFont_wght.ttf");
+}
+.font-ktr {
+font-family: "ktr";
+}
+@font-face {
+  font-family: "kdmr";
+  src: url("assets/fonts/Kdam_Thmor_Pro/KdamThmorPro-Regular.ttf");
+}
+.font-kdmr {
+font-family: "kdmr";
+}
+@font-face {
+  font-family: "kl";
+  src: url("assets/fonts/Koulen/Koulen-Regular.ttf");
+}
+.font-kl {
+font-family: "kl";
+}
+@font-face {
+  font-family: "moul";
+  src: url("assets/fonts/Moul/Moul-Regular.ttf");
+}
+.font-moul {
+font-family: "moul";
+}
+@font-face {
+  font-family: "moulpl";
+  src: url("assets/fonts/Moulpali/Moulpali-Regular.ttf");
+}
+.font-moulpl {
+font-family: "moulpl";
+}
+@font-face {
+  font-family: "omc";
+  src: url("assets/fonts/Odor_Mean_Chey/OdorMeanChey-Regular.ttf");
+}
+.font-omc {
+font-family: "omc";
+}
+@font-face {
+  font-family: "pvh";
+  src: url("assets/fonts/Preahvihear/Preahvihear-Regular.ttf");
+}
+.font-pvh {
+font-family: "pvh";
+}
+@font-face {
+  font-family: "sr";
+  src: url("assets/fonts/Siemreap/Siemreap-Regular.ttf");
+}
+.font-sr {
+font-family: "sr";
+}
+@font-face {
+  font-family: tacteing;
+  src: url("assets/fonts/Tacteing/Tacteing.TTF");
+}
+.font-tacteing {
+  font-family: tacteing;
+}
+body * {
+  font-family: Arial, Helvetica, sans-serif, omc;
+  font-size: 0.75rem;
+  /* Disabled user from select anything */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/*
+  Enter and leave animations can use different
+  durations and timing functions.
+*/
+.slide-fade-enter-active {
+  transition: all 0.1s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/**
+Table Pagination of VCB
+**/
+
+.vcb-table-panel {
+  @apply relative p-4 overflow-auto mb-24;
+}
+.vcb-table {
+  @apply w-full mb-16;
+  height: fit-content ;
+}
+.vcb-table tr.vcb-table-row {
+  @apply border-b border-gray-100 text-left ;
+}
+.vcb-table tr.vcb-table-row td {
+  @apply p-2;
+}
+.vcb-table-actions-panel {
+  @apply flex flex-row-reverse ;
+}
+.vcb-table-actions-panel .vcb-action-button {
+  @apply  rounded-full border border-gray-200 w-8 h-8 mx-2 text-center cursor-pointer hover:border-blue-500 hover:text-blue-500  duration-300;
+}
+.vcb-table-headers {
+  @apply border-b border-gray-200;
+}
+.vcb-table-headers .vcb-table-header {
+  @apply px-2 py-4 text-left ;
+}
+.vcb-table-pagination {
+  @apply flex flex-row bg-white right-1 bottom-1 left-1 border border-l z-40 justify-center px-4 py-3 mx-auto rounded-full h-14 ;
+}
+.vcb-pagination-page {
+  @apply rounded-full border border-gray-200 px-2 h-8 leading-8 mx-1 font-bold cursor-pointer text-center hover:text-blue-500 hover:border-blue-500 duration-300 transform hover:scale-110;
+}
+.vcb-pagination-page-active {
+  @apply rounded-full border border-blue-400 px-2 h-8 leading-8 mx-1 font-bold cursor-pointer text-center hover:text-blue-500 duration-300 text-blue-500 text-lg;
+}
+.vcb-filter-panel {
+  @apply flex flex-row fixed bg-white right-0 bottom-0 left-0 border border-l p-3 ;
+}
+.vcb-table-cell {
+  @apply leading-6 align-text-top;
+}
+.vcb-table-pagination-info {
+  @apply font-pvh text-blue-600 leading-9 px-2 h-8 ;
+}
+
+/**
+  Hover enlargement
+*/
+.hover-enlarge-105 {
+  @apply hover:shadow duration-500 hover:scale-105 transform-gpu border border-gray-100 hover:border-blue-400 ;
+}
+.hover-enlarge-110 {
+  @apply hover:shadow duration-500 hover:scale-105 transform-gpu border border-gray-100 hover:border-blue-400 ;
+}
+.hover-enlarge-120 {
+  @apply hover:shadow duration-500 hover:scale-105 transform-gpu border border-gray-100 hover:border-blue-400 ;
+}

@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor Officer as Officer (User)
+    participant AuthService
+    participant PermissionService
+    participant DB as Database
+
+    Officer->>AuthService: Login (username, password)
+    AuthService->>DB: Validate credentials
+    DB-->>AuthService: Officer ID, Position ID, Org ID
+    AuthService->>PermissionService: getPermissions(OfficerID, PositionID, OrgID)
+    
+    Note over PermissionService, DB: 1. Fetch All Role Assignments
+    PermissionService->>DB: Get roles for Organization (OrgID)
+    PermissionService->>DB: Get roles for Position (PositionID)
+    PermissionService->>DB: Get roles for Officer (OfficerID)
+    DB-->>PermissionService: All assigned roles with Grant/Deny flags
+
+    Note over PermissionService: 2. Resolve Permissions
+    loop For each unique permission
+        PermissionService->>PermissionService: Apply precedence rule<br>(e.g., DENY overrides GRANT, Officer overrides Position, etc.)
+    end
+
+    PermissionService-->>AuthService: Final compiled set of permissions
+    AuthService-->>Officer: Login Success + JWT Token (with permissions)

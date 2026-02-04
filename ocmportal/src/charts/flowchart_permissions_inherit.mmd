@@ -1,0 +1,23 @@
+flowchart TB
+    P[Permissions]:::perm
+    R[Role Definitions<br/>Org / Position / Officer]:::role
+    O[Organization]:::org
+    Pos[Position]:::pos
+    Off[Specific Officer]:::off
+
+    %% Inheritance (top-down)
+    P --> R
+    R --> O
+    O --> Pos
+    Pos --> Off
+
+    %% Override / Exception (bottom-up)
+    Off -. Override .-> Pos
+    Pos -. Override .-> O
+    O -. Override .-> R
+
+    classDef perm fill:#cce5ff,stroke:#333,stroke-width:1px,color:#333333;
+    classDef role fill:#d4edda,stroke:#333,stroke-width:1px,color:#333333;
+    classDef org fill:#f8d7da,stroke:#333,stroke-width:1px,color:#333333;
+    classDef pos fill:#fff3cd,stroke:#333,stroke-width:1px,color:#333333;
+    classDef off fill:#e2e3e5,stroke:#333,stroke-width:1px,color:#333333;

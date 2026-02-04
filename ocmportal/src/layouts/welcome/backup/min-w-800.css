@@ -1,0 +1,48 @@
+@media (min-width: 800px) {
+    .schedule-header-panel .schedule-logo-panel {
+        @apply w-12 ;
+    }
+    .schedule-header-panel .schedule-logo-caption .schedule-caption {
+        font-size: 1.1rem;
+    }
+    .digital-clock {
+        font-size: 1.1rem;
+    }
+    .schedule-table thead tr th {
+        padding: 3px; 
+        font-size: 1rem;
+    }
+    .schedule-table .meeting-index {
+        width: 40px;
+        font-size: 0.9rem;
+    }
+    .schedule-table .meeting-objective {
+        font-size: 1.2rem;
+        line-height: 1.9rem;
+    }
+    .schedule-table .meeting-leader {
+        font-size: 1rem;
+    }
+    .schedule-table .meeting-type-panel {
+        width: 160px;
+    }
+    .schedule-table .meeting-type {
+        font-size: 1rem;
+    }
+    .schedule-table .meeting-dtr {
+        width: 90px;
+        font-size: 0.9rem;
+        line-height: 1.4rem;
+    }
+    .schedule-table .meeting-status {
+        font-size: 0.9rem;
+        padding: 8px 10px ; 
+    }
+    .schedule-footer-caption { 
+        font-size: 1.1rem;
+        padding: 0px 5px; 
+    }
+    .schedule-footer-panel .meeting-inprogress-panel {
+        font-size: 1.1rem;
+    }
+}

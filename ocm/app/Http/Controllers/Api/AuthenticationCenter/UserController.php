@@ -221,7 +221,7 @@ class UserController extends Controller
              */
             $backendMemberRole = \App\Models\Role::backend()->first();
             if( $backendMemberRole != null ){
-                $user->assignRole( $backendMemberRole );
+                $user->roles()->sync( [$backendMemberRole->id] );
             }
             
             $user->save();

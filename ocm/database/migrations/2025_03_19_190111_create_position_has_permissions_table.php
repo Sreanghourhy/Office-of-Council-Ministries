@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('position_has_permissions', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('permission_id')->unsigned();
             $table->integer('position_id')->unsigned();
             $table->timestamps();

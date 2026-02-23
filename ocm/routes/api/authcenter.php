@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +19,23 @@ use App\Http\Controllers\Api\AuthenticationCenter\UserController;
 use App\Http\Controllers\Api\AuthenticationCenter\PeopleController;
 use App\Http\Controllers\Api\AuthenticationCenter\RoleController;
 use App\Http\Controllers\Api\AuthenticationCenter\ProfileController;
+use App\Http\Controllers\Api\AuthenticationCenter\GoogleController;
+use App\Http\Controllers\Api\AuthenticationCenter\TelegramController;
 
 Route::group([
     'prefix' => 'authcenter' ,
     'api'
   ],function(){
+
+    /** RESET PASSWORD */
+    Route::put('password/forgot',[UserController::class,'forgotPassword']);
+    Route::put('password/forgot/confirm',[UserController::class,'checkConfirmationCode']);
+    Route::put('password/reset',[UserController::class,'passwordReset']);
+
+    /** RESET PASSWORD - TELEGRAM */
+    Route::put('password/telegram/forgot',[UserController::class,'telegramForgotPassword']);
+    Route::put('password/telegram/verify',[UserController::class,'telegramVerifyOTP']);
+    Route::put('password/telegram/reset',[UserController::class,'telegramPasswordReset']);
 
     /** SIGNING SECTION */
     Route::group([
@@ -35,8 +48,26 @@ Route::group([
             Route::post('logout', [AuthController::class,'logout']);
             Route::get('user', [AuthController::class,'user']);
             Route::get('confirm', [AuthController::class,'confirmAuthentication']);
-            
+            Route::put('password/change',[UserController::class,'passwordChange']);
         });
+    });
+
+    /** OAUTH AUTHENTICATION */
+    Route::group([
+      'prefix' => 'auth'
+    ], function () {
+      Route::group([
+        'prefix' => 'google' ,
+        'middleware' => 'api'
+      ], function() {
+          Route::post('signin', [GoogleController::class,'updateOrCreate']);
+      });
+      Route::group([
+        'prefix' => 'telegram' ,
+        'middleware' => 'api'
+      ], function() {
+        Route::post('signin', [TelegramController::class,'updateOrCreate']);
+      });
     });
 
     /** USER/ACCOUNT SECTION */

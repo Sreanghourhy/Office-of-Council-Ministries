@@ -11,7 +11,7 @@ use App\Models\User as RecordModel ;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
-
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -374,59 +374,220 @@ class UserController extends Controller
     }
 
     public function forgotPassword(Request $request){
-        if( $request->email != "" ){
-            $user = \App\Models\User::where('email',$request->email )->first();
-            if ($user) {
-                $user -> forgot_password_token = Str::random(60) ;
-                $user -> update();
-                
-                Mail::to($request->email)
-                    ->send( new MobilePasswordResetRequest($user) );
+        // Validate email
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
 
-                return response()->json([
-                    'record' => $user ,
-                    'ok' => true ,
-                    'message' => 'យើងបានបញ្ជូនព័ត៌មាន សម្រាប់អ្នកធ្វើការកំណត់ពាក្យសម្ងាត់ឡើងវិញ ទៅ អ៊ីមែលរបស់អ្នក រួចរាល់ ! សូមពិនិត្យអ៊ីមែលរបស់អ្នកសម្រាប់ការងារបន្ត !'
-                ], 200);
-            }else{
-                return response()->json([
-                    'ok' => false ,
-                    'message' => 'អ៊ីមែលនេះមិនទាន់ក្នុងប្រព័ន្ធឡើយ !'
-                ], 404);
-            }
+        $user = \App\Models\User::where('email', $request->email)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'អ៊ីមែលនេះមិនមានក្នុងប្រព័ន្ធឡើយ!'
+            ], 404);
         }
+
+        // Check if account is locked
+        if ($user->otp_locked_until && \Carbon\Carbon::now()->lt($user->otp_locked_until)) {
+            $remainingMinutes = \Carbon\Carbon::now()->diffInMinutes($user->otp_locked_until);
+            return response()->json([
+                'ok' => false,
+                'message' => "គណនីនេះត្រូវបានចាក់សោរ! សូមព្យាយាមម្តងទៀតក្នុងរយៈពេល {$remainingMinutes} នាទីទៀត។"
+            ], 429);
+        }
+
+        // Generate 6-digit OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        // Update user with OTP info
+        $user->forgot_password_token = $otp;
+        $user->otp_sent_at = \Carbon\Carbon::now();
+        $user->otp_expires_at = \Carbon\Carbon::now()->addMinutes(15);
+        $user->otp_attempts = 0;
+        $user->otp_resend_count = ($user->otp_resend_count ?? 0) + 1;
+        $user->update();
+
+        // ✅ TESTING MODE - Choose one:
+        
+        // 1. Return OTP in response (for development only)
+        if (config('app.debug')) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'OTP generated successfully (TEST MODE)',
+                'expires_at' => $user->otp_expires_at->toDateTimeString(),
+                'otp' => $otp, // ⚠️ REMOVE IN PRODUCTION
+                'email' => $user->email
+            ], 200);
+        }
+
+        // 2. Send email (production mode)
+        try {
+            \Mail::to($request->email)->send(
+                new \App\Mail\MobilePasswordResetRequest($user)
+            );
+        } catch (\Exception $e) {
+            // Still return success even if email fails (for testing)
+            return response()->json([
+                'ok' => true,
+                'message' => 'OTP generated (email failed but OTP saved)',
+                'otp' => config('app.debug') ? $otp : null
+            ], 200);
+        }
+
         return response()->json([
-            'ok' => false ,
-            'message' => 'សូមបញ្ជាក់អំពី អ៊ីមែលរបស់អ្នក !'
-        ], 422);
+            'ok' => true,
+            'message' => 'យើងបានបញ្ជូនលេខកូដ OTP ទៅអ៊ីមែលរបស់អ្នករួចរាល់!',
+            'expires_at' => $user->otp_expires_at->toDateTimeString()
+        ], 200);
     }
     public function checkConfirmationCode(Request $request){
-        if( $request->email != "" && $request->code != "" ){
-            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
-            return $user ;
-            if ($user) {
-                $user -> forgot_password_token = '' ;
-                $user -> update();
-                return response()->json([
-                    'record' => $user ,
-                    'ok' => true ,
-                    'message' => 'ការបញ្ជាក់ កូដសម្ងាត់បានជោគជ័យ ! សូមបញ្ចូល ពាក្យសម្ងាត់ថ្មី របស់អ្នក !'
-                ], 200);
-            }else{
-                return response()->json([
-                    'ok' => false ,
-                    'message' => 'បរាជ័យក្នុងការបញ្ជាក់ពាក្យសម្ងាត់ !'
-                ], 404);
-            }
+        // Validate inputs
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'អ៊ីមែលនេះមិនមានក្នុងប្រព័ន្ធឡើយ!'
+            ], 404);
         }
+
+        // Check if account is locked
+        if ($user->otp_locked_until && \Carbon\Carbon::now()->lt($user->otp_locked_until)) {
+            $remainingMinutes = \Carbon\Carbon::now()->diffInMinutes($user->otp_locked_until);
+            return response()->json([
+                'ok' => false,
+                'message' => "គណនីនេះត្រូវបានចាក់សោរ! សូមព្យាយាមម្តងទៀតក្នុងរយៈពេល {$remainingMinutes} នាទីទៀត។"
+            ], 429);
+        }
+
+        // Check if OTP exists
+        if (!$user->forgot_password_token) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'សូមស្នើសុំលេខកូដ OTP ជាមុនសិន!'
+            ], 400);
+        }
+
+        // Check if OTP has expired
+        if ($user->otp_expires_at && \Carbon\Carbon::now()->greaterThan($user->otp_expires_at)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP បានផុតកំណត់! សូមស្នើសុំលេខកូដថ្មី។'
+            ], 410); // 410 Gone
+        }
+
+        // Check if OTP matches
+        if ($user->forgot_password_token !== $request->code) {
+            // Increment failed attempts
+            $user->otp_attempts = ($user->otp_attempts ?? 0) + 1;
+            
+            // Lock account after 5 failed attempts (lock for 30 minutes)
+            if ($user->otp_attempts >= 5) {
+                $user->otp_locked_until = \Carbon\Carbon::now()->addMinutes(30);
+                $user->update();
+                
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'អ្នកបានបញ្ចូលលេខកូដខុសច្រើនលើសពេក! គណនីត្រូវបានចាក់សោររយៈពេល 30 នាទី។'
+                ], 429);
+            }
+            
+            $user->update();
+            
+            $remainingAttempts = 5 - $user->otp_attempts;
+            return response()->json([
+                'ok' => false,
+                'message' => "លេខកូដ OTP មិនត្រឹមត្រូវ! អ្នកនៅសល់ {$remainingAttempts} ដងទៀត។"
+            ], 400);
+        }
+
+        // OTP is correct - reset attempts
+        $user->otp_attempts = 0;
+        $user->update();
+
         return response()->json([
-            'ok' => false ,
-            'message' => 'សូមបញ្ជាក់អំពី អ៊ីមែល ឬ កូដផ្លាស់ប្ដូរសម្ងាត់ របស់អ្នក !'
-        ], 422);
+            'ok' => true,
+            'message' => 'លេខកូដត្រឹមត្រូវ! អ្នកអាចកំណត់ពាក្យសម្ងាត់ថ្មីបាន។'
+        ], 200);
     }
     public function passwordReset(Request $request){
-        
-        $record = \App\Models\User::where('email',$request->email)->first();
+        // Validate inputs
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6',
+            'password' => 'required|string|min:8|confirmed'
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'អ៊ីមែលនេះមិនមានក្នុងប្រព័ន្ធឡើយ!'
+            ], 404);
+        }
+
+        // Check if account is locked
+        if ($user->otp_locked_until && \Carbon\Carbon::now()->lt($user->otp_locked_until)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'គណនីនេះត្រូវបានចាក់សោរ! សូមព្យាយាមម្តងទៀតពេលក្រោយ។'
+            ], 429);
+        }
+
+        // Check if OTP exists
+        if (!$user->forgot_password_token) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'សូមស្នើសុំលេខកូដ OTP ជាមុនសិន!'
+            ], 400);
+        }
+
+        // Check if OTP has expired
+        if ($user->otp_expires_at && \Carbon\Carbon::now()->greaterThan($user->otp_expires_at)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP បានផុតកំណត់! សូមស្នើសុំលេខកូដថ្មី។'
+            ], 410);
+        }
+
+        // Verify OTP
+        if ($user->forgot_password_token !== $request->code) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP មិនត្រឹមត្រូវ!'
+            ], 400);
+        }
+
+        // Update password and clear OTP data
+        $user->password = bcrypt($request->password);
+        $user->forgot_password_token = null;
+        $user->otp_sent_at = null;
+        $user->otp_expires_at = null;
+        $user->otp_attempts = 0;
+        $user->otp_resend_count = 0;
+        $user->otp_locked_until = null;
+        $user->update();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'ពាក្យសម្ងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ! សូមចូលប្រើប្រាស់។'
+        ], 200);
+    }
+    public function passwordChange(Request $request){
+        $record = \App\Models\User::find($request->id);
         if( $record ){
             // $record->password = Hash::make($request->password);
             $record->password = bcrypt($request->password);
@@ -444,25 +605,6 @@ class UserController extends Controller
             ],201);
         }
         // 'password' => bcrypt($request->password),
-    }
-    public function passwordChange(Request $request){
-        $record = \App\Models\User::find($request->id);
-        if( $record ){
-            // $record->password = Hash::make($request->password);
-            $record->password = bcrypt($request->password);
-            $record->update();
-            return response([
-                'record' => $record ,
-                'ok' => true ,
-                'message' => 'ផ្លាស់ប្ដូរពាក្យសម្ងាត់ថ្មីបានជោគជ័យ !'
-            ],200);
-        }else{
-            return response([
-                'record' => null ,
-                'ok' => false ,
-                'message' => 'មានបញ្ហា គណនីដែលអ្នកចង់ប្ដូរពាក្យសម្ងាត់មិនមានឡើយ !'
-            ],201);
-        }
     }
     public function read(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
@@ -801,7 +943,7 @@ class UserController extends Controller
                         'username' => $user->username ,
                         'last_login' => $user->last_login ,
                         'roles' => $user->roles->map(function($role){
-                            return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' ] );
+                            return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' ]);
                         }) ,
                         'officer' => $user->officer != null 
                             ? collect( $user->officer->toArray() )->only([ 'id' , 'code' , 'leader' , 'official_date' , 'passport' , 'email' , 'phone' , 'image' , 'countesy_id' , 'organization_id' , 'position_id' ])
@@ -923,7 +1065,7 @@ class UserController extends Controller
                         'username' => $user->username ,
                         'last_login' => $user->last_login ,
                         'roles' => $user->roles->map(function($role){
-                            return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' ] );
+                            return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' ]);
                         }) ,
                         'officer' => $user->officer != null 
                             ? collect( $user->officer->toArray() )->only([ 'id' , 'code' , 'leader' , 'official_date' , 'passport' , 'email' , 'phone' , 'image' , 'countesy_id' , 'organization_id' , 'position_id' ])
@@ -931,7 +1073,7 @@ class UserController extends Controller
                         'people' => $user->officer != null 
                             ? (
                                 $user->officer->people != null 
-                                ? collect( $user->officer->people->toArray() )->only([ 'id', 'firstname' , 'lastname' , 'enfirstname' ,'enlastname' , 'gender' , 'dob' ,'mobile_phone' , 'office_phone' , 'email', 'nid' , 'image' , 'marry_status' , 'father' , 'mother' , 'address' , 'pob' , 'passport' ]
+                                ? collect( $user->officer->people->toArray() )->only([ 'id', 'firstname' , 'lastname' , 'enfirstname' ,'enlastname' , 'gender' , 'dob' ,'mobile_phone' , 'office_phone' , 'email', 'nid' , 'image' , 'marry_status' , 'father' , 'mother' , 'address' , 'pob' , 'passport']
                                 )
                                 : null 
                             )

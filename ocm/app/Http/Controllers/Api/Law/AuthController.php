@@ -82,7 +82,7 @@ class AuthController extends Controller
             'email' => strtolower( $request->email??"" ),
             'active' => 1 , // Unactive user
             'password' => bcrypt($request->password),
-            'activation_token' => strtoupper( Str::random(6) )
+            'activation_token' => strtoupper( string: Str::random(6) )
         ]);
         $user->save();
 

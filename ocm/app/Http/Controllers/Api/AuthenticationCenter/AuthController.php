@@ -12,6 +12,7 @@ use Avatar;
 use Storage;
 use Illuminate\Http\File;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str; // ✅ ADD THIS LINE
 
 class AuthController extends Controller
 {
@@ -33,6 +34,45 @@ class AuthController extends Controller
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|confirmed'
         ]);
+        
+        if( strlen( trim( $request->firstname ) ) <= 0 || strlen( trim( $request->lastname ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ គោត្តនាម និង នាម។"
+            ],422);            
+        }
+
+        if( strlen( trim( $request->password ) ) <= 0 || strlen( trim( $request->password_confirmation ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ ពាក្យសម្ងាត់ និង បញ្ចាក់ពាក្យសម្ងាត់។"
+            ],422);            
+        }
+        if( strlen( trim( $request->password ) ) > 0 && strlen( trim( $request->password_confirmation ) ) > 0 && $request->password != $request->password_confirmation ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "ពាក្យសម្រាត់ និងការបញ្ជាក់ពាក្យសម្ងាត់ មិនផ្ទៀងផ្ទាត់គ្នា។"
+            ],422);            
+        }
+
+        if( strlen( trim( $request->email ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ អ៊ីមែលរបស់អ្នក។"
+            ],422);            
+        }
+
+               /**
+         * Check email
+         */
+        $user = \App\Models\User::where('email',$request->email )->first();
+        if( $user != null ){
+            // This email is already in exits
+            return response()->json([
+                'ok' => false ,
+                'message' => 'អ៊ីមែលនេះមានរួចហើយ។'
+            ],403);
+        }
 
         $user = new User([
             'public_key' => md5( 
@@ -75,6 +115,12 @@ class AuthController extends Controller
         ]);
         $user->people_id = $person->id ;
         $user->save();
+        
+        // -- RoleAssignment
+        // $clientClientRole = \App\Models\Role::where('name','client')->first();
+        // if( $clientClientRole != null ){
+        //     $user->assignRole( $clientClientRole );
+        // }
         
         $user->notify(new SignupActivate($user));
 
@@ -258,7 +304,7 @@ class AuthController extends Controller
                 // 'phone' => $user->phone ,
                 // 'username' => $user->username ,
                 'roles' => $user->roles->map(function($role){
-                    return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' , 'sub_role' , 'enname' , 'khname' , 'sub_role_index' ] );
+                    return collect( $role->toArray() )->only([ 'id' , 'name' , 'guard_name' , 'tag' , 'sub_role' , 'enname' , 'khname' , 'sub_role_index' ]);
                 }) ,
                 'officer' => $user->officer != null 
                     ? collect( $user->officer->toArray() )->only([ 'id' , 'code' , 'leader' , 'official_date' , 'passport' , 'email' , 'phone' , 'image' , 'job' ])

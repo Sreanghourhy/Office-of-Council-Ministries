@@ -31,11 +31,13 @@ Route::group([
     Route::put('password/forgot',[UserController::class,'forgotPassword']);
     Route::put('password/forgot/confirm',[UserController::class,'checkConfirmationCode']);
     Route::put('password/reset',[UserController::class,'passwordReset']);
+    
+    // Telegram forgot password
+    Route::post('password/forgot/telegram/send', [TelegramController::class, 'sendOtp']);
+    Route::post('password/forgot/telegram/verify', [TelegramController::class, 'verifyOtp']);
+    Route::post('password/forgot/telegram/reset', [TelegramController::class, 'resetPassword']);
 
-    /** RESET PASSWORD - TELEGRAM */
-    Route::put('password/telegram/forgot',[UserController::class,'telegramForgotPassword']);
-    Route::put('password/telegram/verify',[UserController::class,'telegramVerifyOTP']);
-    Route::put('password/telegram/reset',[UserController::class,'telegramPasswordReset']);
+
 
     /** SIGNING SECTION */
     Route::group([
@@ -67,6 +69,7 @@ Route::group([
         'middleware' => 'api'
       ], function() {
         Route::post('signin', [TelegramController::class,'updateOrCreate']);
+        Route::post('auth/telegram/signin', [TelegramController::class,'updateOrCreate']);
       });
     });
 

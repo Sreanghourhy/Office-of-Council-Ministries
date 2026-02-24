@@ -31,6 +31,11 @@ return [
     'telegram' => [
     'bot_token' => env('TELEGRAM_BOT_TOKEN'),
     ],
+    'twilio' => [
+    'sid'   => env('TWILIO_ACCOUNT_SID'),
+    'token' => env('TWILIO_AUTH_TOKEN'),
+    'from'  => env('TWILIO_FROM_NUMBER'),
+    ],
 
     'slack' => [
         'notifications' => [

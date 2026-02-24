@@ -11,6 +11,7 @@ use Laravolt\Avatar\Avatar;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 
 class TelegramController extends Controller
@@ -184,6 +185,163 @@ class TelegramController extends Controller
             'record' => $user ,
             'message' => 'ចូលប្រើប្រាស់បានជោគជ័យ !'
         ],200);
+    }
+    public function sendOtp(Request $request)
+        {
+            $request->validate(
+                [
+                    'telegram_user_id' => 'required|string'
+                ],
+                [
+                    'telegram_user_id.required' => 'សូមភ្ជាប់គណនី Telegram ជាមុនសិន។'
+                ]
+            );
+
+            $user = User::where('telegram_user_id', $request->telegram_user_id)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'គណនី Telegram មិនទាន់បានភ្ជាប់ជាមួយប្រព័ន្ធទេ។'
+                ], 404);
+            }
+
+
+            // 3️⃣ Check cooldown (LOCK)
+            if ($user->otp_locked_until && now()->lt($user->otp_locked_until)) {
+                $seconds = now()->diffInSeconds($user->otp_locked_until);
+
+                $minutes = intdiv($seconds, 60);
+                $secs = $seconds % 60;
+
+                $waitText = $minutes > 0
+                    ? "សូមរង់ចាំ {$minutes} នាទី {$secs} វិនាទី មុនពេលស្នើសុំលេខកូដម្ដងទៀត។"
+                    : "សូមរង់ចាំ {$secs} វិនាទី មុនពេលស្នើសុំលេខកូដម្ដងទៀត។";
+
+                return response()->json([
+                    'ok' => false,
+                    'message' => $waitText
+                ], 429);
+            }
+
+            // 4️⃣ Resend limit (max 3)
+            if ($user->otp_resend_count >= 3) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'អ្នកបានស្នើសុំលេខកូដ OTP ច្រើនដងពេក។ សូមព្យាយាមម្ដងទៀតពេលក្រោយ។'
+                ], 429);
+            }
+
+            // ✅ Generate OTP
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $cooldownMinutes = match ($user->otp_resend_count) {
+                    0 => 1, // after 1st send
+                    1 => 3, // after 2nd send
+                    default => 5 // after 3rd send
+                };
+
+            $user->update([
+                'forgot_password_token' => $otp,
+                'otp_sent_at' => now(),
+                'otp_expires_at' => now()->addMinutes(5),
+                'otp_attempts' => 0,
+                'otp_resend_count' => $user->otp_resend_count + 1,
+                'otp_locked_until' => now()->addMinutes($cooldownMinutes)
+
+            ]);
+
+            // 📩 Send Telegram
+            Http::withOptions([
+                    'verify' => false
+                ])->post("https://api.telegram.org/bot".env('TELEGRAM_BOT_TOKEN')."/sendMessage", [
+                    'chat_id' => $user->telegram_user_id,
+                    'text' => "🔐 Your OTP code is: {$otp}\nThis code expires in 5 minutes."
+                ]);
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'លេខកូដ OTP បានផ្ញើទៅ Telegram របស់អ្នករួចរាល់។'
+            ]);
+        }
+    public function verifyOtp(Request $request)
+        {
+            $request->validate(
+                [
+                    'telegram_user_id' => 'required|string',
+                    'otp' => 'required|string|size:6'
+                ],
+                [
+                    'telegram_user_id.required' => 'សូមភ្ជាប់គណនី Telegram ជាមុនសិន។',
+                    'otp.required' => 'សូមបញ្ចូលលេខកូដ OTP។',
+                    'otp.size' => 'លេខកូដ OTP ត្រូវមាន ៦ ខ្ទង់។'
+                ]
+            );
+
+            $user = User::where('telegram_user_id', $request->telegram_user_id)->first();
+
+            if (!$user || !$user->forgot_password_token) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'មិនមានការស្នើសុំលេខកូដ OTP ទេ។'
+                ], 400);
+            }
+
+            // ⏰ Expired
+            if (now()->gt($user->otp_expires_at)) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'លេខកូដ OTP បានផុតកំណត់។ សូមស្នើសុំលេខកូដថ្មី។'
+                ], 410);
+            }
+
+            // ❌ Wrong OTP
+            if (trim($request->otp) !== $user->forgot_password_token) {
+                $user->increment('otp_attempts');
+
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'លេខកូដ OTP មិនត្រឹមត្រូវទេ។'
+                ], 400);
+            }
+
+            // ✅ Success
+            return response()->json([
+                'ok' => true,
+                'message' => 'លេខកូដ OTP ត្រឹមត្រូវ។'
+            ]);
+        }
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'telegram_user_id' => 'required|string',
+            'password' => 'required|min:8|confirmed'
+        ]);
+
+        $user = User::where('telegram_user_id', $request->telegram_user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $user->update([
+            'password' => bcrypt($request->password),
+            'forgot_password_token' => null,
+            'otp_sent_at' => null,
+            'otp_expires_at' => null,
+            'otp_attempts' => 0,
+            'otp_resend_count' => 0,
+            'otp_locked_until' => null
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'ពាក្យសម្ងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ។ សូមចូលប្រើប្រាស់វិញ។'
+        ]);
     }
 
 }

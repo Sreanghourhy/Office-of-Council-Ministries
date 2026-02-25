@@ -12,6 +12,7 @@ use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Services\TwilioSmsService;
 
 class UserController extends Controller
 {
@@ -1142,5 +1143,203 @@ class UserController extends Controller
                 'ok' => false
                 ], 500);
         }
+    }
+    public function forgotPasswordByPhone(Request $request, TwilioSmsService $sms)
+    {
+        $request->validate(
+            [
+                'phone' => 'required|string|exists:users,phone',
+            ],
+            [
+                'phone.required' => 'សូមបញ្ចូលលេខទូរស័ព្ទ។',
+                'phone.exists'   => 'លេខទូរស័ព្ទនេះមិនមានក្នុងប្រព័ន្ធឡើយ។',
+            ]
+        );
+
+        $user = RecordModel::where('phone', $request->phone)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខទូរស័ព្ទមិនមានក្នុងប្រព័ន្ធឡើយ។'
+            ], 404);
+        }
+
+        /** 🔒 account locked */
+        if ($user->otp_locked_until && now()->lt($user->otp_locked_until)) {
+            $remain = now()->diffInMinutes($user->otp_locked_until);
+            return response()->json([
+                'ok' => false,
+                'message' => "គណនីត្រូវបានចាក់សោ។ សូមព្យាយាមម្តងទៀតក្នុង {$remain} នាទី។"
+            ], 429);
+        }
+
+        /** 🔁 resend limit logic */
+        $resendCount = $user->otp_resend_count ?? 0;
+
+        $waitMinutes = match (true) {
+            $resendCount === 1 => 1,
+            $resendCount === 2 => 3,
+            $resendCount === 3 => 5,
+            $resendCount >= 4  => -1,
+            default => 0,
+        };
+
+        if ($waitMinutes === -1) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'អ្នកបានស្នើសុំលេខកូដច្រើនលើសកំណត់។ សូមព្យាយាមពេលក្រោយ។'
+            ], 429);
+        }
+
+        if ($user->otp_sent_at && now()->diffInMinutes($user->otp_sent_at) < $waitMinutes) {
+            $remain = $waitMinutes - now()->diffInMinutes($user->otp_sent_at);
+            return response()->json([
+                'ok' => false,
+                'message' => "សូមរង់ចាំ {$remain} នាទី មុនស្នើសុំលេខកូដម្ដងទៀត។"
+            ], 429);
+        }
+
+        /** 🔢 generate OTP */
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        $user->update([
+            'forgot_password_token' => $otp,
+            'otp_sent_at' => now(),
+            'otp_expires_at' => now()->addMinutes(5),
+            'otp_attempts' => 0,
+            'otp_resend_count' => $resendCount + 1,
+        ]);
+
+        /** 🧪 debug mode */
+        if (config('app.debug')) {
+            return response()->json([
+                'ok' => true,
+                'otp' => $otp,
+                'message' => 'OTP ត្រូវបានបង្កើត (TEST MODE)'
+            ]);
+        }
+
+        /** 📩 send SMS */
+        $sms->send(
+            $user->phone,
+            "លេខកូដ OTP របស់អ្នកគឺ {$otp}។ មានសុពលភាព 5 នាទី។"
+        );
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'លេខកូដ OTP ត្រូវបានផ្ញើទៅទូរស័ព្ទរបស់អ្នក។'
+        ]);
+    }
+    public function verifyPhoneOtp(Request $request)
+    {
+        $request->validate(
+            [
+                'phone' => 'required|string',
+                'code' => 'required|digits:6',
+            ],
+            [
+                'phone.required' => 'សូមបញ្ចូលលេខទូរស័ព្ទ។',
+                'code.required'  => 'សូមបញ្ចូលលេខកូដ OTP។',
+                'code.digits'    => 'លេខកូដ OTP ត្រូវមាន ៦ ខ្ទង់។',
+            ]
+        );
+
+        $user = RecordModel::where('phone', $request->phone)->first();
+
+        if (!$user || !$user->forgot_password_token) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'សូមស្នើសុំលេខកូដ OTP ជាមុនសិន។'
+            ], 400);
+        }
+
+        /** ⏰ expired */
+        if ($user->otp_expires_at && now()->gt($user->otp_expires_at)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP បានផុតកំណត់។ សូមស្នើសុំលេខកូដថ្មី។'
+            ], 410);
+        }
+
+        /** ❌ wrong OTP */
+        if ($user->forgot_password_token !== $request->code) {
+            $user->otp_attempts++;
+
+            if ($user->otp_attempts >= 5) {
+                $user->otp_locked_until = now()->addMinutes(30);
+                $user->save();
+
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'អ្នកបានបញ្ចូលលេខកូដខុសច្រើនពេក។ គណនីត្រូវបានចាក់សោ ៣០ នាទី។'
+                ], 429);
+            }
+
+            $user->save();
+
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP មិនត្រឹមត្រូវ។'
+            ], 400);
+        }
+
+        /** ✅ success */
+        $user->update(['otp_attempts' => 0]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'លេខកូដ OTP ត្រឹមត្រូវ។'
+        ]);
+    }
+    public function resetPasswordByPhone(Request $request)
+    {
+        $request->validate(
+            [
+                'phone' => 'required|string',
+                'code' => 'required|digits:6',
+                'password' => 'required|min:8|confirmed',
+            ],
+            [
+                'phone.required' => 'សូមបញ្ចូលលេខទូរស័ព្ទ។',
+                'code.required'  => 'សូមបញ្ចូលលេខកូដ OTP។',
+                'code.digits'    => 'លេខកូដ OTP ត្រូវមាន ៦ ខ្ទង់។',
+                'password.required' => 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មី។',
+                'password.confirmed' => 'ពាក្យសម្ងាត់មិនត្រូវគ្នា។',
+            ]
+        );
+
+        $user = RecordModel::where('phone', $request->phone)->first();
+
+        if (!$user || $user->forgot_password_token !== $request->code) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP មិនត្រឹមត្រូវ។'
+            ], 400);
+        }
+
+        if ($user->otp_expires_at && now()->gt($user->otp_expires_at)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'លេខកូដ OTP បានផុតកំណត់។'
+            ], 410);
+        }
+
+        $user->update([
+            'password' => bcrypt($request->password),
+            'forgot_password_token' => null,
+            'otp_sent_at' => null,
+            'otp_expires_at' => null,
+            'otp_attempts' => 0,
+            'otp_resend_count' => 0,
+            'otp_locked_until' => null,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'ប្តូរពាក្យសម្ងាត់បានជោគជ័យ! សូមចូលប្រើប្រាស់វិញ។'
+        ]);
     }
 }

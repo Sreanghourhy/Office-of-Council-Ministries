@@ -37,6 +37,11 @@ Route::group([
     Route::post('password/forgot/telegram/verify', [TelegramController::class, 'verifyOtp']);
     Route::post('password/forgot/telegram/reset', [TelegramController::class, 'resetPassword']);
 
+    //phone forgot password
+    Route::post('password/forgot/phone/send', [UserController::class, 'forgotPasswordByPhone']);
+    Route::post('password/forgot/phone/verify', [UserController::class, 'verifyPhoneOtp']);
+    Route::post('password/forgot/phone/reset', [UserController::class, 'resetPasswordByPhone']);
+
 
 
     /** SIGNING SECTION */

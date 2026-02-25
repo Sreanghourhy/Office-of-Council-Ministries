@@ -20,8 +20,7 @@ return new class extends Migration
             $table->integer('officer_id')->nullable(false);
             $table->integer('countesy_id')->nullable(false);
             $table->string('start',50)->nullable(false);
-            $table->string('end',50)->nullable(true);
-            $table->integer('created_by')->nullable(true);
+            $table->string('end',50)->nullable(true);            $table->integer('created_by')->nullable(true);
             $table->integer('updated_by')->nullable(true);
             $table->integer('deleted_by')->nullable(true);
             $table->timestamps();

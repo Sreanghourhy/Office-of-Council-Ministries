@@ -270,4 +270,64 @@ class RankController extends Controller
             }
         }
     }
+
+    public function uploadpdfsalary(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'id' => 'required|integer|exists:officer_ranks,id',
+            'pdf' => 'required|file|mimes:pdf|max:10240', // max 10MB
+        ]);
+
+        try {
+            // Find the officer_ranks record by id
+            $officerRank = RecordModel::findOrFail($request->id);
+            
+            if ($request->hasFile('pdf')) {
+                $file = $request->file('pdf');
+                
+                // Generate unique filename
+                $filename = 'salary_' . $officerRank->id . '_' . time() . '.pdf';
+                
+                // Store the file in 'ranks' folder
+                $path = $file->storeAs('ranks', $filename, 'certificate');
+                
+                // Optional: Delete old PDF if exists
+                if (!empty($officerRank->pdf) && \Storage::disk('certificate')->exists($officerRank->pdf)) {
+                    \Storage::disk('certificate')->delete($officerRank->pdf);
+                }
+                
+                // Update the pdf column
+                $officerRank->pdf = $path;
+                
+                // Set updated_by if authenticated
+                if (auth()->check()) {
+                    $officerRank->updated_by = auth()->id();
+                }
+                
+                $officerRank->save();
+                
+                return response()->json([
+                    'ok' => true,
+                    'message' => 'PDF uploaded successfully',
+                    'data' => [
+                        'id' => $officerRank->id,
+                        'pdf' => $path,
+                        'filename' => $filename
+                    ]
+                ], 200);
+            }
+            
+            return response()->json([
+                'ok' => false,
+                'message' => 'No PDF file provided'
+            ], 400);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

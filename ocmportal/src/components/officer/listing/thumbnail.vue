@@ -113,7 +113,7 @@
       </Transition>
       <!-- Loading -->
       <Transition name="slide-fade" >
-        <div v-if="locationLoading == true || table.loading == true " class="table-loading fixed flex h-screen left-0 top-10 right-0 bottom-0 bg-white bg-opacity-90 ">
+        <div v-if="table.loading == true " class="table-loading fixed flex h-screen left-0 top-10 right-0 bottom-0 bg-white bg-opacity-90 ">
           <div class="flex mx-auto items-center">
             <div class="spinner">
               <svg class="animate-spin w-16 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48s21.49-48 48-48s48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48s48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.491-48-48-48z" fill="currentColor"></path></svg>
@@ -396,6 +396,7 @@ export default {
      */
     var createModal = reactive({show:false})
     function showCreateModal(){
+      ensureCreateLookups()
       createModal.show = true
     }
 
@@ -409,6 +410,7 @@ export default {
      */
      var createNonOfficerModal = reactive({show:false})
     function showCreateNonOfficerModal(){
+      ensureCreateLookups()
       createNonOfficerModal.show = true
     }
 
@@ -419,6 +421,24 @@ export default {
 
     function closeActions( actionStatus ){
       if( parseInt( actionStatus ) > 0 ) getRecords()
+    }
+
+    function ensureFilterLookups(){
+      if( !Array.isArray( store.getters['position/getRecords'] ) || store.getters['position/getRecords'].length <= 0 ){
+        getPositions()
+      }
+      if( !Array.isArray( store.getters['organization/getRecords'] ) || store.getters['organization/getRecords'].length <= 0 ){
+        getOrganizations()
+      }
+    }
+
+    function ensureCreateLookups(){
+      ensureFilterLookups()
+      if( !Array.isArray( store.getters['countesy/getRecords'] ) || store.getters['countesy/getRecords'].length <= 0 ){
+        getCountesies()
+      }
+      getRankStructure()
+      getPdcv()
     }
     
     /**
@@ -503,6 +523,9 @@ export default {
     const filter = ref(false)    
     function toggleFilter(){
       filter.value = !filter.value
+      if( filter.value ){
+        ensureFilterLookups()
+      }
     }
 
     function getRankStructure(){
@@ -558,12 +581,7 @@ export default {
     /**
      * Initial the data
      */
-    getOrganizations()
-    getPositions()
-    getRankStructure()
-    getCountesies()
     getRecords()
-    getPdcv()
         
 
 

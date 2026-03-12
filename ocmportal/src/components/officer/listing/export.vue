@@ -492,7 +492,11 @@ export default {
   @apply border rounded-full border-gray-200 p-2 w-20 h-20 flex-none mx-auto overflow-hidden bg-white ;
 }
 .vcb-filters-panel {
-  @apply fixed left-0 top-10 right-0 bottom-0 bg-opacity-60 bg-white ;
+  @apply fixed top-10 right-0 bottom-0 bg-opacity-60 bg-white ;
+  left: 60px;
+}
+.app_snav_open .vcb-filters-panel {
+  left: 230px;
 }
 .vcb-filters-panel .filter-title {
   @apply w-full text-left p-4 bg-white rounded-lg ;

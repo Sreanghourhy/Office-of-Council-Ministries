@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen absolute left-40 top-12 right-0 flex flex-wrap" >
+  <div class="min-h-screen absolute left-0 top-12 right-0 flex flex-wrap system-layout" >
     <!-- <router-view ></router-view> -->
     <router-view v-if="$hasPermission('portal_staff_listing')" v-slot="{ Component }">
       <transition :name="$route.meta.transition || 'slide-fade'">
@@ -38,5 +38,13 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.system-layout {
+  margin-left: 60px;
+}
+
+.app_snav_open .system-layout {
+  margin-left: 230px;
 }
 </style>

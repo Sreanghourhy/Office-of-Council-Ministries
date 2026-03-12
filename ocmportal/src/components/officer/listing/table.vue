@@ -713,7 +713,11 @@ export default {
     @apply leading-7; 
   }
 .vcb-filters-panel {
-  @apply fixed left-40 top-10 right-0 bottom-0 bg-opacity-60 bg-white ;
+  @apply fixed top-10 right-0 bottom-0 bg-opacity-60 bg-white ;
+  left: 60px;
+}
+.app_snav_open .vcb-filters-panel {
+  left: 230px;
 }
 .vcb-filters-panel .filter-title {
   @apply w-full text-left p-4 bg-white rounded-lg ;

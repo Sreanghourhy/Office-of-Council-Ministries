@@ -2,7 +2,7 @@
   <div class="app_snav">
     <div class="app_card_w">
       <!-- Dynamic apps -->
-      <div v-for="app in matchedApps" :key="app.url">
+      <div v-for="app in topApps" :key="app.url">
         <div
           v-if="!app || !$hasPermission || !app.permissions || $hasPermission(app.permissions)"
           class="app_card"
@@ -10,7 +10,12 @@
           @click="$router.push(app.url)"
         >
           <span class="apico">
-            <span v-html="app.svg"></span>
+            <span
+              v-if="isProfileApp(app) && getProfilePicture()"
+              class="sidebar-avatar"
+              :style="{ backgroundImage: `url(${getProfilePicture()})` }"
+            ></span>
+            <span v-else v-html="app.svg"></span>
             <span class="app_txt t-lspace" v-html="app.name"></span>
           </span>
         </div>
@@ -39,7 +44,27 @@
         </span>
       </div>
 
-      <!-- Logout card -->
+      <div class="app_card_bottom">
+        <div v-for="app in bottomApps" :key="app.url">
+          <div
+            v-if="!app || !$hasPermission || !app.permissions || $hasPermission(app.permissions)"
+            class="app_card"
+            :class="{ app_active: isActive(app) }"
+            @click="$router.push(app.url)"
+          >
+            <span class="apico">
+              <span
+                v-if="isProfileApp(app) && getProfilePicture()"
+                class="sidebar-avatar"
+                :style="{ backgroundImage: `url(${getProfilePicture()})` }"
+              ></span>
+              <span v-else v-html="app.svg"></span>
+              <span class="app_txt t-lspace" v-html="app.name"></span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Logout card -->
       <div class="app_card app_logout" @click="logout">
         <span class="apico">
           <svg
@@ -48,12 +73,14 @@
             viewBox="0 0 24 24"
           >
             <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v8" />
-              <path d="M7.05 5.05a7 7 0 1 0 9.9 0" />
+              <path d="M10 17l5-5l-5-5" />
+              <path d="M15 12H3" />
+              <path d="M21 4v16" />
             </g>
           </svg>
           <span class="app_txt t-lspace">ចេញ</span>
         </span>
+      </div>
       </div>
     </div>
   </div>
@@ -445,6 +472,62 @@ export default {
           //   }
           // ]
       },
+      {
+          url: '/notifications' ,
+          icon: 'Alert24Regular' ,
+          svg: '<svg class="text-blue-500 h-6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></g></svg>' ,
+          name: 'ជូនដំណឹង',
+          roles: [
+            2, // Administrator
+            3, // backend
+          ],
+          permissions: [
+            'portal' ,
+            'portal_user_profile'
+          ],
+      },
+      {
+          url: '/privacy' ,
+          icon: 'QuestionCircle' ,
+          svg: '<svg class="text-blue-500 h-6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.8.7-1.6 1.2-1.6 2.6"></path><path d="M12 17h.01"></path></g></svg>' ,
+          name: 'ភាពឯកជន',
+          roles: [
+            2, // Administrator
+            3, // backend
+          ],
+          permissions: [
+            'portal' ,
+            'portal_user_profile'
+          ],
+      },
+      {
+          url: '/profile' ,
+          icon: 'UserAvatar' ,
+          svg: '<svg class="text-blue-500 h-6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M16 8a5 5 0 1 0 5 5a5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3a3.003 3 0 0 1-3 3z" fill="currentColor"></path><path d="M16 2a14 14 0 1 0 14 14A14.016 14.016 0 0 0 16 2zm-6 24.377V25a3.003 3.003 0 0 1 3-3h6a3.003 3.003 0 0 1 3 3v1.377a11.899 11.899 0 0 1-12 0zm13.992-1.451A5.002 5.002 0 0 0 19 20h-6a5.002 5.002 0 0 0-4.992 4.926a12 12 0 1 1 15.985 0z" fill="currentColor"></path></svg>' ,
+          name: 'ប្រវត្តិរូបមន្ត្រី',
+          roles: [
+            2, // Administrator
+            3, // backend
+          ],
+          permissions: [
+            'portal' ,
+            'portal_user_profile'
+          ],
+      },
+      {
+          url: '/support' ,
+          icon: 'QuestionCircle' ,
+          svg: '<svg class="text-blue-500 h-6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.8.7-1.6 1.2-1.6 2.6"></path><path d="M12 17h.01"></path></g></svg>' ,
+          name: 'ជំនួយ',
+          roles: [
+            2, // Administrator
+            3, // backend
+          ],
+          permissions: [
+            'portal' ,
+            'portal_user_profile'
+          ],
+      },
       // {
       //     url: '/structure' ,
       //     icon: 'Organization32Regular' ,
@@ -539,6 +622,9 @@ export default {
     let user = reactive({})
 
     let matchedApps = ref([])
+    const bottomAppUrls = ['/privacy', '/profile']
+    const topApps = computed(() => matchedApps.value.filter(app => !bottomAppUrls.includes(app?.url)))
+    const bottomApps = computed(() => matchedApps.value.filter(app => bottomAppUrls.includes(app?.url)))
     function filterApps(){
       matchedApps.value = []
       /**
@@ -547,6 +633,7 @@ export default {
       matchedApps.value = ( search.value != null && search.value.trim() != '' ) 
       ? apps.value.filter( app => app.name.indexOf( search.value ) != -1 )
       : apps.value
+      matchedApps.value = matchedApps.value.filter(app => app.url !== '/support')
       /**
        * Filter the apps base on the user role
        */
@@ -640,12 +727,30 @@ export default {
       return route.path === app.url || route.path.startsWith(app.url + '/')
     }
 
+    function isProfileApp(app) {
+      return app !== null && app !== undefined && app.url === '/profile'
+    }
+
+    function getProfilePicture() {
+      const currentUser = getUser()
+
+      return currentUser !== null &&
+        currentUser !== undefined &&
+        currentUser.avatar_url !== null &&
+        currentUser.avatar_url !== undefined &&
+        String(currentUser.avatar_url).trim() !== ''
+        ? currentUser.avatar_url
+        : null
+    }
+
     filterApps()
 
     return {
       logout ,
       search ,
       matchedApps ,
+      topApps ,
+      bottomApps ,
       apps ,
       toggleApps ,
       user ,
@@ -655,7 +760,9 @@ export default {
       isSnavOpen ,
       isSnavAnimating ,
       toggleSnav ,
-      isActive
+      isActive ,
+      isProfileApp ,
+      getProfilePicture
     }
   }
 }
@@ -679,6 +786,14 @@ export default {
 }
 
 .app_card_w {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.app_card_bottom {
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -714,6 +829,18 @@ body:not(.app_snav_open) .app_snav .app_card .apico {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidebar-avatar {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #dbeafe;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  flex: 0 0 auto;
 }
 
 .app_card .apico svg {
@@ -772,8 +899,16 @@ body:not(.app_snav_open) .app_snav .app_card .apico {
 }
 
 .app_card.app_logout .apico {
-  background: rgba(255, 255, 255, 0.08);
-  color: #f87171;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.app_card.app_logout {
+  margin-top: 0;
+}
+
+.app_card.app_logout .app_txt {
+  color: #ffffff;
 }
 
 .app_card.app_logout .apico svg {
@@ -782,7 +917,11 @@ body:not(.app_snav_open) .app_snav .app_card .apico {
 }
 
 .app_card.app_logout:hover .apico {
-  background: #f87171;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.app_card.app_logout:hover .app_txt {
   color: #ffffff;
 }
 

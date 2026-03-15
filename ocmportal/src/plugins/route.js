@@ -33,7 +33,9 @@ import FolderRegulatorComponent from './../components/regulator/folder/regulator
  */
 import UserComponent from './../components/user/index.vue'
 import UserProfileComponent from './../components/user/profile.vue'
+import UserNotificationComponent from './../components/notification/notification.vue'
 import PasswordChangeComponent from './../components/user/password_change.vue'
+import UserPrivacyComponent from './../components/notification/Privacy.vue'
 
 /**
  * Officer
@@ -132,6 +134,30 @@ export const getRoutes = () => {
                 name: "UserProfile" ,
                 path: '/profile' ,
                 component: UserProfileComponent ,
+                meta: {
+                    // transition: 'fade'
+                },
+                permissions: [
+                    'portal' ,
+                    'portal_user_profile'
+                ]
+            },
+            {
+                name: "UserNotification" ,
+                path: '/notifications' ,
+                component: UserNotificationComponent ,
+                meta: {
+                    // transition: 'fade'
+                },
+                permissions: [
+                    'portal' ,
+                    'portal_user_profile'
+                ]
+            },
+            {
+                name: "UserPrivacy" ,
+                path: '/privacy' ,
+                component: UserPrivacyComponent ,
                 meta: {
                     // transition: 'fade'
                 },

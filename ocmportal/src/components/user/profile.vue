@@ -1,482 +1,283 @@
 <template>
-  <div class="w-full pt-12">
-    <div
-      class="grid grid-flow-row gap-2 ml-40 p-4 md:grid-flow-col md:grid-cols-10 lg:grid-cols-12"
-    >
-      <div class="bg-white rounded-lg shadow p-4 md:col-span-3 lg:col-span-3">
-        <Transition name="slide-fade">
-          <div
+  <div class="profile-page min-h-screen w-full pb-10 pt-6 lg:pt-12">
+    <div class="relative px-4 lg:ml-40 lg:px-6">
+      <div class="mx-auto grid max-w-7xl gap-4 xl:grid-cols-12">
+        <Transition name="profile-drop">
+          <aside
             v-if="transitionHelper"
-            class="w-full relative profileInformation"
+            class="profile-card xl:col-span-4 xl:sticky xl:top-6"
           >
-            <div
-              class="profileImage border-4 rounded-full border-gray-200 p-2 md:w-24 md:h-24 lg:w-32 lg:h-32 w-28 h-28 mx-auto bg-center bg-no-repeat bg-cover"
-              :style="'background-image: url(' + localProfile + ');'"
-            ></div>
-            <div
-              v-if="user.countesy != null"
-              class="font-moul text-center my-2"
-            >
-              {{ user.countesy.name }}
-            </div>
-            <div v-if="user.people != null" class="font-moul text-center my-1">
-              {{ user.people.lastname + " " + user.people.firstname }}<br />
-              {{ user.people.enlastname + " " + user.people.enfirstname }}
-            </div>
-            <div v-if="user.position != null" class="my-2">
-              តួនាទី ៖ {{ user.position.name }}
-            </div>
-            <div v-if="user.organization != null" class="my-2">
-              អង្គភាព ៖ {{ user.organization.name }}
-            </div>
-            <div v-if="user.officer != null" class="my-2">
-              អត្តលេខមន្ត្រី ៖ {{ $toKhmer(user.officer.code) }}
-            </div>
-            <div v-if="user.card != null" class="my-2">
-              លេខកាតមន្ត្រី ៖ {{ $toKhmer(user.card.number) }}
-            </div>
-            <div
-              class="uploader absolute md:-right-12 lg:-right-8 -right-8 -top-4 w-14 flex"
-            >
-              <input
-                type="file"
-                placeholder="ឯកសារយោង"
-                @change="fileChange"
-                class="hidden"
-                id="referenceDocument"
-              />
-              <div class="cursor-pointer hover:border-green-500 flex flex-wrap">
-                <n-tooltip trigger="hover">
-                  <template #trigger>
-                    <div
-                      @click="clickUpload"
-                      class="changeProfile p-1 m-1 border bg-white rounded-full md:w-6 md:h-6 lg:w-8 lg:h-8 w-8 h-8 border-gray-300"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        viewBox="0 0 512 512"
-                      >
-                        <path
-                          d="M350.54 148.68l-26.62-42.06C318.31 100.08 310.62 96 302 96h-92c-8.62 0-16.31 4.08-21.92 10.62l-26.62 42.06C155.85 155.23 148.62 160 140 160H80a32 32 0 0 0-32 32v192a32 32 0 0 0 32 32h352a32 32 0 0 0 32-32V192a32 32 0 0 0-32-32h-59c-8.65 0-16.85-4.77-22.46-11.32z"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="32"
-                        ></path>
-                        <circle
-                          cx="256"
-                          cy="272"
-                          r="80"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-miterlimit="10"
-                          stroke-width="32"
-                        ></circle>
-                        <path
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="32"
-                          d="M124 158v-22h-24v22"
-                        ></path>
-                      </svg>
-                    </div> </template
-                  >ប្ដូររូបភាពគណនី
-                </n-tooltip>
-                <n-tooltip trigger="hover">
-                  <template #trigger>
-                    <div
-                      @click="uploadFiles"
-                      class="saveProfile p-1 m-1 border bg-white rounded-full md:w-6 md:h-6 lg:w-8 lg:h-8 w-8 h-8 border-gray-300"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5c0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4c0-2.05 1.53-3.76 3.56-3.97l1.07-.11l.5-.95A5.469 5.469 0 0 1 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5l1.53.11A2.98 2.98 0 0 1 22 15c0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </div> </template
-                  >រក្សារទុករូបភាពថ្មី
-                </n-tooltip>
-                <n-tooltip trigger="hover">
-                  <template #trigger>
-                    <div
-                      @click="$router.push('/password/change')"
-                      class="changePassword p-1 m-1 border bg-white rounded-full md:w-6 md:h-6 lg:w-8 lg:h-8 w-8 h-8 border-gray-300"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        viewBox="0 0 16 16"
-                      >
-                        <g fill="none">
-                          <path
-                            d="M11 6a1 1 0 1 0 0-2a1 1 0 0 0 0 2z"
-                            fill="currentColor"
-                          ></path>
-                          <path
-                            d="M7.5 12v-.5h1A.5.5 0 0 0 9 11v-1h1a4 4 0 1 0-3.838-2.87L2.292 11a1 1 0 0 0-.292.707V13a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.5h1a.5.5 0 0 0 .5-.5zM7 6a3 3 0 1 1 3 3H8.5a.5.5 0 0 0-.5.5v1H7a.5.5 0 0 0-.5.5v.5h-1a.5.5 0 0 0-.5.5v1H3v-1.293l4.089-4.089a.5.5 0 0 0 .113-.534C7.072 6.748 7 6.384 7 6z"
-                            fill="currentColor"
-                          ></path>
-                        </g>
-                      </svg>
-                    </div> </template
-                  >ប្ដូរពាក្យសម្ងាត់
-                </n-tooltip>
+            <input
+              id="referenceDocument"
+              type="file"
+              class="hidden"
+              @change="fileChange"
+            />
+
+            <div class="profile-card__top">
+              <div class="profile-avatar-wrap">
+                <div class="profile-avatar-ring">
+                  <div class="profile-avatar" :style="avatarStyle"></div>
+                </div>
+                <button
+                  type="button"
+                  class="profile-fab"
+                  @click="clickUpload"
+                >
+                  <svg viewBox="0 0 512 512" aria-hidden="true">
+                    <path
+                      d="M350.54 148.68l-26.62-42.06C318.31 100.08 310.62 96 302 96h-92c-8.62 0-16.31 4.08-21.92 10.62l-26.62 42.06C155.85 155.23 148.62 160 140 160H80a32 32 0 0 0-32 32v192a32 32 0 0 0 32 32h352a32 32 0 0 0 32-32V192a32 32 0 0 0-32-32h-59c-8.65 0-16.85-4.77-22.46-11.32z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="32"
+                    />
+                    <circle
+                      cx="256"
+                      cy="272"
+                      r="80"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-miterlimit="10"
+                      stroke-width="32"
+                    />
+                    <path
+                      d="M124 158v-22h-24v22"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="32"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <p v-if="hasText(user?.countesy?.name)" class="profile-pill font-moul">
+                {{ user.countesy.name }}
+              </p>
+
+              <h1 class="profile-name font-moul">
+                {{ userDisplayName }}
+              </h1>
+              <p v-if="hasText(userEnglishName)" class="profile-subtitle">
+                {{ userEnglishName }}
+              </p>
+              <p class="profile-summary">
+                {{ profileTagline }}
+              </p>
+
+              <div class="profile-selected-file">
+                <span>Photo</span>
+                <strong>{{ selectedFileName }}</strong>
+              </div>
+
+              <div class="profile-action-list">
+                <button
+                  type="button"
+                  class="profile-action profile-action--primary"
+                  @click="clickUpload"
+                >
+                  Choose Photo
+                </button>
+                <button
+                  type="button"
+                  class="profile-action profile-action--secondary"
+                  :class="{ 'profile-action--active': hasPendingAvatar }"
+                  @click="uploadFiles"
+                >
+                  Upload Photo
+                </button>
+                <button
+                  type="button"
+                  class="profile-action profile-action--ghost"
+                  @click="goToPasswordChange"
+                >
+                  Change Password
+                </button>
               </div>
             </div>
-          </div>
+
+            <div class="profile-stat-grid">
+              <article
+                v-for="item in quickStatItems"
+                :key="item.label"
+                class="profile-stat"
+              >
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+              </article>
+            </div>
+
+            <div class="profile-mini-panel">
+              <div class="profile-section-heading">
+                <span>Account Snapshot</span>
+                <p>Fast access to the most-used identity and login details.</p>
+              </div>
+
+              <div class="profile-mini-list">
+                <article
+                  v-for="item in accountSnapshotItems"
+                  :key="item.label"
+                  class="profile-mini-item"
+                >
+                  <span>{{ item.label }}</span>
+                  <strong>{{ item.value }}</strong>
+                </article>
+              </div>
+            </div>
+          </aside>
+        </Transition>
+
+        <Transition name="profile-drop">
+          <section
+            v-if="transitionHelper"
+            class="profile-card profile-card--main xl:col-span-8"
+          >
+            <n-tabs class="profile-tabs" type="line" animated>
+              <n-tab-pane name="personal" tab="Personal">
+                <div class="profile-sections">
+                  <section class="profile-section">
+                    <div class="profile-section__head">
+                      <h3>Identity</h3>
+                      <p>Core personal details.</p>
+                    </div>
+
+                    <div class="profile-info-grid">
+                      <article
+                        v-for="item in personalIdentityItems"
+                        :key="item.label"
+                        class="profile-info-card"
+                      >
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </article>
+                    </div>
+                  </section>
+
+                  <section class="profile-section">
+                    <div class="profile-section__head">
+                      <h3>Contact and Civil Record</h3>
+                      <p>Contact, address, and identification details.</p>
+                    </div>
+
+                    <div class="profile-info-grid">
+                      <article
+                        v-for="item in personalContactItems"
+                        :key="item.label"
+                        class="profile-info-card"
+                        :class="{ 'profile-info-card--wide': item.wide }"
+                      >
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </article>
+                    </div>
+                  </section>
+                </div>
+              </n-tab-pane>
+
+              <n-tab-pane name="work" tab="Organization">
+                <div class="profile-sections">
+                  <section class="profile-section">
+                    <div class="profile-section__head">
+                      <h3>Officer Record</h3>
+                      <p>Officer information linked to this account.</p>
+                    </div>
+
+                    <div class="profile-info-grid">
+                      <article
+                        v-for="item in officerItems"
+                        :key="item.label"
+                        class="profile-info-card"
+                      >
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </article>
+                    </div>
+                  </section>
+
+                  <section class="profile-section">
+                    <div class="profile-section__head">
+                      <h3>Assignment</h3>
+                      <p>Current role and organization.</p>
+                    </div>
+
+                    <div class="profile-info-grid">
+                      <article
+                        v-for="item in assignmentItems"
+                        :key="item.label"
+                        class="profile-info-card"
+                      >
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </article>
+                    </div>
+                  </section>
+                </div>
+              </n-tab-pane>
+
+              <n-tab-pane name="account" tab="Account">
+                <div class="profile-sections">
+                  <section class="profile-section">
+                    <div class="profile-section__head">
+                      <h3>Access Details</h3>
+                      <p>Login and profile image status.</p>
+                    </div>
+
+                    <div class="profile-info-grid">
+                      <article
+                        v-for="item in accountItems"
+                        :key="item.label"
+                        class="profile-info-card"
+                      >
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                      </article>
+                    </div>
+                  </section>
+
+                  <div class="profile-note-grid">
+                    <section class="profile-note-card">
+                      <h3>Profile Actions</h3>
+                      <p>
+                        Choose a new photo from the summary card, then upload it when
+                        you are ready.
+                      </p>
+                    </section>
+
+                    <section class="profile-note-card profile-note-card--light">
+                      <h3>Security Reminder</h3>
+                      <p>
+                        Password changes stay on a separate screen for cleaner account
+                        management.
+                      </p>
+                    </section>
+                  </div>
+                </div>
+              </n-tab-pane>
+            </n-tabs>
+          </section>
         </Transition>
       </div>
-      <Transition name="slide-fade">
-        <div
-          v-if="transitionHelper"
-          class="relative bg-white shadow rounded-lg p-4 md:col-span-7 lg:col-span-9"
-        >
-          <n-tabs type="line" animated>
-            <n-tab-pane name="background" tab="ព័តមានផ្ទាល់ខ្លួន">
-              <div class="my-4 relative">
-                <n-form
-                  ref="formRef"
-                  label-placement="top"
-                  :model="user"
-                  label-width="120"
-                  class="grid grid-cols-2 gap-1"
-                >
-                  <div class="">
-                    <!-- <n-form-item label="ឈ្មោះគណនីប្រើប្រាស់" path="username" class="w-11/12" >
-                      <n-input v-model:value="user.people.username" placeholder="ឈ្មោះគណនីប្រើប្រាស់" class="text-left" />
-                    </n-form-item> -->
-                    <n-form-item label="ត្រកូល" path="lastname" class="w-11/12">
-                      <!-- <n-input v-model:value="user.people.lastname" placeholder="នាមត្រកូល" class="text-left" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.lastname }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item label="ឈ្មោះ" path="firstname" class="w-11/12">
-                      <!-- <n-input v-model:value="user.people.firstname" placeholder="នាមខ្លួន" class="text-left"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.firstname }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item
-                      label="ត្រកូល (អង់គ្លេស)"
-                      path="enlastname"
-                      class="w-11/12"
-                    >
-                      <!-- <n-input v-model:value="user.people.enlastname" placeholder="នាមត្រកូល" class="text-left"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.enlastname }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item
-                      label="ឈ្មោះ (អង់គ្លេស)"
-                      path="enfirstname"
-                      class="w-11/12"
-                    >
-                      <!-- <n-input v-model:value="user.people.enfirstname" placeholder="នាមខ្លួន" class="text-left"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.enfirstname }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item
-                      label="ថ្ងៃ ខែ ឆ្នាំ កំណើត"
-                      path="dob"
-                      class="w-11/12"
-                    >
-                      <!-- <n-date-picker v-model:value="peopleDob" type="date" placeholder="ថ្ងៃ ខែ ឆ្នាំ កំណើត" class="w-full" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ dateFormat(new Date(peopleDob), "dd-mm-yyyy") }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item label="ភេទ" path="gender" class="w-11/12">
-                      <n-radio-group
-                        v-model:value="user.people.gender"
-                        class="text-left"
-                        :disabled="true"
-                      >
-                        <n-space>
-                          <n-radio
-                            v-for="gender in [
-                              { label: 'ស្រី', value: 0 },
-                              { label: 'ប្រុស', value: 1 },
-                            ]"
-                            :key="gender.value"
-                            :value="gender.value"
-                            :label="gender.label"
-                          />
-                        </n-space>
-                      </n-radio-group>
-                      <!-- <div class="p-2 border border-gray-200 rounded w-full text-left " >{{ user.people.gender == 0 ? 'ស្រី' : 'ប្រុស' }}</div> -->
-                    </n-form-item>
-                    <n-form-item
-                      label="នៅលីវ ឬ រៀបការរួច"
-                      path="marry"
-                      class="w-11/12 text-left"
-                    >
-                      <n-radio-group
-                        v-model:value="user.people.marry_status"
-                        class=""
-                        :disabled="true"
-                      >
-                        <n-space>
-                          <n-radio
-                            v-for="status in [
-                              { label: 'នៅលីវ', value: 'single' },
-                              { label: 'រៀបការរួច', value: 'married' },
-                              { label: 'ពោះមាយ / មេមាយ', value: 'divorced' },
-                            ]"
-                            :key="status.value"
-                            :value="status.value"
-                            :label="status.label"
-                          />
-                        </n-space>
-                      </n-radio-group>
-                      <!-- <div class="p-2 border border-gray-200 rounded w-full text-left " >{{ user.people.marry_status == 'single' ? 'នៅលីវ' : ( user.people.marry_status == 'married' ? 'រៀបការរួច' : ( user.people.marry_status == 'divorced' ? 'ពោះមាយ / មេមាយ' : '' ) ) }}</div> -->
-                    </n-form-item>
-                  </div>
-                  <div class="">
-                    <n-form-item-row label="ទូរស័ព្ទដៃ">
-                      <!-- <n-input placeholder="ទូរស័ព្ទ" class="text-left w-11/12" v-model:value="user.people.mobile_phone"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.mobile_phone }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="ទូរស័ព្ទនៅផ្ទះ">
-                      <!-- <n-input placeholder="ទូរស័ព្ទ" class="text-left w-11/12" v-model:value="user.people.office_phone"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.office_phone }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="អ៊ីមែល">
-                      <!-- <n-input placeholder="អ៊ីមែល" class="text-left w-11/12" v-model:value="user.people.email"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.email }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="អត្តសញ្ញាណបណ្ណ">
-                      <!-- <n-input placeholder="អត្តសញ្ញាណបណ្ណ" class="text-left w-11/12" v-model:value="user.people.nid"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.nid }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="លិខិតឆ្លងដែន">
-                      <!-- <n-input placeholder="លិខិតឆ្លងដែន" class="text-left w-11/12" v-model:value="user.people.passport"  /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.passport }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="អសយដ្ឋានបច្ចុប្បន្ន">
-                      <!-- <n-input 
-                        placeholder="អសយដ្ឋានបច្ចុប្បន្ន" 
-                        class="text-left" 
-                        v-model:value="user.people.address" 
-                        type="textarea" show-count maxlength="5000" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.address }}
-                      </div>
-                    </n-form-item-row>
-                    <n-form-item-row label="ទីកន្លែងកំណើត">
-                      <!-- <n-input placeholder="ទីកន្លែងកំណើត" class="text-left" 
-                      v-model:value="user.people.pob" 
-                      type="textarea" show-count maxlength="5000" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.people.pob }}
-                      </div>
-                    </n-form-item-row>
-                  </div>
-                </n-form>
-                <div class="w-full py-2 text-left">
-                  <!-- <n-button class="" @click="saveProfile" type="primary" >រក្សារទុក</n-button> -->
-                </div>
-              </div>
-            </n-tab-pane>
-            <n-tab-pane name="organization" tab="ព័ត៌មានអង្គភាព">
-              <div class="mt-4">
-                <n-form
-                  ref="formRef"
-                  label-placement="top"
-                  :model="user"
-                  label-width="120"
-                  class="grid grid-cols-2 gap-1"
-                >
-                  <div class="">
-                    <n-form-item
-                      label="ថ្ងៃខែឆ្នាំពេញសិទ្ធិ(តាំងស៊ុប)"
-                      path="officer_dob"
-                      class="w-11/12"
-                    >
-                      <!-- <n-date-picker disabled v-model:value="officerDate" type="date" placeholder="ថ្ងៃ ខែ ឆ្នាំ កំណើត" class="w-full" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ dateFormat(new Date(officerDate), "dd-mm-yyyy") }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item label="អត្តលេខ" path="code" class="w-11/12">
-                      <!-- <n-input disabled v-model:value="user.officer.code" placeholder="អត្តលេខ" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.officer.code }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item label="ទូរស័ព្ទ" path="phone" class="w-11/12">
-                      <!-- <n-input v-model:value="user.officer.phone" placeholder="ទូរស័ព្ទ" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.officer.phone }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item label="អ៊ីមែល" path="email" class="w-11/12">
-                      <!-- <n-input v-model:value="user.officer.email" placeholder="អ៊ីមែល" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.officer.email }}
-                      </div>
-                    </n-form-item>
-                    <n-form-item
-                      label="លេខិតឆ្លងដែន"
-                      path="passport"
-                      class="w-11/12"
-                    >
-                      <!-- <n-input v-model:value="user.officer.passport" placeholder="លេខិតឆ្លងដែន" /> -->
-                      <div
-                        class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                      >
-                        {{ user.officer.passport }}
-                      </div>
-                    </n-form-item>
-                  </div>
-                  <div class="">
-                    <n-form-item label="ងារ" path="countesy" class="w-11/12">
-                      <n-select
-                        :disabled="true"
-                        v-model:value="selectedCountesies"
-                        filterable
-                        placeholder="សូមជ្រើសរើសងារ"
-                        :options="countesies"
-                        multiple
-                      />
-                    </n-form-item>
-                    <n-form-item label="តួនាទី" path="position" class="w-11/12">
-                      <n-select
-                        :disabled="true"
-                        v-model:value="selectedPosition"
-                        filterable
-                        placeholder="សូមជ្រើសរើសតួនាទី"
-                        :options="positions"
-                      />
-                    </n-form-item>
-                    <n-form-item
-                      label="អង្គភាព"
-                      path="organization"
-                      class="w-11/12"
-                    >
-                      <n-select
-                        :disabled="true"
-                        v-model:value="selectedOrganization"
-                        filterable
-                        placeholder="សូមជ្រើសរើសអង្គភាព"
-                        :options="organizations"
-                      />
-                    </n-form-item>
-                  </div>
-                </n-form>
-                <div class="w-full py-2 text-left">
-                  <!-- <n-button class="" @click="saveOfficer" type="primary" >រក្សារទុក</n-button> -->
-                </div>
-              </div>
-            </n-tab-pane>
-            <n-tab-pane name="profile" tab="ព័ត៌មានគណនី">
-              <div class="my-4">
-                <n-form
-                  ref="formRef"
-                  label-placement="top"
-                  :model="user"
-                  label-width="120"
-                >
-                  <n-form-item-row label="ឈ្មោះគណនី">
-                    <!-- <n-input placeholder="ឈ្មោះគណនី" class="text-left" v-model:value="user.username" /> -->
-                    <div
-                      class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                    >
-                      {{ user.username }}
-                    </div>
-                  </n-form-item-row>
-                  <n-form-item-row label="អ៊ីមែល">
-                    <!-- <n-input placeholder="អ៊ីមែល" class="text-left" disabled v-model:value="user.email" /> -->
-                    <div
-                      class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                    >
-                      {{ user.email }}
-                    </div>
-                  </n-form-item-row>
-                  <n-form-item-row label="ទូរស័ព្ទ">
-                    <!-- <n-input placeholder="ទូរស័ព្ទ" class="text-left" v-model:value="user.phone" /> -->
-                    <div
-                      class="p-2 border border-gray-200 rounded w-full text-left min-h-9"
-                    >
-                      {{ user.phone }}
-                    </div>
-                  </n-form-item-row>
-                </n-form>
-                <div class="w-full py-2 text-left">
-                  <!-- <n-button class="" @click="saveAccount" type="primary" >រក្សារទុក</n-button> -->
-                </div>
-              </div>
-            </n-tab-pane>
-          </n-tabs>
-        </div>
-      </Transition>
     </div>
-    <float-top-menu v-bind:title="title" />
+
+    <float-top-menu :title="title" />
     <sidebar />
   </div>
 </template>
+
 <script>
-import { isAuth, getUser, authLogout } from "./../../plugins/authentication.js";
-import { reactive, ref, computed, onMounted } from "vue";
+import { isAuth, getUser } from "./../../plugins/authentication.js";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter, useRoute } from "vue-router";
-import Dock from "@components/widgets/Dock.vue";
-import { useMessage, useNotification } from "naive-ui";
+import { useRouter } from "vue-router";
+import { useNotification } from "naive-ui";
 import dateFormat from "dateformat";
 import FloatTopMenu from "@components/menu/topmenu-float-items.vue";
 import Sidebar from "@components/widgets/Sidebar.vue";
+
+const EMPTY_VALUE = "-";
 
 export default {
   name: "Profile",
@@ -487,377 +288,380 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-    const user = ref(null);
-    const currentUserValue = ref(null);
-    const message = useMessage();
     const notify = useNotification();
+
+    const user = ref(isAuth() ? getUser() : {});
     const base64Avatar = ref(null);
     const selectedFileType = ref("");
     const transitionHelper = ref(false);
     const peopleDob = ref(null);
     const officerDate = ref(null);
+    const files = ref([]);
     const title = ref("ប្រវត្តិរូបមន្ត្រី");
 
-    if (isAuth()) {
-      user.value = getUser();
-      currentUserValue.value = user.value;
-      setTimeout(function () {
-        transitionHelper.value = true;
-      }, 300);
-    } else {
-      transitionHelper.value = false;
-      user.value = ref({
-        lastname: "",
-        firstname: "",
-        phone: "",
-        username: "",
-        email: "",
-        dob: null,
-      });
+    function hasText(value) {
+      return value !== null && value !== undefined && String(value).trim() !== "";
     }
 
-    const selectedOrganization = ref(null);
-    const selectedPosition = ref(null);
-    const selectedCountesies = ref([]);
+    function fallbackValue(value) {
+      return hasText(value) ? String(value).trim() : EMPTY_VALUE;
+    }
 
-    const organizations = computed(() =>
-      store.getters["organization/getRecords"].map((o) => ({
-        label: o.name,
-        value: o.id,
-      })),
-    );
-    const positions = computed(() =>
-      store.getters["position/getRecords"].map((o) => ({
-        label: o.name,
-        value: o.id,
-      })),
-    );
-    const countesies = computed(() =>
-      store.getters["countesy/getRecords"].map((c) => ({
-        label: c.name,
-        value: c.id,
-      })),
-    );
+    function formatDisplayDate(value) {
+      if (!value) {
+        return EMPTY_VALUE;
+      }
+
+      const date = new Date(value);
+
+      return Number.isNaN(date.getTime())
+        ? EMPTY_VALUE
+        : dateFormat(date, "dd-mm-yyyy");
+    }
 
     onMounted(() => {
       if (isAuth()) {
-        console.log(user.value);
-        peopleDob.value =
-          user.value.people != null
-            ? user.value.people.dob != undefined &&
-              user.value.people.dob.length > 0
-              ? new Date(user.value.people.dob).getTime()
-              : new Date().getTime()
-            : null;
-        officerDate.value =
-          user.value.officer != null
-            ? user.value.officer.date != undefined &&
-              user.value.officer.date.length > 0
-              ? new Date(user.value.officer.date).getTime()
-              : new Date().getTime()
-            : null;
-        selectedPosition.value =
-          user.value.position != null ? user.value.position.id : null;
-        selectedOrganization.value =
-          user.value.organization != null ? user.value.organization.id : null;
-        selectedCountesies.value =
-          user.value.countesy != null ? [user.value.countesy.id] : null;
+        peopleDob.value = hasText(user.value?.people?.dob)
+          ? new Date(user.value.people.dob).getTime()
+          : null;
+        officerDate.value = hasText(user.value?.officer?.date)
+          ? new Date(user.value.officer.date).getTime()
+          : null;
       }
-      getOrganizations();
-      getPositions();
-      getCountesies();
+
+      setTimeout(() => {
+        transitionHelper.value = true;
+      }, 250);
     });
 
-    /**
-     * Variables
-     */
-    const model = reactive({
-      name: "UserProfile",
-      title: "ព័ត៌មានមន្ត្រី",
+    const localProfile = computed(() => {
+      if (hasText(base64Avatar.value)) {
+        return base64Avatar.value;
+      }
+
+      return hasText(user.value?.avatar_url)
+        ? user.value.avatar_url
+        : "/src/assets/logo.png";
     });
 
-    const saveAccountEnable = computed(() => {
-      return (
-        user.value.phone != currentUserValue.value.phone ||
-        user.value.username != currentUserValue.value.username
-      );
+    const avatarStyle = computed(() => ({
+      backgroundImage: `url(${localProfile.value})`,
+    }));
+
+    const userDisplayName = computed(() => {
+      const khmerName = [
+        user.value?.people?.lastname,
+        user.value?.people?.firstname,
+      ]
+        .filter(hasText)
+        .join(" ")
+        .trim();
+
+      return khmerName || fallbackValue(user.value?.username);
     });
-    function saveAccount() {
-      if (user.value.username == "") {
-        notify.info({
-          title: "រក្សារទុកព័ត៌មាន",
-          content: "សូមបំពេញព័ត៌មានឈ្មោះគណនី",
-          duration: 1000,
-        });
-        return false;
-      }
-      if (user.value.phone == "") {
-        notify.info({
-          title: "រក្សារទុកព័ត៌មាន",
-          content: "សូមបំពេញព័ត៌មានលេខទូរសព្ទ",
-          duration: 1000,
-        });
-        return false;
-      }
-      store
-        .dispatch("user/update", {
-          phone: user.value.phone,
-          username: user.value.username,
-        })
-        .then((res) => {
-          notify.success({
-            title: "រក្សារទុករួចរាល់។",
-            content: res.data.message,
-            duration: 1000,
-          });
-          let tmpUser = getUser();
-          tmpUser.phone = res.data.user.phone;
-          tmpUser.username = res.data.user.username;
-          localStorage.setItem("user", JSON.stringify(tmpUser));
-          user.value = getUser();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
 
-    function saveProfile() {
-      if (
-        user.value.people.lastname.length <= 0 ||
-        user.value.people.firstname.length <= 0 ||
-        user.value.people.enlastname.length <= 0 ||
-        user.value.people.enfirstname.length <= 0
-      ) {
-        notify.info({
-          title: "ព័ត៌មានអង្គភាព",
-          content: "សូមបំពេញឈ្មៅខ្មែរ និង អង់គ្លេស",
-          duration: 1000,
-        });
-        return false;
-      }
-      if (peopleDob.value == null) {
-        notify.info({
-          title: "ព័ត៌មានអង្គភាព",
-          content: "សូមបំពេញ ថ្ងៃ ខែ ឆ្នាំ កំណើត",
-          duration: 1000,
-        });
-        return false;
+    const userEnglishName = computed(() => {
+      const englishName = [
+        user.value?.people?.enlastname,
+        user.value?.people?.enfirstname,
+      ]
+        .filter(hasText)
+        .join(" ")
+        .trim();
+
+      return englishName || "";
+    });
+
+    const profileTagline = computed(() => {
+      const parts = [
+        user.value?.position?.name,
+        user.value?.organization?.name,
+        user.value?.countesy?.name,
+      ].filter(hasText);
+
+      return parts.length > 0
+        ? parts.join(" / ")
+        : "Clean overview of your profile and account information.";
+    });
+
+    const selectedFileName = computed(() => {
+      return files.value.length > 0 ? files.value[0].name : "No image selected";
+    });
+
+    const hasPendingAvatar = computed(() => files.value.length > 0);
+
+    const headerBadges = computed(() => {
+      const badges = [
+        user.value?.countesy?.name,
+        user.value?.position?.name,
+        user.value?.organization?.name,
+      ].filter(hasText);
+
+      return badges.length > 0 ? badges : ["Profile Overview"];
+    });
+
+    const quickStatItems = computed(() => [
+      {
+        label: "Position",
+        value: fallbackValue(user.value?.position?.name),
+      },
+      {
+        label: "Organization",
+        value: fallbackValue(user.value?.organization?.name),
+      },
+      {
+        label: "Officer Code",
+        value: fallbackValue(user.value?.officer?.code),
+      },
+      {
+        label: "Card Number",
+        value: fallbackValue(user.value?.card?.number),
+      },
+    ]);
+
+    const accountSnapshotItems = computed(() => [
+      {
+        label: "Username",
+        value: fallbackValue(user.value?.username),
+      },
+      {
+        label: "Email",
+        value: fallbackValue(user.value?.email),
+      },
+      {
+        label: "Phone",
+        value: fallbackValue(user.value?.phone),
+      },
+    ]);
+
+    const genderLabel = computed(() => {
+      if (user.value?.people?.gender === 0) {
+        return "Female";
       }
 
-      store
-        .dispatch("user/peopleUpdate", {
-          user_id: user.value.id,
-          officer_id: user.value.officer.id,
-          people_id: user.value.people.id,
-          lastname: user.value.people.lastname,
-          firstname: user.value.people.firstname,
-          enlastname: user.value.people.enlastname,
-          enfirstname: user.value.people.enfirstname,
-          dob:
-            peopleDob.value != null && parseInt(peopleDob.value) > 0
-              ? dateFormat(new Date(peopleDob.value), "yyyy-mm-dd")
-              : dateFormat(new Date(), "yyyy-mm-dd"),
-          gender: user.value.people.gender,
-          marry_status: user.value.people.marry_status,
-          mobile_phone: user.value.people.mobile_phone,
-          office_phone: user.value.people.office_phone,
-          email: user.value.people.email,
-          nid: user.value.people.nid,
-          passport: user.value.people.passport,
-          address: user.value.people.address,
-          pob: user.value.people.pob,
-        })
-        .then((res) => {
-          notify.success({
-            title: "រក្សារទុករួចរាល់។",
-            content: res.data.message,
-            duration: 500,
-          });
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          user.value = getUser();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+      if (user.value?.people?.gender === 1) {
+        return "Male";
+      }
 
-    function saveOfficer() {
-      if (parseInt(selectedPosition.value) <= 0) {
-        notify.info({
-          title: "ព័ត៌មានអង្គភាព",
-          content: "សូមជ្រើសរើស តួនាទី របស់មន្ត្រី",
-          duration: 1000,
-        });
-        return false;
-      }
-      if (parseInt(selectedOrganization.value) <= 0) {
-        notify.info({
-          title: "ព័ត៌មានអង្គភាព",
-          content: "សូមជ្រើសរើស អង្គភាព របស់មន្ត្រី",
-          duration: 1000,
-        });
-        return false;
-      }
-      if (
-        Array.isArray(selectedCountesies.value) &&
-        selectedCountesies.value.length > 0 &&
-        parseInt(selectedCountesies.value[0]) <= 0
-      ) {
-        notify.info({
-          title: "ព័ត៌មានអង្គភាព",
-          content: "សូមជ្រើសរើស ងារ របស់មន្ត្រី",
-          duration: 1000,
-        });
-        return false;
-      }
-      store
-        .dispatch("user/officerUpdate", {
-          user_id: user.value.id,
-          officer_id: user.value.officer.id,
-          officer_code: user.value.officer.code,
-          officer_phone: user.value.officer.phone,
-          officer_email: user.value.officer.email,
-          officer_date:
-            officerDate.value != null && parseInt(officerDate.value) > 0
-              ? dateFormat(new Date(officerDate.value), "yyyy-mm-dd")
-              : dateFormat(new Date(), "yyyy-mm-dd"),
-          officer_passport: user.value.officer.passport,
-          officer_organization_id: selectedOrganization.value,
-          officer_position_id: selectedPosition.value,
-          officer_countesy_id: selectedCountesies.value[0],
-        })
-        .then((res) => {
-          notify.success({
-            title: "រក្សារទុករួចរាល់។",
-            content: res.data.message,
-            duration: 1000,
-          });
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          user.value = getUser();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+      return EMPTY_VALUE;
+    });
 
-    function logout() {
-      if (isAuth()) {
-        authLogout();
+    const maritalStatusLabel = computed(() => {
+      switch (user.value?.people?.marry_status) {
+        case "single":
+          return "Single";
+        case "married":
+          return "Married";
+        case "divorced":
+          return "Divorced / Widowed";
+        default:
+          return EMPTY_VALUE;
       }
-      router.push("/welcome");
-    }
+    });
 
-    const files = ref([]);
-    /**
-     * File upload
-     */
-    /**
-     * On change
-     */
+    const personalIdentityItems = computed(() => [
+      {
+        label: "Khmer Last Name",
+        value: fallbackValue(user.value?.people?.lastname),
+      },
+      {
+        label: "Khmer First Name",
+        value: fallbackValue(user.value?.people?.firstname),
+      },
+      {
+        label: "English Last Name",
+        value: fallbackValue(user.value?.people?.enlastname),
+      },
+      {
+        label: "English First Name",
+        value: fallbackValue(user.value?.people?.enfirstname),
+      },
+      {
+        label: "Date of Birth",
+        value: formatDisplayDate(peopleDob.value),
+      },
+      {
+        label: "Gender",
+        value: genderLabel.value,
+      },
+      {
+        label: "Marital Status",
+        value: maritalStatusLabel.value,
+      },
+    ]);
+
+    const personalContactItems = computed(() => [
+      {
+        label: "Mobile Phone",
+        value: fallbackValue(user.value?.people?.mobile_phone),
+      },
+      {
+        label: "Office Phone",
+        value: fallbackValue(user.value?.people?.office_phone),
+      },
+      {
+        label: "Personal Email",
+        value: fallbackValue(user.value?.people?.email),
+      },
+      {
+        label: "National ID",
+        value: fallbackValue(user.value?.people?.nid),
+      },
+      {
+        label: "Passport",
+        value: fallbackValue(user.value?.people?.passport),
+      },
+      {
+        label: "Address",
+        value: fallbackValue(user.value?.people?.address),
+        wide: true,
+      },
+      {
+        label: "Place of Birth",
+        value: fallbackValue(user.value?.people?.pob),
+        wide: true,
+      },
+    ]);
+
+    const officerItems = computed(() => [
+      {
+        label: "Appointment Date",
+        value: formatDisplayDate(officerDate.value),
+      },
+      {
+        label: "Officer Code",
+        value: fallbackValue(user.value?.officer?.code),
+      },
+      {
+        label: "Officer Phone",
+        value: fallbackValue(user.value?.officer?.phone),
+      },
+      {
+        label: "Officer Email",
+        value: fallbackValue(user.value?.officer?.email),
+      },
+      {
+        label: "Officer Passport",
+        value: fallbackValue(user.value?.officer?.passport),
+      },
+    ]);
+
+    const assignmentItems = computed(() => [
+      {
+        label: "Countesy",
+        value: fallbackValue(user.value?.countesy?.name),
+      },
+      {
+        label: "Position",
+        value: fallbackValue(user.value?.position?.name),
+      },
+      {
+        label: "Organization",
+        value: fallbackValue(user.value?.organization?.name),
+      },
+      {
+        label: "Card Number",
+        value: fallbackValue(user.value?.card?.number),
+      },
+    ]);
+
+    const accountItems = computed(() => [
+      {
+        label: "Username",
+        value: fallbackValue(user.value?.username),
+      },
+      {
+        label: "Login Email",
+        value: fallbackValue(user.value?.email),
+      },
+      {
+        label: "Phone Number",
+        value: fallbackValue(user.value?.phone),
+      },
+      {
+        label: "Avatar Status",
+        value: hasPendingAvatar.value
+          ? "New image ready to upload"
+          : hasText(user.value?.avatar_url)
+            ? "Profile image configured"
+            : "Using default image",
+      },
+      {
+        label: "Selected File Type",
+        value: hasText(selectedFileType.value)
+          ? selectedFileType.value
+          : "No file selected",
+      },
+    ]);
+
     function fileChange(event) {
-      for (const file of event.target.files) {
-        // if( index == 'item' || index == 'length' ) continue;
+      const [file] = Array.from(event.target.files || []);
 
-        // allowed types
-        let allowed_mime_types = [
-          /**
-           * Image mime type
-           */
-          "image/jpeg",
-          "image/png",
-          /**
-           * Application file mime type
-           */
-          // "application/pdf"
-        ];
-
-        // allowed max size in MB
-        let allowed_size_mb = 5;
-
-        // Validate file type
-        if (allowed_mime_types.indexOf(file.type) == -1) {
-          notify.error({
-            title: "ដាក់រូបភាពអ្នកប្រើប្រាស់",
-            description: "សូមបញ្ចូលឯកសារជាប្រភេទរូបភាព JPG និង PNG។",
-            duration: 3000,
-          });
-          return;
-        }
-
-        selectedFileType.value = file.type;
-
-        // Validate file size
-        if (file.size > allowed_size_mb * 1024 * 1024) {
-          notify.error({
-            title: "ដាក់រូបភាពអ្នកប្រើប្រាស់",
-            description:
-              "ទំហំនៃរូបភាពគឺ៖ " +
-              (file.size / 1024 / 1024).toFixed(2) +
-              " មេកាបៃ (MB) លើលទំហំដែលកំណត់គឺ ៥ មេកាបៃ។",
-            duration: 3000,
-          });
-          return;
-        }
-
-        let reader = new FileReader();
-        reader.onerror = function (e) {
-          console.log("On error");
-        };
-        reader.onprogress = function (e) {
-          console.log("On progress");
-        };
-        reader.onabort = function (e) {
-          console.log("On abort");
-        };
-        reader.onloadstart = function (e) {
-          console.log("On load start");
-        };
-        reader.onload = function (e) {
-          // Ensure that the progress bar displays 100% at the end.
-          console.log("On load");
-          /**
-           * Read binary string from 'e.target.result' and convert to base64
-           */
-          base64Avatar.value =
-            "data:" + file.type + ";base64," + btoa(e.target.result);
-          files.value.push(file);
-        };
-        // // // Read in the image file as base64 type
-        // // reader.readAsDataURL(file);
-        reader.readAsBinaryString(file);
-
-        // files.value.push( file )
+      if (!file) {
+        return;
       }
-    }
-    /**
-     * On click file upload
-     */
-    function clickUpload() {
-      document.getElementById("referenceDocument").click();
-    }
-    function uploadFiles() {
-      console.log(files.value);
-      if (
-        !Array.isArray(files.value) ||
-        files.value.length <= 0 ||
-        !files.value[0]
-      ) {
-        notify.info({
-          title: "រក្សារទុករូបភាពគណនី",
-          content: "សូមជ្រើសរើសរូបភាពជាមុនសិន។",
+
+      const allowedMimeTypes = ["image/jpeg", "image/png"];
+      const allowedSizeMb = 5;
+
+      if (!allowedMimeTypes.includes(file.type)) {
+        notify.error({
+          title: "Avatar Upload",
+          description: "Please choose a JPG or PNG image.",
           duration: 3000,
         });
-        return false;
+        return;
       }
+
+      if (file.size > allowedSizeMb * 1024 * 1024) {
+        notify.error({
+          title: "Avatar Upload",
+          description: `The selected image is ${(file.size / 1024 / 1024).toFixed(2)} MB. Maximum size is 5 MB.`,
+          duration: 3000,
+        });
+        return;
+      }
+
+      selectedFileType.value = file.type;
+
+      const reader = new FileReader();
+      reader.onload = (loadEvent) => {
+        base64Avatar.value = loadEvent.target?.result || null;
+        files.value = [file];
+      };
+      reader.onerror = () => {
+        notify.error({
+          title: "Avatar Upload",
+          description: "Unable to read the selected image.",
+          duration: 3000,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clickUpload() {
+      document.getElementById("referenceDocument")?.click();
+    }
+
+    function uploadFiles() {
+      if (!Array.isArray(files.value) || files.value.length === 0 || !files.value[0]) {
+        notify.info({
+          title: "Avatar Upload",
+          content: "Choose an image before saving your profile photo.",
+          duration: 3000,
+        });
+        return;
+      }
+
       notify.info({
-        title: "ដាក់រូបភាពអ្នកប្រើប្រាស់",
-        description: "កំពុងដាក់រូបភាព។",
+        title: "Avatar Upload",
+        description: "Uploading profile image...",
         duration: 1000,
       });
 
-      console.log(files.value);
-      let formData = new FormData();
+      const formData = new FormData();
       const selectedFile = files.value[0];
+
       formData.append("id", user.value.id);
       formData.append("files", selectedFile, selectedFile.name);
 
@@ -865,131 +669,552 @@ export default {
         .dispatch("user/upload", formData)
         .then((res) => {
           notify.success({
-            title: "ដាក់រូបភាពអ្នកប្រើប្រាស់",
-            description: "កំពុងរក្សាទុករូបភាព។",
+            title: "Avatar Upload",
+            description: "Profile image updated.",
             duration: 1000,
           });
+
           if (res.data.record != null && res.data.record != undefined) {
-            let tmpUser = getUser();
+            const tmpUser = getUser();
             tmpUser.avatar_url = res.data.record.avatar_url;
             localStorage.setItem("user", JSON.stringify(tmpUser));
             user.value = getUser();
             base64Avatar.value = user.value.avatar_url;
-            formData = new FormData();
+            selectedFileType.value = "";
             files.value = [];
           }
         })
         .catch((err) => {
           console.log(err);
           notify.error({
-            title: "ដាក់រូបភាពអ្នកប្រើប្រាស់",
-            description: "មានបញ្ហាក្នុងការរក្សារទុករូបភាព។",
+            title: "Avatar Upload",
+            description: "There was a problem saving the selected image.",
             duration: 3000,
           });
         });
     }
-    /**
-     * Update local photo
-     */
-    const localProfile = computed(() => {
-      return base64Avatar.value !== "" && base64Avatar.value !== null
-        ? base64Avatar.value
-        : user.value.avatar_url !== "" && user.value.avatar_url !== null
-          ? user.value.avatar_url
-          : "/src/assets/logo.png";
-    });
 
-    function getOrganizations() {
-      store
-        .dispatch("organization/list", {
-          page: 1,
-          perPage: 1000,
-          search: "",
-          id: 0,
-        })
-        .then((res) => {
-          store.commit("organization/setRecords", res.data.records);
-        })
-        .catch((err) => {
-          notify.error({
-            title: "អានអង្គភាព",
-            description: "មានបញ្ហាពេលអានអានអង្គភាព។",
-          });
-          console.log(err);
-        });
+    function goToPasswordChange() {
+      router.push("/password/change");
     }
-    function getCountesies() {
-      store
-        .dispatch("countesy/list", {
-          page: 1,
-          perPage: 1000,
-          search: "",
-        })
-        .then((res) => {
-          store.commit("countesy/setRecords", res.data.records);
-        })
-        .catch((err) => {
-          notify.error({
-            title: "អានងារ",
-            description: "មានបញ្ហាពេលអានងារ។",
-          });
-          console.log(err);
-        });
-    }
-    function getPositions() {
-      store
-        .dispatch("position/list", {
-          page: 1,
-          perPage: 1000,
-          search: "",
-        })
-        .then((res) => {
-          store.commit("position/setRecords", res.data.records);
-        })
-        .catch((err) => {
-          notify.error({
-            title: "អានតំណែង",
-            description: "មានបញ្ហាពេលអានតំណែង។",
-          });
-          console.log(err);
-        });
-    }
-
-    const visibleHelper = ref(false);
-    setTimeout(() => {
-      visibleHelper.value = true;
-      clearTimeout();
-    }, 500);
 
     return {
-      visibleHelper,
-      user,
-      logout,
-      saveAccount,
-      saveProfile,
-      saveOfficer,
-      officerDate,
-      peopleDob,
-      fileChange,
-      uploadFiles,
+      accountItems,
+      accountSnapshotItems,
+      assignmentItems,
+      avatarStyle,
       clickUpload,
-      localProfile,
-      model,
-      transitionHelper,
-      selectedPosition,
-      selectedOrganization,
-      selectedCountesies,
-      positions,
-      organizations,
-      countesies,
+      fileChange,
+      goToPasswordChange,
+      hasPendingAvatar,
+      hasText,
+      headerBadges,
+      officerItems,
+      personalContactItems,
+      personalIdentityItems,
+      profileTagline,
+      quickStatItems,
+      selectedFileName,
       title,
-      dateFormat,
+      transitionHelper,
+      uploadFiles,
+      user,
+      userDisplayName,
+      userEnglishName,
     };
   },
 };
 </script>
-<style lang="css" scoped>
-.profileInformation {
-  @apply text-left;
+
+<style scoped>
+.profile-page {
+  --profile-ink: #1f2937;
+  --profile-muted: #6b7280;
+  --profile-border: #e5e7eb;
+  --profile-accent: #2563eb;
+  --profile-accent-strong: #1d4ed8;
+  --profile-accent-soft: #eff6ff;
+  --profile-warm-soft: #fffbeb;
+  --profile-warm-border: #fde68a;
+  background: #f9fafb;
+}
+
+.profile-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--profile-border);
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.profile-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: #1d4ed8;
+}
+
+.profile-card__top {
+  position: relative;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid var(--profile-border);
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 1.25rem;
+}
+
+.profile-avatar-ring {
+  padding: 6px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+}
+
+.profile-avatar {
+  width: 8rem;
+  height: 8rem;
+  border: 3px solid #ffffff;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: 0 0 0 1px var(--profile-border);
+}
+
+.profile-fab {
+  position: absolute;
+  right: 0;
+  bottom: 0.35rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid #ffffff;
+  border-radius: 9999px;
+  background: var(--profile-accent-strong);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.24);
+  transition: background 0.18s ease;
+}
+
+.profile-fab:hover {
+  background: #1e40af;
+}
+
+.profile-fab svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--profile-warm-border);
+  border-radius: 9999px;
+  background: var(--profile-warm-soft);
+  color: #b45309;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.profile-name {
+  margin-top: 0.9rem;
+  color: var(--profile-ink);
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.profile-subtitle {
+  margin-top: 0.35rem;
+  color: var(--profile-muted);
+  font-size: 0.88rem;
+}
+
+.profile-summary {
+  margin-top: 0.65rem;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.profile-selected-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.profile-selected-file span {
+  color: var(--profile-muted);
+  font-size: 0.76rem;
+}
+
+.profile-selected-file strong {
+  color: var(--profile-ink);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: right;
+  word-break: break-word;
+}
+
+.profile-action-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.profile-action {
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.profile-action--primary {
+  background: var(--profile-accent-strong);
+  border-color: var(--profile-accent-strong);
+  color: #ffffff;
+}
+
+.profile-action--secondary {
+  background: var(--profile-accent-soft);
+  color: var(--profile-accent-strong);
+  border-color: #bfdbfe;
+}
+
+.profile-action--active {
+  background: var(--profile-accent);
+  border-color: var(--profile-accent);
+  color: #ffffff;
+}
+
+.profile-action--ghost {
+  background: #ffffff;
+  color: var(--profile-ink);
+  border-color: #d1d5db;
+}
+
+.profile-stat-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 1rem 1rem 0;
+}
+
+.profile-stat {
+  padding: 0.9rem;
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.profile-stat span {
+  display: block;
+  color: var(--profile-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.profile-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--profile-ink);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.profile-mini-panel {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.profile-section-heading span {
+  color: var(--profile-ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.profile-section-heading p {
+  margin-top: 0.35rem;
+  color: var(--profile-muted);
+  line-height: 1.6;
+}
+
+.profile-mini-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.profile-mini-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.profile-mini-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.profile-mini-item span {
+  color: var(--profile-muted);
+}
+
+.profile-mini-item strong {
+  color: var(--profile-ink);
+  text-align: right;
+  word-break: break-word;
+}
+
+.profile-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  color: var(--profile-ink);
+  border-bottom: 1px solid var(--profile-border);
+}
+
+.profile-banner__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  background: var(--profile-accent-soft);
+  color: var(--profile-accent-strong);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.profile-banner__title {
+  margin-top: 0.75rem;
+  font-size: 1.35rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #111827;
+}
+
+.profile-banner__text {
+  margin-top: 0.5rem;
+  max-width: 48rem;
+  color: var(--profile-muted);
+  line-height: 1.6;
+}
+
+.profile-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.profile-badge {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--profile-border);
+  border-radius: 9999px;
+  background: #f9fafb;
+  color: #4b5563;
+  font-size: 0.82rem;
+}
+
+.profile-tabs {
+  padding: 1.25rem;
+}
+
+.profile-sections {
+  display: grid;
+  gap: 1rem;
+}
+
+.profile-section {
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: #ffffff;
+}
+
+.profile-section__head {
+  margin-bottom: 0.9rem;
+}
+
+.profile-section__head h3 {
+  color: var(--profile-ink);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.profile-section__head p {
+  margin-top: 0.25rem;
+  color: var(--profile-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.profile-info-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profile-info-card {
+  min-height: 5.25rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+  background: #ffffff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.profile-info-card:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+}
+
+.profile-info-card--wide {
+  grid-column: span 2;
+}
+
+.profile-info-card span {
+  display: block;
+  color: var(--profile-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.profile-info-card strong {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--profile-ink);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.profile-note-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profile-note-card {
+  padding: 1rem;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: var(--profile-accent-soft);
+  color: var(--profile-ink);
+}
+
+.profile-note-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.profile-note-card p {
+  margin-top: 0.45rem;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.profile-note-card--light {
+  border-color: var(--profile-border);
+  background: #f9fafb;
+  color: var(--profile-ink);
+}
+
+:deep(.n-tabs-nav-scroll-content) {
+  gap: 0.5rem;
+}
+
+:deep(.n-tabs-tab) {
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+:deep(.n-tabs-tab.n-tabs-tab--active) {
+  background: var(--profile-accent-soft);
+  color: var(--profile-accent-strong);
+}
+
+:deep(.n-tabs-bar) {
+  background: var(--profile-accent-strong);
+}
+
+.profile-drop-enter-active,
+.profile-drop-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.profile-drop-enter-from,
+.profile-drop-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+@media (min-width: 768px) {
+  .profile-card__top {
+    padding: 1.75rem;
+  }
+
+  .profile-banner {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .profile-tabs {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .profile-card--main {
+    margin-top: 1.4rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .profile-stat-grid,
+  .profile-info-grid,
+  .profile-note-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-info-card--wide {
+    grid-column: span 1;
+  }
+
+  .profile-selected-file,
+  .profile-mini-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-mini-item strong,
+  .profile-selected-file strong {
+    text-align: left;
+  }
 }
 </style>

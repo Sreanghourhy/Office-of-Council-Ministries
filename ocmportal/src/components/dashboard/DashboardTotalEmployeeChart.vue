@@ -188,7 +188,7 @@ export default {
         const prevVal = prevDatum != null ? Number(prevDatum.value) || 0 : null
         const diff = prevVal != null ? currVal - prevVal : null
         const pct = prevVal != null && prevVal !== 0 ? Math.round(((currVal - prevVal) / prevVal) * 1000) / 10 : null
-        let line1 = `ចំនួនមន្រ្តីសរុបក្នុងឆ្នាំ ${d.year}: <span class="tt-amt">${currVal.toLocaleString()}</span>`
+        let line1 = `ចំនួនមន្ត្រីសរុបក្នុងឆ្នាំ ${d.year}: <span class="tt-amt">${currVal.toLocaleString()}</span>`
         if (diff !== null) {
           const sign = diff > 0 ? '+' : ''
           const diffClass = diff > 0 ? 'tt-up' : diff < 0 ? 'tt-down' : 'tt-same'

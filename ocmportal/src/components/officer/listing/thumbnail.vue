@@ -1,682 +1,1446 @@
 <template>
-  <div class="relative w-full" >
-  <!-- Top action panel of crud -->
-    <div class="flex title-bar border-b border-gray-200 bg-white ">
-      <!-- Title of crud -->
-      <div class="flex w-64 h-10 py-1 title px-4" >
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 28 28"><g fill="none"><path d="M17.254 11a2.25 2.25 0 0 1 2.25 2.25v6.249a5.501 5.501 0 0 1-11.002 0V13.25a2.25 2.25 0 0 1 2.25-2.25h6.502zm0 1.5h-6.502a.75.75 0 0 0-.75.75v6.249a4.001 4.001 0 0 0 8.002 0V13.25a.75.75 0 0 0-.75-.75zM4.25 11h4.156a3.243 3.243 0 0 0-.817 1.5H4.25a.75.75 0 0 0-.75.75v5.249a3.001 3.001 0 0 0 4.238 2.735c.133.49.324.956.564 1.392A4.501 4.501 0 0 1 2 18.499V13.25A2.25 2.25 0 0 1 4.25 11zm19.5 0A2.25 2.25 0 0 1 26 13.25v5.25a4.5 4.5 0 0 1-6.298 4.127l.056-.102c.214-.406.387-.837.511-1.289A3 3 0 0 0 24.5 18.5v-5.25a.75.75 0 0 0-.749-.75h-3.333A3.242 3.242 0 0 0 19.6 11h4.151zM14 3a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zm8.003 1a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM5.997 4a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM14 4.5a2 2 0 1 0 0 4a2 2 0 0 0 0-4zm8.003 1a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-16.006 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3z" fill="currentColor"></path></g></svg>
-        <div class="font-moul ml-2 leading-9" v-html="model.title" ></div>
+  <div class="thumbnail-page">
+    <section class="hero-shell">
+      <div class="hero-copy">
+        <span class="hero-mark"></span>
+        <div>
+          <p class="hero-kicker">Card Directory</p>
+          <h1 class="hero-title">{{ model.title }}</h1>
+        </div>
       </div>
-      <!-- Actions button of the crud -->
-      <div class="flex-grow action-buttons flex-row-reverse flex px-4">
-        <!-- New Button -->
-        <div class="mt-1 ml-2 flex flex-wrap">
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <svg class="ml-1 w-7 h-7 p-1 mt-1 bg-white rounded-full border border-gray-300 cursor-pointer hover:text-green-500 duration-300" @click="toggleFilter()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M18 28h-4a2 2 0 0 1-2-2v-7.59L4.59 11A2 2 0 0 1 4 9.59V6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v3.59a2 2 0 0 1-.59 1.41L20 18.41V26a2 2 0 0 1-2 2zM6 6v3.59l8 8V26h4v-8.41l8-8V6z" fill="currentColor"></path></svg>
-            </template>
-            សម្រង់ទិន្នន័យ
-          </n-tooltip>
-        </div>
-        <div class="w-3/5 md:w-2/5 relative" >
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <div class="w-full relative" >
-                <input type="text" @keypress.enter="filterRecords(false)" v-model="table.search" class="bg-gray-100 px-2 h-8 my-1 w-full rounded border border-gray-200 focus:border-blue-600 hover:border-blue-600 duration-300" placeholder="ស្វែងរក" />
-                <svg class="absolute right-1 top-2 w-6 h-6 text-gray-400  cursor-pointer" @click="filterRecords(false)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 20 20"><g fill="none"><path d="M8.5 3a5.5 5.5 0 0 1 4.227 9.02l4.127 4.126a.5.5 0 0 1-.638.765l-.07-.057l-4.126-4.127A5.5 5.5 0 1 1 8.5 3zm0 1a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9z" fill="currentColor"></path></g></svg>
-              </div>
-            </template>
-            សូមបញ្ចូលពាក្យគន្លឹះដើម្បីស្វែងរក
-          </n-tooltip>
-        </div>
-        <div class="mt-1 mr-2 flex flex-wrap">
-          <n-tooltip v-if="$hasPermission('portal_staff_creating')" trigger="hover">
-            <template #trigger>
-              <div @click="tableView()" class="flex cursor-pointer hover:text-green-500 duration-300 ml-2 leading-8" >
-                <svg class="w-6 h-6 mt-1 mr-1 " xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 28 28"><g fill="none"><path d="M25 6.75A3.75 3.75 0 0 0 21.25 3H6.75A3.75 3.75 0 0 0 3 6.75v14.5A3.75 3.75 0 0 0 6.75 25h14.5A3.75 3.75 0 0 0 25 21.25V6.75zM4.5 11h5v6h-5v-6zM17 17h-6v-6h6v6zM4.5 18.5h5v5H6.75a2.25 2.25 0 0 1-2.25-2.25V18.5zm12.5 5h-6v-5h6v5zm6.5-2.25a2.25 2.25 0 0 1-2.25 2.25H18.5v-5h5v2.75zm0-10.25v6h-5v-6h5zm-19-4.25A2.25 2.25 0 0 1 6.75 4.5h14.5a2.25 2.25 0 0 1 2.25 2.25V9.5h-19V6.75z" fill="currentColor"></path></g></svg>
-                តារាង
-              </div>
-            </template>
-            បង្ហាញជាតារាង
-          </n-tooltip>
-          <n-tooltip v-if="$hasPermission('portal_staff_creating')" trigger="hover">
-            <template #trigger>
-              <div @click="showCreateModal()" class="flex cursor-pointer hover:text-green-500 duration-300 ml-2 leading-8" >
-                <svg class="w-7 h-7 mr-1 " xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9 12h6"></path><path d="M12 9v6"></path></g></svg>
-                មន្ត្រីមានអត្តលេខ
-              </div>
-            </template>
-            មន្ត្រីរាជការមុខងារសាធារណៈ
-          </n-tooltip>
-          <n-tooltip v-if="$hasPermission('portal_staff_creating')" trigger="hover">
-            <template #trigger>
-              <div @click="showCreateNonOfficerModal()" class="flex cursor-pointer hover:text-green-500 duration-300 ml-2 leading-8" >
-                <svg class="w-7 h-7 mr-1 " xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9 12h6"></path><path d="M12 9v6"></path></g></svg>
-                មន្ត្រីគ្មានអត្តលេខ
-              </div>
-            </template>
-            មន្ត្រីនយោបាយ
-          </n-tooltip>
-          <!-- 
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <svg class="mx-1 w-7 h-7 p-1 bg-white rounded-full border border-gray-300 cursor-pointer hover:text-green-500 duration-300" @click="$router.push('/people/export')" 
-              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0 0 42 42h216v494zM514.1 580.1l-61.8-102.4c-2.2-3.6-6.1-5.8-10.3-5.8h-38.4c-2.3 0-4.5.6-6.4 1.9c-5.6 3.5-7.3 10.9-3.7 16.6l82.3 130.4l-83.4 132.8a12.04 12.04 0 0 0 10.2 18.4h34.5c4.2 0 8-2.2 10.2-5.7L510 664.8l62.3 101.4c2.2 3.6 6.1 5.7 10.2 5.7H620c2.3 0 4.5-.7 6.5-1.9c5.6-3.6 7.2-11 3.6-16.6l-84-130.4l85.3-132.5a12.04 12.04 0 0 0-10.1-18.5h-35.7c-4.2 0-8.1 2.2-10.3 5.8l-61.2 102.3z" fill="currentColor"></path></svg>
-            </template>
-            នាំចេញទិន្នន័យ
-          </n-tooltip> -->
-        </div>
+
+      <div class="hero-actions">
+        <button type="button" class="hero-button hero-button-secondary" @click="tableView()">Table View</button>
+        <button
+          v-if="$hasPermission('portal_staff_creating')"
+          type="button"
+          class="hero-button hero-button-primary"
+          @click="showCreateModal()"
+        >
+          Add Officer
+        </button>
+        <button
+          v-if="$hasPermission('portal_staff_creating')"
+          type="button"
+          class="hero-button hero-button-ghost"
+          @click="showCreateNonOfficerModal()"
+        >
+          Add Non-Officer
+        </button>
+      </div>
+    </section>
+
+    <div class="stats-grid">
+      <div
+        v-for="(tab, index) in summaryTabs"
+        :key="tab.label"
+        class="stat-card"
+        :class="{ 'stat-card-active': index === 0 }"
+      >
+        <span class="stat-label">{{ tab.label }}</span>
+        <strong class="stat-value">{{ $toKhmer(tab.value) }}</strong>
       </div>
     </div>
-    <!-- Table of crud -->
-    <div class="vcb-table-panel relative ">
-      <Transition name="fade" >
-        <div v-if="Array.isArray( table.records.matched ) && table.records.matched.length > 0 " class="vcb-thumbnail mb-12" >
-          <div v-for="(record, index) in table.records.matched" :key='index' class="item" >
-            <div class="content" >
-              <div v-if="record.image != false && record.image != null && record.image != undefined " class="image bg-cover bg-no-repeat " :style=" 'background-image: url(' + record.image +');' " ></div>
-              <div v-if="record.image == false || record.image == null || record.image == undefined " class="image bg-contain bg-center bg-no-repeat " :style=" 'background-image: url('+ocmLogoUrl+');' " ></div>
-              <div class="flex flex-wrap " >
-                <div class="w-full py-2" >
-                  <div v-if="record.countesy != undefined && record.countesy != null " class="w-full officer-countesy text-center font-moul" >{{  record.countesy.name }}</div>
-                  <div v-if="record.people != undefined && record.people != null " class="w-full officer-name text-center font-moul tracking-wider pt-1" >{{ record.people.lastname + " " + record.people.firstname }}</div>
-                  <div v-if="record.people != undefined && record.people != null " class="w-full officer-name text-center font-moul tracking-wider" >{{ record.people.enlastname + " " + record.people.enfirstname }}</div>
-                </div>
-                <div class="w-full flex flex-wrap justify-between text-gray-600" >
-                  <div class="w-1/2 flex flex-wrap " >
-                    <div v-if=" ( record.official_date != undefined && record.official_date != null ) " class="text-left text-xxs mt-1 leading-5 tracking-wider w-full" >{{ $toKhmer( dateFormat( new Date( record.official_date ) , 'dd-mm-yyyy' ) ) }}<br/></div>
-                    <div v-if=" record.current_job != undefined && record.current_job != null " class="text-left text-xxs leading-5 tracking-wider w-full" >{{ 
-                      record.current_job.organization_structure_position != undefined && record.current_job.organization_structure_position != null 
-                        ? record.current_job.organization_structure_position.position != undefined && record.current_job.organization_structure_position.position != null 
-                          ? record.current_job.organization_structure_position.position.name 
-                          : '' 
-                        : '' 
-                    }}</div>
-                  </div>
-                  <div v-if=" record.current_job != undefined && record.current_job != null " class="w-1/2 text-right text-xxs my-1  leading-5 tracking-wide" >{{ 
-                    record.current_job.organization_structure_position != undefined && record.current_job.organization_structure_position != null 
-                        ? record.current_job.organization_structure_position.organization_structure != undefined && record.current_job.organization_structure_position.organization_structure != null 
-                          ? record.current_job.organization_structure_position.organization_structure.organization.name 
-                          : 'ok' 
-                        : 'no'  
-                  }}</div>
-                </div>
-                <div v-if="record.card != null && record.card != undefined && record.card.id > 0" class="absolute left-1 top-1 text-vcb-xs text-left font-bold leading-6 tracking-wider" >{{ $toKhmer( record.card.number ) }}</div>
-                <!-- <div v-if="(record.card == null || record.card == undefined ) && ( record.organization != undefined && record.organization != null ) " class="absolute left-1 top-1 text-xxs text-left font-bold leading-6 tracking-wider" v-html=" $toKhmer( ( record.organization != undefined && record.organization.prefix != null && record.organization.prefix != '' ? record.organization.prefix + '-'  : '' ) + ( record.id + '' ).padStart( 4 , '0' ) )" ></div> -->
-                <div v-if="record.rank != null && record.rank != undefined " class="absolute left-1 top-5 text-vcb-xs text-left font-bold leading-6 tracking-wider text-xxs " v-html=" $toKhmer( record.rank.prefix + ' ' + record.rank.name )" ></div>
-                <div v-if=" record.current_job != undefined && record.current_job != null " class="absolute right-10 top-2 w-1 h-1 bg-green-400 rounded-full " ></div>
-              </div>
-              <thumbnail-actions-form v-bind:model="model" v-bind:record="record" :onClose="closeActions" />
-            </div>
-          </div>
+
+    <section class="card-shell">
+      <div class="toolbar">
+        <div class="search-shell">
+          <input
+            v-model="table.search"
+            type="text"
+            class="search-input"
+            placeholder="Search for staff"
+            @keyup.enter="filterRecords(false)"
+          />
         </div>
-      </Transition>
-      <!-- Loading -->
-      <Transition name="slide-fade" >
-        <div v-if="table.loading == true " class="table-loading fixed flex h-screen left-0 top-10 right-0 bottom-0 bg-white bg-opacity-90 ">
-          <div class="flex mx-auto items-center">
-            <div class="spinner">
-              <svg class="animate-spin w-16 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48s21.49-48 48-48s48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48s48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.491-48-48-48z" fill="currentColor"></path></svg>
-              <br/><br/>កំពុងអាន...
-            </div>
-          </div>
-          <div class="absolute top-2 right-2 cursor-pointer bg-white rounded-full " @click="closeTableLoading" >
-            <svg class="w-10 mx-auto text-red-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 320L192 192"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M192 320l128-128"></path></svg>
-          </div>
-        </div>
-      </Transition>
-      <!-- Pagination of crud -->
-      <div class="fixed left-0 right-0 bottom-8 flex flex-wrap" >
-        <Transition name="slide-fade" >
-          <!-- This pagination is for the media side with from Medium up -->
-          <div v-if="table.pagination.totalPages > 1" class="vcb-table-pagination bg-blue-300 mx-auto">
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-popselect 
-                  trigger="click"
-                  v-model:value="table.pagination.perPage"
-                  :options="[
-                    { label: 5 , value: 5 } ,
-                    { label: 10 , value: 10 } ,
-                    { label: 20 , value: 20 } ,
-                    { label: 30 , value: 30 } ,
-                    { label: 40 , value: 40 } ,
-                    { label: 50 , value: 50 } ,
-                    { label: 100 , value: 100 } ,
-                    { label: 200 , value: 200 } ,
-                    { label: 500 , value: 500 } ,
-                  ]"
-                  size="small"
-                  scrollable
-                  @update:value="goTo(1)"
-                >
-                  <div class="cursor-pointer font-pvh rounded-full p-2 px-4 border border-gray-200 text-blue-600" >{{ $toKhmer( table.pagination.perPage ) }}</div>
-                </n-popselect>
-              </template>
-              ចំនួនព័ត៌មានបង្ហាញម្ដង
-            </n-tooltip>
-            <!-- Information -->
-            <div class="vcb-table-pagination-info font-pvh text-blue-600 p-1 mx-2" >{{ table.pagination.totalRecords > 0 ? $toKhmer( table.pagination.totalRecords ) + " ឯកសារ" : "" }}</div>
-            <div class="vcb-table-pagination-info font-pvh text-blue-600 p-1 mx-2" >{{ table.pagination.totalPages > 0 ? $toKhmer( table.pagination.totalPages ) + " ទំព័រ" : "" }}</div>
-            <!-- Pages (7) -->
-            <div v-for="(page, index) in table.pagination.buttons" :key="index" :class=" (table.pagination.page == page ? ' vcb-pagination-page-active ' : ' vcb-pagination-page ' )" @click="table.pagination.page == page ? false : goTo(page) " >{{ $toKhmer( page ) }}</div>
-            <!-- First -->
-            <div v-if="table.pagination.page > 1 " class="vcb-pagination-page p-1" @click="first()" >
-              <svg class="w-5 h-5 mx-auto" 
-              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M18.29 17.29a.996.996 0 0 0 0-1.41L14.42 12l3.88-3.88a.996.996 0 1 0-1.41-1.41L12.3 11.3a.996.996 0 0 0 0 1.41l4.59 4.59c.38.38 1.01.38 1.4-.01z" fill="currentColor"></path><path d="M11.7 17.29a.996.996 0 0 0 0-1.41L7.83 12l3.88-3.88a.996.996 0 1 0-1.41-1.41L5.71 11.3a.996.996 0 0 0 0 1.41l4.59 4.59c.38.38 1.01.38 1.4-.01z" fill="currentColor"></path></svg>
-            </div>
-            <!-- Previous -->
-            <Transition name="slide-fade" >
-              <div v-if="table.pagination.page > 1 " class="vcb-pagination-page p-1" @click="previous()" >
-                <svg class="w-5 h-5 mx-auto" 
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M14.71 15.88L10.83 12l3.88-3.88a.996.996 0 1 0-1.41-1.41L8.71 11.3a.996.996 0 0 0 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0c.38-.39.39-1.03 0-1.42z" fill="currentColor"></path></svg>
-              </div>
-            </Transition>
-            <!-- Next -->
-            <Transition name="slide-fade" >
-              <div v-if="table.pagination.page < table.pagination.totalPages " class="vcb-pagination-page p-1" @click="next()" >
-                <svg class="w-5 h-5 mx-auto" 
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12L9.29 8.12a.996.996 0 1 1 1.41-1.41l4.59 4.59c.39.39.39 1.02 0 1.41L10.7 17.3a.996.996 0 0 1-1.41 0c-.38-.39-.39-1.03 0-1.42z" fill="currentColor"></path></svg>
-              </div>
-            </Transition>
-            <!-- Last -->
-            <div v-if="table.pagination.page < table.pagination.totalPages "  class="vcb-pagination-page p-1" @click="last()" >
-              <svg class="w-5 h-5 mx-auto" 
-              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M5.7 6.71a.996.996 0 0 0 0 1.41L9.58 12L5.7 15.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L7.12 6.71c-.39-.39-1.03-.39-1.42 0z" fill="currentColor"></path><path d="M12.29 6.71a.996.996 0 0 0 0 1.41L16.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L13.7 6.7c-.38-.38-1.02-.38-1.41.01z" fill="currentColor"></path></svg>
-            </div>
-            <!-- Go to -->
-            <!-- Total per page -->
-          </div>
-        </Transition>
-      </div>
-    </div>
-    <!-- Form create account -->
-    <create-form v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal"/>
-    <create-non-officer-form v-bind:model="model" v-bind:show="createNonOfficerModal.show" :onClose="closeCreateNonOfficerModal"/>
-    <!-- Filter panel of crud -->
-    <Transition name="slide-fade" >
-      <div v-if="filter" class="vcb-filters-panel">
-        <svg @click="toggleFilter()" class="absolute bg-white rounded-full shadow p-2 right-2 top-2 w-10 h-10 border border-gray-200 cursor-pointer hover:text-green-500 duration-300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M18 28h-4a2 2 0 0 1-2-2v-7.59L4.59 11A2 2 0 0 1 4 9.59V6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v3.59a2 2 0 0 1-.59 1.41L20 18.41V26a2 2 0 0 1-2 2zM6 6v3.59l8 8V26h4v-8.41l8-8V6z" fill="currentColor"></path></svg>
-        <div class="filter-title font-moul" >សូមជ្រើសរើសលក្ខណ សម្រង់ទិន្នន័យ៖</div>
-        <div class="filter-actions" >
-          <div class="filter-action" >
-            <!-- Positions -->
-            <n-select v-model:value="selectedPositions" filterable clearable multiple @update:value="filterRecords(false)" placeholder="សូមជ្រើសរើស មុខតំណែង" :options="optionPositions" />
-          </div>
-          <div class="filter-action" >
-            <!-- Organizations -->
-            <n-select v-model:value="selectedOrganizations" filterable clearable multiple @update:value="filterRecords(false)" placeholder="សូមជ្រើសើស ស្ថាប័ន / អង្គភាព" :options="optionOrganizations" />
-          </div>
+
+        <div class="toolbar-actions">
+          <n-popselect
+            trigger="click"
+            v-model:value="table.pagination.perPage"
+            :options="perPageOptions"
+            size="small"
+            scrollable
+            @update:value="goTo(1)"
+          >
+            <button type="button" class="toolbar-chip">
+              {{ $toKhmer(table.pagination.perPage) }} / page
+            </button>
+          </n-popselect>
+
+          <button
+            type="button"
+            class="toolbar-chip"
+            :class="{ 'toolbar-chip-active': filter || activeFilterCount > 0 }"
+            @click="toggleFilter()"
+          >
+            Filters
+            <span class="toolbar-chip-count">{{ $toKhmer(activeFilterCount) }}</span>
+          </button>
         </div>
       </div>
-    </Transition>
+
+      <Transition name="slide-fade">
+        <div v-if="filter" class="filter-row">
+          <div class="filter-item">
+            <label class="filter-label">Positions</label>
+            <n-select
+              v-model:value="selectedPositions"
+              filterable
+              clearable
+              multiple
+              placeholder="Choose positions"
+              :options="optionPositions"
+              @update:value="filterRecords(false)"
+            />
+          </div>
+          <div class="filter-item">
+            <label class="filter-label">Organizations</label>
+            <n-select
+              v-model:value="selectedOrganizations"
+              filterable
+              clearable
+              multiple
+              placeholder="Choose organizations"
+              :options="optionOrganizations"
+              @update:value="filterRecords(false)"
+            />
+          </div>
+          <button type="button" class="filter-reset" @click="resetFilters()">Clear</button>
+        </div>
+      </Transition>
+
+      <div class="toolbar-meta">
+        <span>Showing {{ $toKhmer(Array.isArray(table.records.matched) ? table.records.matched.length : 0) }} of {{ $toKhmer(table.pagination.totalRecords || 0) }} records</span>
+        <span>Page {{ $toKhmer(table.pagination.page || 1) }} / {{ $toKhmer(table.pagination.totalPages || 1) }}</span>
+      </div>
+
+      <Transition name="fade">
+        <div v-if="hasRecords" class="vcb-thumbnail thumbnail-grid">
+          <article
+            v-for="(record, index) in table.records.matched"
+            :key="record != null && record.id != null ? record.id : index"
+            class="thumb-card"
+          >
+            <div class="thumb-head">
+              <span class="thumb-index">#{{ $toKhmer(((table.pagination.page - 1) * table.pagination.perPage) + (index + 1)) }}</span>
+              <span class="thumb-badge" :class="{ 'thumb-badge-card': hasCard(record) }">
+                {{ hasCard(record) ? $toKhmer(record.card.number) : `Code ${$toKhmer(getOfficerCode(record))}` }}
+              </span>
+            </div>
+
+            <div class="thumb-identity">
+              <div class="thumb-avatar-wrap">
+                <div class="thumb-avatar">
+                  <img
+                    :src="getAvatarUrl(record)"
+                    :alt="getKhmerName(record)"
+                    class="thumb-avatar-image"
+                    :class="{ 'thumb-avatar-image-default': !hasAvatar(record) }"
+                    @error="setFallbackAvatar"
+                  />
+                </div>
+                <span v-if="hasCurrentJob(record)" class="thumb-active-dot"></span>
+              </div>
+
+              <div class="thumb-main">
+                <div class="thumb-name-block">
+                  <div v-if="record?.countesy?.name" class="thumb-countesy">{{ record.countesy.name }}</div>
+                  <h3 class="thumb-name">{{ getKhmerName(record) }}</h3>
+                  <p class="thumb-subtitle">{{ getEnglishName(record) }}</p>
+                </div>
+
+                <div class="thumb-rank-row">
+                  <span class="rank-pill">{{ getRankName(record) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="thumb-detail-grid">
+              <div class="thumb-detail">
+                <span class="thumb-detail-label">National ID</span>
+                <strong class="thumb-detail-value">{{ $toKhmer(getNationalId(record)) }}</strong>
+              </div>
+              <div class="thumb-detail">
+                <span class="thumb-detail-label">Official Date</span>
+                <strong class="thumb-detail-value">{{ $toKhmer(formatDateLabel(record?.official_date)) }}</strong>
+              </div>
+              <div class="thumb-detail thumb-detail-wide">
+                <span class="thumb-detail-label">Position</span>
+                <strong class="thumb-detail-value">{{ getPositionName(record) }}</strong>
+              </div>
+              <div class="thumb-detail thumb-detail-wide">
+                <span class="thumb-detail-label">Organization</span>
+                <strong class="thumb-detail-value">{{ getOrganizationName(record) }}</strong>
+              </div>
+            </div>
+
+            <thumbnail-actions-form v-bind:model="model" v-bind:record="record" :onClose="closeActions" />
+          </article>
+        </div>
+      </Transition>
+
+      <Transition name="fade">
+        <div v-if="!table.loading && !hasRecords" class="empty-state">
+          <h3>No staff cards found</h3>
+          <p>Try a different search term or adjust the active filters.</p>
+        </div>
+      </Transition>
+
+      <Transition name="slide-fade">
+        <div v-if="table.loading" class="loading-shell">
+          <div class="loading-card">
+            <div class="loading-spinner"></div>
+            <p>Loading staff cards...</p>
+          </div>
+          <button type="button" class="loading-close" @click="closeTableLoading">Close</button>
+        </div>
+      </Transition>
+
+      <div v-if="table.pagination.totalPages > 1" class="footer-bar">
+        <button type="button" class="footer-nav" :disabled="table.pagination.page <= 1" @click="previous()">Previous</button>
+
+        <div class="footer-center">
+          <span class="footer-summary">{{ $toKhmer(table.pagination.totalRecords) }} records</span>
+          <div class="footer-pages">
+            <button
+              v-for="(page, index) in table.pagination.buttons"
+              :key="index"
+              type="button"
+              class="footer-page"
+              :class="{ 'footer-page-active': table.pagination.page == page }"
+              @click="table.pagination.page == page ? false : goTo(page)"
+            >
+              {{ $toKhmer(page) }}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="footer-nav"
+          :disabled="table.pagination.page >= table.pagination.totalPages"
+          @click="next()"
+        >
+          Next
+        </button>
+      </div>
+    </section>
+
+    <create-form v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
+    <create-non-officer-form v-bind:model="model" v-bind:show="createNonOfficerModal.show" :onClose="closeCreateNonOfficerModal" />
   </div>
 </template>
+
 <script>
-import { reactive ,ref , computed } from 'vue'
+import { reactive, ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import QrcodeVue from 'qrcode.vue'
-import Vue3Barcode from 'vue3-barcode'
-import { useDialog, useMessage, useNotification } from 'naive-ui'
-import ocmLogoUrl from './../../../assets/logo.svg'
+import { useNotification } from 'naive-ui'
 import dateFormat from 'dateformat'
-/**
- * CRUD component form
- */
+
+import defaultOfficerAvatar from './../../../assets/logo copy.png'
 import CreateForm from './../widgets/create.vue'
 import CreateNonOfficerForm from './../widgets/createnonofficer.vue'
 import ThumbnailActionsForm from './actions/thumbnail-action.vue'
+
 export default {
-  name: "People" ,
+  name: 'People',
   components: {
-    QrcodeVue ,
-    Vue3Barcode,
-    /**
-     * Forms
-     */
-    CreateForm ,
-    CreateNonOfficerForm ,
+    CreateForm,
+    CreateNonOfficerForm,
     ThumbnailActionsForm
   },
-  setup(){
+  setup() {
     const store = useStore()
     const route = useRoute()
-    const dialog = useDialog()
-    const message = useMessage()
     const notify = useNotification()
     const router = useRouter()
 
-    const peopleIds = ref( 
-      route.params.ids != undefined && route.params.ids.trim().length > 0 ? route.params.ids.split(',') : null
+    const peopleIds = ref(
+      typeof route.params.ids === 'string' && route.params.ids.trim().length > 0
+        ? route.params.ids.split(',')
+        : null
     )
 
-    /**
-     * Variables
-     */    
-    const model = reactive( {
-      name: "officer" ,
-      module: "officers" ,
-      title: "មន្ត្រីរាជការមុខងារសាធារណៈ"
+    const model = reactive({
+      name: 'officer',
+      module: 'officers',
+      title: 'មន្ត្រីរាជការមុខងារសាធារណៈ'
     })
-    const table = reactive( {
-      loading: false ,
-      search: '' ,
+
+    const table = reactive({
+      loading: false,
+      search: '',
       records: {
-        all: [] ,
+        all: [],
         matched: []
       },
-      columns: {
-        searchable: {
-          username: '' ,
-          firstname: '' ,
-          lastname: '' ,
-          email: '' ,
-          phone: '' ,
-          active: ''
-        },
-        format: {
-          username: '' ,
-          firstname: '' ,
-          lastname: '' ,
-          email: '' ,
-          phone: '' ,
-          active: ''
-        }
-      } ,
       pagination: {
-        perPage: 20 ,
-        page: 1 ,
-        totalPages: 0 ,
-        totalRecords: 0 ,
-        start: 0 ,
-        end: 0 ,
+        perPage: 20,
+        page: 1,
+        totalPages: 0,
+        totalRecords: 0,
+        start: 0,
+        end: 0,
         buttons: []
       }
     })
 
-    function filterRecords(helper=true){
-      if( helper ){
+    const perPageOptions = [5, 10, 20, 30, 40, 50, 100, 200, 500].map((value) => ({
+      label: value,
+      value
+    }))
+
+    const avatarRefreshKey = ref(Date.now())
+    const selectedPositions = ref([])
+    const selectedOrganizations = ref([])
+    const filter = ref(false)
+    let filterTimeout = null
+
+    function countSelectedEntries(values) {
+      return Array.isArray(values)
+        ? values.filter((value) => value !== null && value !== undefined && `${value}`.trim() !== '').length
+        : 0
+    }
+
+    const hasRecords = computed(() => Array.isArray(table.records.matched) && table.records.matched.length > 0)
+
+    const activeFilterCount = computed(() => {
+      return countSelectedEntries(selectedPositions.value) + countSelectedEntries(selectedOrganizations.value)
+    })
+
+    const summaryTabs = computed(() => {
+      return [
+        { label: 'All Staff', value: table.pagination.totalRecords || 0 },
+        { label: 'Showing', value: Array.isArray(table.records.matched) ? table.records.matched.length : 0 },
+        { label: 'Positions', value: countSelectedEntries(selectedPositions.value) },
+        { label: 'Organizations', value: countSelectedEntries(selectedOrganizations.value) }
+      ]
+    })
+
+    const optionPositions = computed(() => {
+      let positions =
+        Array.isArray(store.getters['position/getRecords']) && store.getters['position/getRecords'].length > 0
+          ? store.getters['position/getRecords']
+          : []
+      positions = positions.map((position) => {
+        return { label: position.name, value: position.id }
+      })
+      return positions
+    })
+
+    const optionOrganizations = computed(() => {
+      let organizations =
+        Array.isArray(store.getters['organization/getRecords']) && store.getters['organization/getRecords'].length > 0
+          ? store.getters['organization/getRecords']
+          : []
+      organizations = organizations.map((organization) => {
+        return { label: organization.name, value: organization.id }
+      })
+      return organizations
+    })
+
+    function normalizeText(value, fallback = '--') {
+      if (value === null || value === undefined) {
+        return fallback
+      }
+
+      const text = `${value}`.trim()
+      return text.length > 0 ? text : fallback
+    }
+
+    function getKhmerName(record) {
+      const parts = [record?.countesy?.name, record?.people?.lastname, record?.people?.firstname].filter(
+        (value) => typeof value === 'string' && value.trim().length > 0
+      )
+      return parts.length > 0 ? parts.join(' ') : '--'
+    }
+
+    function getEnglishName(record) {
+      const parts = [record?.people?.enlastname, record?.people?.enfirstname].filter(
+        (value) => typeof value === 'string' && value.trim().length > 0
+      )
+      return parts.length > 0 ? parts.join(' ') : '--'
+    }
+
+    function getOfficerCode(record) {
+      return normalizeText(record?.code)
+    }
+
+    function getNationalId(record) {
+      return normalizeText(record?.people?.nid)
+    }
+
+    function getRankName(record) {
+      return normalizeText(record?.rank?.name)
+    }
+
+    function getOrganizationName(record) {
+      return normalizeText(record?.current_job?.organization_structure_position?.organization_structure?.organization?.name)
+    }
+
+    function getPositionName(record) {
+      return normalizeText(record?.current_job?.organization_structure_position?.position?.name)
+    }
+
+    function formatDateLabel(value) {
+      if (!value) {
+        return '--'
+      }
+
+      const parsedDate = new Date(value)
+      if (Number.isNaN(parsedDate.getTime())) {
+        return '--'
+      }
+
+      return dateFormat(parsedDate, 'dd-mm-yyyy')
+    }
+
+    function resolveAvatarUrl(record) {
+      const candidates = [record?.image, record?.avatar_url, record?.people?.avatar_url, record?.user?.avatar_url]
+      return candidates.find((value) => typeof value === 'string' && value.trim().length > 0) || null
+    }
+
+    function withAvatarVersion(url, record) {
+      if (typeof url !== 'string' || url.trim().length <= 0 || url.startsWith('data:')) {
+        return url
+      }
+      const version =
+        record?.updated_at || record?.user?.updated_at || record?.people?.updated_at || avatarRefreshKey.value
+      const separator = url.includes('?') ? '&' : '?'
+      return `${url}${separator}v=${encodeURIComponent(version)}`
+    }
+
+    function hasAvatar(record) {
+      const avatarUrl = resolveAvatarUrl(record)
+      return typeof avatarUrl === 'string' && avatarUrl.trim().length > 0
+    }
+
+    function getAvatarUrl(record) {
+      return hasAvatar(record)
+        ? withAvatarVersion(resolveAvatarUrl(record).trim(), record)
+        : defaultOfficerAvatar
+    }
+
+    function setFallbackAvatar(event) {
+      if (event?.target) {
+        event.target.onerror = null
+        event.target.src = defaultOfficerAvatar
+        event.target.classList.add('thumb-avatar-image-default')
+      }
+    }
+
+    function hasCurrentJob(record) {
+      return record?.current_job !== null && record?.current_job !== undefined
+    }
+
+    function hasCard(record) {
+      return record?.card !== null && record?.card !== undefined && record?.card?.id > 0
+    }
+
+    function buildPaginationButtons() {
+      const paginationNumberList = 10
+      if ((table.pagination.page - (parseInt(paginationNumberList / 2, 10) + 1)) < 1) {
+        table.pagination.start = 1
+        table.pagination.end =
+          table.pagination.totalPages > paginationNumberList ? paginationNumberList : table.pagination.totalPages
+      } else {
+        table.pagination.start = table.pagination.page - parseInt(paginationNumberList / 2, 10)
+        table.pagination.end =
+          table.pagination.page >= table.pagination.totalPages
+            ? table.pagination.totalPages
+            : table.pagination.page + parseInt(paginationNumberList / 2, 10)
+      }
+
+      table.pagination.buttons = []
+      for (let i = table.pagination.start; i <= table.pagination.end; i += 1) {
+        if (i <= table.pagination.totalPages) {
+          table.pagination.buttons.push(i)
+        }
+      }
+    }
+
+    function getRecords() {
+      table.loading = true
+      store
+        .dispatch(model.name + '/list', {
+          search: table.search,
+          perPage: table.pagination.perPage,
+          page: table.pagination.page,
+          positions: selectedPositions.value,
+          organizations: selectedOrganizations.value,
+          ids: peopleIds.value
+        })
+        .then((res) => {
+          table.records.all = table.records.matched = res.data.records
+          table.pagination = { ...table.pagination, ...res.data.pagination }
+          buildPaginationButtons()
+          closeTableLoading()
+        })
+        .catch((err) => {
+          notify.error({
+            title: 'Load Staff',
+            description: 'There was a problem while loading staff cards.'
+          })
+          table.loading = false
+          console.log(err)
+        })
+    }
+
+    function filterRecords(helper = true) {
+      if (helper) {
         table.records.matched = []
-        if( table.search != "" ) {
-          for(var index in table.records.all ){
-            for(var field in table.records.all[index] ){
-              if( (""+table.records.all[index][field]).includes( table.search ) !== false ) {
-                table.records.matched.push( table.records.all[index] )
-                break;
+        if (table.search !== '') {
+          for (const index in table.records.all) {
+            for (const field in table.records.all[index]) {
+              if ((`${table.records.all[index][field]}`).includes(table.search) !== false) {
+                table.records.matched.push(table.records.all[index])
+                break
               }
             }
           }
         }
-        if( table.records.matched.length <= 0 ) {
+
+        if (table.records.matched.length <= 0) {
           table.records.matched = table.records.all
         }
-      }else{
-        setTimeout( function(){
-          table.pagination.page = 1
-          getRecords()
-        } , 500 )
+        return
       }
+
+      if (filterTimeout) {
+        window.clearTimeout(filterTimeout)
+      }
+
+      filterTimeout = window.setTimeout(() => {
+        table.pagination.page = 1
+        getRecords()
+      }, 300)
     }
 
-    /**
-     * Functions
-     */
-    function getRecords(){
-      /**
-       * Clear time interval after calling
-       */
-      window.clearTimeout()
-      table.loading = true
-      store.dispatch(model.name+'/list',{
-        search: table.search ,
-        perPage: table.pagination.perPage ,
-        page: table.pagination.page ,
-        positions: selectedPositions.value ,
-        organizations: selectedOrganizations.value ,
-        ids: peopleIds.value
-      }).then(res => {
-        table.records.all = table.records.matched = res.data.records
-        table.pagination = res.data.pagination
-        
-        var paginationNumberList = 10
-        if( ( table.pagination.page - ( parseInt( paginationNumberList / 2 ) + 1 ) ) < 1 ){
-          table.pagination.start = 1
-          table.pagination.end = table.pagination.totalPages > paginationNumberList ? paginationNumberList : table.pagination.totalPages
-        }
-        else{
-          table.pagination.start = table.pagination.page - parseInt( paginationNumberList / 2 )
-          table.pagination.end = table.pagination.page >= table.pagination.totalPages ? table.pagination.totalPages : table.pagination.page + parseInt( paginationNumberList / 2 )
-        }
-        /**
-         * Create pagination buttons
-         */
-        table.pagination.buttons = []
-        for(var i=table.pagination.start;i<=table.pagination.end;i++){
-          i <= table.pagination.totalPages ? table.pagination.buttons.push(i) : false
-        }
-
-        closeTableLoading()
-      }).catch( err => {
-        console.log( err )
-      })
-    }
-    
-    function closeTableLoading(){
+    function closeTableLoading() {
       table.loading = false
     }
 
-    /**
-     * Pagination functions
-     */
-     function first(){
-      goTo( table.pagination.totalPages > 0 ? 1 : 0 )
+    function maxPage() {
+      return table.pagination.totalPages > 0 ? table.pagination.totalPages : 1
     }
-    function previous(){
-      goTo( table.pagination.page <= 1 ? 1 : table.pagination.page - 1 )
+
+    function previous() {
+      goTo(table.pagination.page <= 1 ? 1 : table.pagination.page - 1)
     }
-    function next(){
-      goTo( table.pagination.page >= table.pagination.totalPages ? table.pagination.totalPages : table.pagination.page + 1 )
+
+    function next() {
+      goTo(table.pagination.page >= maxPage() ? maxPage() : table.pagination.page + 1)
     }
-    function last(){
-      goTo( table.pagination.totalPages > 0 ? table.pagination.totalPages : 0 )
-    }
-    function goTo(page){
-      table.pagination.page = page >= table.pagination.totalPages ? table.pagination.totalPages : ( page < 1 ? 1 : page)
-      getRecords()
-    }
-    function updatePerpage(perPage){
-      table.pagination.perPage = perPage < 5 ? 5 : ( perPage > 100 ? 100 : perPgae )
-      table.pagination.page = 1
+
+    function goTo(page) {
+      table.pagination.page = page > maxPage() ? maxPage() : page < 1 ? 1 : page
       getRecords()
     }
 
-    /**
-     * Create modal handling
-     */
-    var createModal = reactive({show:false})
-    function showCreateModal(){
+    const createModal = reactive({ show: false })
+
+    function showCreateModal() {
       ensureCreateLookups()
       createModal.show = true
     }
 
-    function closeCreateModal( actionStatus ){
+    function closeCreateModal(actionStatus) {
       createModal.show = false
-      if( parseInt( actionStatus ) > 0 ) getRecords()
+      if (parseInt(actionStatus, 10) > 0) {
+        getRecords()
+      }
     }
 
-    /**
-     * Create non officer modal handling
-     */
-     var createNonOfficerModal = reactive({show:false})
-    function showCreateNonOfficerModal(){
+    const createNonOfficerModal = reactive({ show: false })
+
+    function showCreateNonOfficerModal() {
       ensureCreateLookups()
       createNonOfficerModal.show = true
     }
 
-    function closeCreateNonOfficerModal( actionStatus ){
+    function closeCreateNonOfficerModal(actionStatus) {
       createNonOfficerModal.show = false
-      if( parseInt( actionStatus ) > 0 ) getRecords()
+      if (parseInt(actionStatus, 10) > 0) {
+        getRecords()
+      }
     }
 
-    function closeActions( actionStatus ){
-      if( parseInt( actionStatus ) > 0 ) getRecords()
+    function closeActions(actionStatus) {
+      if (parseInt(actionStatus, 10) > 0) {
+        avatarRefreshKey.value = Date.now()
+        getRecords()
+      }
     }
 
-    function ensureFilterLookups(){
-      if( !Array.isArray( store.getters['position/getRecords'] ) || store.getters['position/getRecords'].length <= 0 ){
+    function ensureFilterLookups() {
+      if (!Array.isArray(store.getters['position/getRecords']) || store.getters['position/getRecords'].length <= 0) {
         getPositions()
       }
-      if( !Array.isArray( store.getters['organization/getRecords'] ) || store.getters['organization/getRecords'].length <= 0 ){
+
+      if (
+        !Array.isArray(store.getters['organization/getRecords']) ||
+        store.getters['organization/getRecords'].length <= 0
+      ) {
         getOrganizations()
       }
     }
 
-    function ensureCreateLookups(){
+    function ensureCreateLookups() {
       ensureFilterLookups()
-      if( !Array.isArray( store.getters['countesy/getRecords'] ) || store.getters['countesy/getRecords'].length <= 0 ){
+      if (!Array.isArray(store.getters['countesy/getRecords']) || store.getters['countesy/getRecords'].length <= 0) {
         getCountesies()
       }
       getRankStructure()
       getPdcv()
     }
-    
-    /**
-     * Load positions
-     */
-    const selectedPositions = ref(null)
-    const optionPositions = computed( () => {
-      let positions = Array.isArray( store.getters['position/getRecords'] ) && store.getters['position/getRecords'].length > 0 ? store.getters['position/getRecords'] : []
-      positions = positions.map( ( p ) => { return { label : p.name , value : p.id } })
-      positions.unshift({ label: 'សូមជ្រើសរើស មុនតំណែង' , value: null })
-      return positions
-    })
-    function getPositions(){
-      store.dispatch('position/structurePosition',{
-        page: 1 ,
-        perPage: 1000 ,
-        search: ''
-      }).then(res=>{
-        store.commit('position/setRecords',res.data.records)
-      }).catch(err =>{
-        notify.error({
-          title: 'អានតំណែង' ,
-          description: 'មានបញ្ហាពេលអានតំណែង។'
+
+    function getPositions() {
+      store
+        .dispatch('position/structurePosition', {
+          page: 1,
+          perPage: 1000,
+          search: ''
         })
-        console.log( err )
-      })
+        .then((res) => {
+          store.commit('position/setRecords', res.data.records)
+        })
+        .catch((err) => {
+          notify.error({
+            title: 'Load Positions',
+            description: 'There was a problem while loading positions.'
+          })
+          console.log(err)
+        })
     }
 
-    /**
-     * Load positions
-     */
-    const selectedOrganizations = ref(null)
-    const optionOrganizations = computed( () => {
-      let organizations = Array.isArray( store.getters['organization/getRecords'] ) && store.getters['organization/getRecords'].length > 0 ? store.getters['organization/getRecords'] : []
-      organizations = organizations.map( ( p ) => { return { label : p.name , value : p.id } })
-      organizations.unshift({ label: 'សូមជ្រើសរើស ស្ថាប័ន / អង្គភាព' , value: null })
-      return organizations
-    })
-    function getOrganizations(){
-      store.dispatch('organization/organizationStructure',{
-        page: 1 ,
-        perPage: 1000 ,
-        search: '' ,
-        id: 0
-      }).then(res=>{
-        store.commit('organization/setRecords',res.data.records)
-      }).catch(err =>{
-        notify.error({
-          title: 'អានអង្គភាព' ,
-          description: 'មានបញ្ហាពេលអានអានអង្គភាព។'
+    function getOrganizations() {
+      store
+        .dispatch('organization/organizationStructure', {
+          page: 1,
+          perPage: 1000,
+          search: '',
+          id: 0
         })
-        console.log( err )
-      })
+        .then((res) => {
+          store.commit('organization/setRecords', res.data.records)
+        })
+        .catch((err) => {
+          notify.error({
+            title: 'Load Organizations',
+            description: 'There was a problem while loading organizations.'
+          })
+          console.log(err)
+        })
     }
 
-    /**
-     * Load positions
-     */
-     const selectedCountesies = ref(null)
-    const optionCountesies = computed( () => {
-      let countesies = Array.isArray( store.getters['countesy/getRecords'] ) && store.getters['countesy/getRecords'].length > 0 ? store.getters['countesy/getRecords'] : []
-      countesies = countesies.map( ( p ) => { return { label : p.name , value : p.id } })
-      countesies.unshift({ label: 'សូមជ្រើសរើស ងារ' , value: null })
-      return countesies
-    })
-    function getCountesies(){
-      store.dispatch('countesy/list',{
-        page: 1 ,
-        perPage: 1000 ,
-        search: ''
-      }).then(res=>{
-        store.commit('countesy/setRecords',res.data.records)
-      }).catch(err =>{
-        notify.error({
-          title: 'អានងារ' ,
-          description: 'មានបញ្ហាពេលអានងារ។'
+    function getCountesies() {
+      store
+        .dispatch('countesy/list', {
+          page: 1,
+          perPage: 1000,
+          search: ''
         })
-        console.log( err )
-      })
+        .then((res) => {
+          store.commit('countesy/setRecords', res.data.records)
+        })
+        .catch((err) => {
+          notify.error({
+            title: 'Load Courtesy Titles',
+            description: 'There was a problem while loading courtesy titles.'
+          })
+          console.log(err)
+        })
     }
-    
-    const filter = ref(false)    
-    function toggleFilter(){
-      filter.value = !filter.value
-      if( filter.value ){
-        ensureFilterLookups()
+
+    function closeFilter() {
+      filter.value = false
+    }
+
+    function openFilter() {
+      filter.value = true
+      ensureFilterLookups()
+    }
+
+    function toggleFilter() {
+      filter.value ? closeFilter() : openFilter()
+    }
+
+    function resetFilters() {
+      selectedPositions.value = []
+      selectedOrganizations.value = []
+      table.pagination.page = 1
+      getRecords()
+    }
+
+    function handleKeydown(event) {
+      if (event.key === 'Escape') {
+        closeFilter()
       }
     }
 
-    function getRankStructure(){
-      if( store.getters['rank/records'].all.length <= 0 ){
-        store.dispatch('rank/structure').then( 
-          res => {
-            if( res.data.ok ){
-              store.commit('rank/setAllRecords',res.data.records)
-            }else{
+    function getRankStructure() {
+      if (store.getters['rank/records'].all.length <= 0) {
+        store
+          .dispatch('rank/structure')
+          .then((res) => {
+            if (res.data.ok) {
+              store.commit('rank/setAllRecords', res.data.records)
+            } else {
               notify.info({
-                title: 'អានព័ត៌មានតួនាទី' ,
-                content: res.data.message
+                title: 'Load Ranks',
+                description: res.data.message
               })
             }
-          }
-        ).catch( err => {
-          console.log( err )
-        })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     }
 
-    const locationLoading = ref(false)
-    function getProvinces(){
-      if( store.getters['province/records'].all.length <= 0 ){
-        locationLoading.value = true
-        store.dispatch( 'province/list' ).then( res => {
-          store.commit('province/setAllRecords',res.data.records)
-          locationLoading.value = false
-        }).catch( err => {
-          console.log( err )
-        })
+    function getPdcv() {
+      if (store.getters['province/records'].all.length <= 0) {
+        store
+          .dispatch('province/pdcv')
+          .then((res) => {
+            store.commit('province/setAllRecords', res.data.provinces)
+            store.commit('district/setAllRecords', res.data.districts)
+            store.commit('commune/setAllRecords', res.data.communes)
+            store.commit('village/setAllRecords', res.data.villages)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     }
 
-    function getPdcv(){
-      if( store.getters['province/records'].all.length <= 0 ){
-        locationLoading.value = true
-        store.dispatch( 'province/pdcv' ).then( res => {
-          store.commit('province/setAllRecords',res.data.provinces)
-          store.commit('district/setAllRecords',res.data.districts)
-          store.commit('commune/setAllRecords',res.data.communes)
-          store.commit('village/setAllRecords',res.data.villages)
-          locationLoading.value = false
-        }).catch( err => {
-          console.log( err )
-        })
-      }
-    }
-
-    function tableView(){
+    function tableView() {
       router.push('/hr/officer/table')
     }
-    /**
-     * Initial the data
-     */
-    getRecords()
-        
 
+    onMounted(() => {
+      window.addEventListener('keydown', handleKeydown)
+    })
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('keydown', handleKeydown)
+      if (filterTimeout) {
+        window.clearTimeout(filterTimeout)
+      }
+    })
+
+    getRecords()
 
     return {
-      /**
-       * Variables
-       */
-      model ,
-      table ,
-      ocmLogoUrl ,
-      /**
-       * Table
-       */
-      filterRecords ,
-      /**
-       * Pagination functions
-       */
-      updatePerpage ,
-      goTo ,
-      previous ,
-      next ,
-      first , 
-      last ,
-      /**
-       * Loading overlay
-       */
-      closeTableLoading ,
-      /**
-       * Creating
-       */
-      createModal ,
-      showCreateModal ,
-      closeCreateModal ,
-      /**
-       * Creating non officer
-       */
-      createNonOfficerModal ,
-      showCreateNonOfficerModal ,
-      closeCreateNonOfficerModal ,
-      closeActions ,
-      /**
-       * Functions
-       */
-      toggleFilter ,
-      filterRecords ,
-      filter ,
-      /**
-      * Filters
-      */
-      optionPositions ,
-      selectedPositions ,
-      selectedCountesies ,
-      optionOrganizations ,
-      selectedOrganizations ,
-      dateFormat ,
-      locationLoading ,
-      tableView
+      model,
+      table,
+      perPageOptions,
+      hasRecords,
+      activeFilterCount,
+      summaryTabs,
+      filterRecords,
+      goTo,
+      previous,
+      next,
+      closeTableLoading,
+      createModal,
+      showCreateModal,
+      closeCreateModal,
+      createNonOfficerModal,
+      showCreateNonOfficerModal,
+      closeCreateNonOfficerModal,
+      closeActions,
+      resetFilters,
+      toggleFilter,
+      filter,
+      optionPositions,
+      selectedPositions,
+      optionOrganizations,
+      selectedOrganizations,
+      tableView,
+      getKhmerName,
+      getEnglishName,
+      getOfficerCode,
+      getNationalId,
+      getRankName,
+      getOrganizationName,
+      getPositionName,
+      formatDateLabel,
+      hasAvatar,
+      getAvatarUrl,
+      setFallbackAvatar,
+      hasCurrentJob,
+      hasCard
     }
   }
 }
-
 </script>
-<style type="text/css" scoped >
-.vcb-table-pagination-info {
-    @apply leading-7; 
+
+<style type="text/css" scoped>
+.thumbnail-page {
+  width: 100%;
+  padding: 24px;
+}
+
+.hero-shell,
+.card-shell {
+  border: 1px solid #dbe4f0;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.07);
+}
+
+.hero-shell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 55%, #eef6ff 100%);
+}
+
+.hero-copy {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-mark {
+  width: 6px;
+  height: 52px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #2563eb 0%, #38bdf8 100%);
+}
+
+.hero-kicker {
+  margin: 0 0 6px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.hero-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 34px;
+  line-height: 1.35;
+  font-weight: 650;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.hero-actions,
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-button,
+.toolbar-chip,
+.filter-reset,
+.footer-nav,
+.footer-page,
+.loading-close {
+  border: 1px solid #dbe4f0;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.hero-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffff;
+}
+
+.hero-button-secondary:hover,
+.toolbar-chip:hover,
+.filter-reset:hover,
+.footer-nav:hover:not(:disabled),
+.footer-page:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.hero-button-primary {
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.hero-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 32px rgba(37, 99, 235, 0.28);
+}
+
+.hero-button-ghost {
+  color: #0f766e;
+  border-color: #99f6e4;
+  background: #f0fdfa;
+}
+
+.hero-button-ghost:hover {
+  border-color: #5eead4;
+}
+
+.stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 22px 0 18px;
+}
+
+.stat-card {
+  min-width: 150px;
+  padding: 14px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.05);
+}
+
+.stat-card-active {
+  border-color: #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.stat-label {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.stat-value {
+  display: block;
+  margin-top: 8px;
+  color: #0f172a;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 700;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.card-shell {
+  position: relative;
+  padding: 24px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.search-shell {
+  flex: 1 1 420px;
+}
+
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.toolbar-chip,
+.filter-reset,
+.footer-nav {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.toolbar-chip-active {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.toolbar-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin: 16px 0 20px;
+  padding: 16px;
+  border: 1px solid #dbe4f0;
+  border-radius: 20px;
+  background: #f8fbff;
+}
+
+.filter-item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.filter-label,
+.thumb-detail-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.filter-row :deep(.n-base-selection) {
+  min-height: 46px;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.toolbar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 18px;
+  color: #64748b;
+  font-size: 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 420px));
+  justify-content: center;
+  gap: 22px;
+}
+
+.thumb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100%;
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.07);
+  transition: 0.25s ease;
+}
+
+.thumb-card:hover {
+  transform: translateY(-4px);
+  border-color: #bfdbfe;
+  box-shadow: 0 28px 50px rgba(37, 99, 235, 0.14);
+}
+
+.thumb-head,
+.thumb-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.thumb-head {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding-right: 110px;
+}
+
+.thumb-index,
+.thumb-badge,
+.rank-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.thumb-index {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.thumb-badge {
+  border: 1px solid #dbe4f0;
+  background: #ffffff;
+  color: #475569;
+  text-align: center;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.thumb-badge-card {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.thumb-avatar-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.thumb-identity {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+
+.thumb-main {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.thumb-avatar {
+  width: 104px;
+  height: 104px;
+  padding: 5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+  box-shadow: 0 20px 32px rgba(59, 130, 246, 0.18);
+}
+
+.thumb-avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ffffff;
+}
+
+.thumb-avatar-image-default {
+  padding: 12px;
+  object-fit: contain;
+}
+
+.thumb-active-dot {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.28);
+}
+
+.thumb-name-block {
+  text-align: left;
+  min-width: 0;
+}
+
+.thumb-countesy {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.thumb-name {
+  margin: 4px 0 0;
+  color: #0f172a;
+  font-size: 19px;
+  line-height: 1.45;
+  font-weight: 650;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.thumb-subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.rank-pill {
+  background: #fef3c7;
+  color: #854d0e;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.thumb-rank-row {
+  justify-content: flex-start;
+}
+
+.thumb-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.thumb-detail {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #f8fbff;
+  text-align: left;
+}
+
+.thumb-detail-wide {
+  grid-column: 1 / -1;
+}
+
+.thumb-detail-value {
+  display: block;
+  margin-top: 8px;
+  color: #0f172a;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 650;
+  word-break: break-word;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.empty-state,
+.loading-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  min-height: 300px;
+  flex-direction: column;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-state h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: "ktr", "btb", Arial, sans-serif;
+}
+
+.empty-state p {
+  margin: 10px 0 0;
+  max-width: 360px;
+  line-height: 1.7;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.loading-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.loading-card {
+  text-align: center;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.loading-spinner {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  border: 4px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.loading-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.footer-nav:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.footer-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+}
+
+.footer-summary {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.footer-pages {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footer-page {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.footer-page-active {
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-.vcb-thumbnail {
-  @apply flex flex-wrap justify-center;
 }
-.vcb-thumbnail .item {
-  @apply 2xl:w-2/12 xl:w-1/5 lg:w-1/4 md:w-1/3 sm:w-1/3 w-1/2 p-2 ;
+
+@media (max-width: 1100px) {
+  .hero-shell,
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
-.vcb-thumbnail .item .content {
-  @apply border rounded-lg hover:shadow duration-500 p-4 pt-8 relative hover:scale-105 transform-gpu bg-white hover:bg-yellow-100;
-}
-.vcb-thumbnail .item .content .officer-countesy , .vcb-thumbnail .item .content .officer-name {
-  font-size: 0.65rem;
-}
-.vcb-thumbnail .item .content .image {
-  @apply border rounded-full border-gray-200 p-2 w-16 h-16 flex-none mx-auto overflow-hidden bg-white ;
-}
-.vcb-filters-panel {
-  @apply fixed top-10 right-0 bottom-0 bg-opacity-60 bg-white ;
-  left: 60px;
-}
-.app_snav_open .vcb-filters-panel {
-  left: 230px;
-}
-.vcb-filters-panel .filter-title {
-  @apply w-full text-left p-4 bg-white rounded-lg ;
-}
-.vcb-filters-panel .filter-actions {
-  @apply w-full text-left p-4 flex flex-wrap justify-center;
-}
-.vcb-filters-panel .filter-actions .filter-action {
-  @apply p-2 m-2 bg-white rounded-lg shadow border border-gray-300 w-4/6 sm:w-2/5 md:w-1/3 lg:w-1/4 xl:w-2/6 ;
+
+@media (max-width: 768px) {
+  .thumbnail-page {
+    padding: 16px;
+  }
+
+  .hero-shell,
+  .card-shell {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .hero-copy {
+    align-items: flex-start;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .toolbar-actions > * {
+    flex: 1 1 0;
+  }
+
+  .filter-row,
+  .footer-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-reset,
+  .footer-nav {
+    width: 100%;
+  }
+
+  .thumbnail-grid,
+  .thumb-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .thumb-detail-wide {
+    grid-column: auto;
+  }
+
+  .thumb-identity {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .thumb-main,
+  .thumb-name-block {
+    text-align: center;
+  }
+
+  .thumb-rank-row {
+    justify-content: center;
+  }
 }
 </style>

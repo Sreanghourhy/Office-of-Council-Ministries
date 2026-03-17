@@ -374,6 +374,7 @@ export default {
       value
     }))
 
+    const avatarRefreshKey = ref(Date.now())
     const selectedPositions = ref([])
     const selectedOrganizations = ref([])
     const filter = ref(false)
@@ -504,14 +505,29 @@ export default {
       return initials || 'OC'
     }
 
+    function resolveAvatarUrl(record) {
+      const candidates = [record?.image, record?.avatar_url, record?.people?.avatar_url, record?.user?.avatar_url]
+      return candidates.find((value) => typeof value === 'string' && value.trim().length > 0) || null
+    }
+
+    function withAvatarVersion(url, record) {
+      if (typeof url !== 'string' || url.trim().length <= 0 || url.startsWith('data:')) {
+        return url
+      }
+      const version =
+        record?.updated_at || record?.user?.updated_at || record?.people?.updated_at || avatarRefreshKey.value
+      const separator = url.includes('?') ? '&' : '?'
+      return `${url}${separator}v=${encodeURIComponent(version)}`
+    }
+
     function hasAvatar(record) {
-      const avatarUrl = record?.avatar_url || record?.people?.avatar_url || record?.user?.avatar_url
+      const avatarUrl = resolveAvatarUrl(record)
       return typeof avatarUrl === 'string' && avatarUrl.trim().length > 0
     }
 
     function getAvatarUrl(record) {
       return hasAvatar(record)
-        ? (record?.avatar_url || record?.people?.avatar_url || record?.user?.avatar_url).trim()
+        ? withAvatarVersion(resolveAvatarUrl(record).trim(), record)
         : defaultOfficerAvatar
     }
 
@@ -685,6 +701,7 @@ export default {
 
     function closeActions(actionStatus) {
       if (parseInt(actionStatus, 10) > 0) {
+        avatarRefreshKey.value = Date.now()
         getRecords()
       }
     }

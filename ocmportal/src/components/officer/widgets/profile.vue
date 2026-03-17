@@ -213,8 +213,7 @@ export default {
       document.getElementById('referenceDocument').click()
     }
     function uploadFiles(){
-      // console.log( files.value )
-      if( files.value.length < 0 ) {
+      if( user.value == null || files.value.length <= 0 || files.value[0] == null ) {
         notify.info({
           title: "រក្សារទុករូបភាពគណនី" ,
           content: "សូមជ្រើសរើសរូបភាពជាមុនសិន។" ,
@@ -228,26 +227,29 @@ export default {
         duration: 1000
       })
 
-      // console.log( files.value )
       let formData = new FormData()
       formData.append('id', user.value.id )
       formData.append('files',files.value[0],files.value[0].name)
       
-      store.dispatch('user/uploadProfilePicture', formData ).then( res => {
+      store.dispatch('user/upload', formData ).then( res => {
         notify.success({
           title: 'ដាក់រូបភាពអ្នកប្រើប្រាស់' ,
           description: 'កំពុងរក្សាទុករូបភាព។' ,
           duration: 1000
         })
         if( res.data.record != null && res.data.record != undefined ){
-          // let tmpUser = getUser()
-          // tmpUser.avatar_url = res.data.props.record.avatar_url
-          // localStorage.setItem( 'user' , JSON.stringify( tmpUser ) )
-          // user.value = getUser()
-          // base64Avatar.value = props.record.avatar_url
+          let tmpUser = getUser()
+          if( tmpUser != null ){
+            tmpUser.avatar_url = res.data.record.avatar_url
+            localStorage.setItem( 'user' , JSON.stringify( tmpUser ) )
+            user.value = getUser()
+          }
           formData = new FormData()
           files.value = []
-          base64Avatar.value = null
+          base64Avatar.value = res.data.record.avatar_url
+          if( document.getElementById('referenceDocument') != null ){
+            document.getElementById('referenceDocument').value = ''
+          }
           clearRecord( 1 )
         }
       }).catch( err => {
@@ -263,7 +265,11 @@ export default {
      * Update local photo
      */
     const localProfile = computed( () => {
-      return base64Avatar.value !== "" && base64Avatar.value !== null ? base64Avatar.value : ( props.record.avatar_url !== "" && props.record.avatar_url !== null ? props.record.avatar_url : "/src/assets/logo.png" )
+      return base64Avatar.value !== "" && base64Avatar.value !== null
+        ? base64Avatar.value
+        : ( props.record.avatar_url !== "" && props.record.avatar_url !== null
+            ? props.record.avatar_url
+            : ( props.record.image !== "" && props.record.image !== null ? props.record.image : "/src/assets/logo.png" ) )
     })
 
     /**

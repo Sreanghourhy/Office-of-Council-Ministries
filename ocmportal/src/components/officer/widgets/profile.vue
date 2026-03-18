@@ -46,7 +46,6 @@
     <!-- End of edit account -->
 </template>
 <script>
-import { isAuth, getUser , authLogout } from './../../../plugins/authentication.js'
 import { reactive, ref , computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
@@ -238,11 +237,8 @@ export default {
           duration: 1000
         })
         if( res.data.record != null && res.data.record != undefined ){
-          let tmpUser = getUser()
-          if( tmpUser != null ){
-            tmpUser.avatar_url = res.data.record.avatar_url
-            localStorage.setItem( 'user' , JSON.stringify( tmpUser ) )
-            user.value = getUser()
+          if( user.value != null ){
+            user.value.avatar_url = res.data.record.avatar_url
           }
           formData = new FormData()
           files.value = []
@@ -267,9 +263,11 @@ export default {
     const localProfile = computed( () => {
       return base64Avatar.value !== "" && base64Avatar.value !== null
         ? base64Avatar.value
-        : ( props.record.avatar_url !== "" && props.record.avatar_url !== null
-            ? props.record.avatar_url
-            : ( props.record.image !== "" && props.record.image !== null ? props.record.image : "/src/assets/logo.png" ) )
+        : ( user.value != null && user.value.avatar_url !== "" && user.value.avatar_url !== null
+            ? user.value.avatar_url
+            : ( props.record.avatar_url !== "" && props.record.avatar_url !== null
+                ? props.record.avatar_url
+                : ( props.record.image !== "" && props.record.image !== null ? props.record.image : "/src/assets/logo.png" ) ) )
     })
 
     /**

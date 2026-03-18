@@ -1,16 +1,21 @@
 <template>
-  <div class="dashboard-stats grid grid-cols-1 gap-4 lg:grid-cols-4 xl:grid-cols-5 min-w-0">
+  <div class="dashboard-stats dashboard-stats-shell grid grid-cols-1 gap-4 lg:grid-cols-4 xl:grid-cols-5 min-w-0">
     <div class="lg:col-span-3 xl:col-span-4 min-w-0 h-full">
       <DashboardTotalEmployeeChart
+        class="dashboard-card dashboard-card--hero dashboard-reveal dashboard-delay-1"
         :total-count="totalForChart"
         :trend="trend"
       />
     </div>
     <div class="lg:col-span-1 xl:col-span-1 min-w-0 h-full">
-      <DashboardPieChart class="w-full h-full" :gender-ratio="genderRatio" />
+      <DashboardPieChart
+        class="dashboard-card dashboard-card--compact dashboard-reveal dashboard-delay-2 w-full h-full"
+        :gender-ratio="genderRatio"
+      />
     </div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:col-span-4 xl:col-span-5 min-w-0">
       <DashboardStatCard
+        class="dashboard-card dashboard-card--stat dashboard-reveal dashboard-delay-3"
         :title="cardLabels.political"
         :value="totals.political"
         icon="people"
@@ -19,6 +24,7 @@
         :trend-label="periodLabel"
       />
       <DashboardStatCard
+        class="dashboard-card dashboard-card--stat dashboard-reveal dashboard-delay-4"
         :title="cardLabels.publicService"
         :value="totals.publicService"
         icon="people"
@@ -27,6 +33,7 @@
         :trend-label="periodLabel"
       />
       <DashboardStatCard
+        class="dashboard-card dashboard-card--stat dashboard-reveal dashboard-delay-5"
         :title="cardLabels.contract"
         :value="totals.contract"
         icon="people"
@@ -35,6 +42,7 @@
         :trend-label="periodLabel"
       />
       <DashboardStatCard
+        class="dashboard-card dashboard-card--stat dashboard-reveal dashboard-delay-6"
         :title="cardLabels.agreement"
         :value="totals.agreement"
         icon="people"

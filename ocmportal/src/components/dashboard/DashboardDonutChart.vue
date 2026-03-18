@@ -132,10 +132,10 @@ export default {
         .outerRadius(radius)
         .cornerRadius(3)
 
-      const arcs = g.selectAll('path')
-        .data(pie(dataWithFill))
+      const pieData = pie(dataWithFill)
+      g.selectAll('path')
+        .data(pieData)
         .join('path')
-        .attr('d', arc)
         .attr('fill', d => d.data.fill)
         .attr('stroke', '#fff')
         .attr('stroke-width', 2.5)
@@ -153,12 +153,24 @@ export default {
         .on('mouseleave', function () {
           tooltip.style('opacity', 0)
         })
+        .transition()
+        .duration(900)
+        .ease(d3.easeCubicOut)
+        .attrTween('d', function (d) {
+          const interpolate = d3.interpolate(
+            { startAngle: d.startAngle, endAngle: d.startAngle },
+            d
+          )
+          return function (t) {
+            return arc(interpolate(t))
+          }
+        })
 
       const total = dataWithFill.reduce((s, d) => s + d.value, 0)
       const labelRadius = (innerRadius + radius) * 0.52
       const labelArc = d3.arc().innerRadius(labelRadius).outerRadius(labelRadius)
       g.selectAll('.donut-label')
-        .data(pie(dataWithFill))
+        .data(pieData)
         .join('text')
         .attr('class', 'donut-label')
         .attr('transform', d => `translate(${labelArc.centroid(d)})`)
@@ -169,10 +181,15 @@ export default {
         .attr('paint-order', 'stroke fill')
         .style('font-size', '15px')
         .style('font-weight', '700')
+        .style('opacity', 0)
         .text(d => {
           const pct = total > 0 ? ((d.data.value / total) * 100).toFixed(0) : 0
           return `${pct}%`
         })
+        .transition()
+        .delay(380)
+        .duration(260)
+        .style('opacity', 1)
     }
 
     onMounted(draw)

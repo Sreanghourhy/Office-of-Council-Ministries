@@ -75,17 +75,29 @@ export default {
       const g = svg.append('g').attr('transform', `translate(${size/2},${size/2})`)
       const pie = d3.pie().value(d => d.value)
       const arc = d3.arc().innerRadius(0).outerRadius(radius)
+      const pieData = pie(data)
       g.selectAll('path')
-        .data(pie(data))
+        .data(pieData)
         .join('path')
-        .attr('d', arc)
         .attr('fill', d => d.data.fill)
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
+        .transition()
+        .duration(850)
+        .ease(d3.easeCubicOut)
+        .attrTween('d', function (d) {
+          const interpolate = d3.interpolate(
+            { startAngle: d.startAngle, endAngle: d.startAngle },
+            d
+          )
+          return function (t) {
+            return arc(interpolate(t))
+          }
+        })
       const labelRadius = radius * 0.65
       const labelArc = d3.arc().innerRadius(labelRadius).outerRadius(labelRadius)
       g.selectAll('.pie-label')
-        .data(pie(data))
+        .data(pieData)
         .join('text')
         .attr('class', 'pie-label')
         .attr('transform', d => `translate(${labelArc.centroid(d)})`)
@@ -93,10 +105,15 @@ export default {
         .attr('fill', '#fff')
         .style('font-size', '11px')
         .style('font-weight', '600')
+        .style('opacity', 0)
         .text(d => {
           const pct = total > 0 ? ((d.data.value / total) * 100).toFixed(1) : 0
           return `${d.data.label} ${pct}%`
         })
+        .transition()
+        .delay(360)
+        .duration(260)
+        .style('opacity', 1)
     }
 
     onMounted(draw)

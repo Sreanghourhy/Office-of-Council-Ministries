@@ -1,14 +1,13 @@
 <template>
-  <div class="min-h-screen w-full bg-gray-50 pb-10 pt-6 lg:pt-12">
-    <div class="relative px-4 lg:ml-40 lg:px-6">
+  <div class="relative min-h-screen w-full overflow-hidden bg-white">
+    <div class="relative flex min-h-screen items-center justify-center px-3 py-3 lg:ml-40 lg:px-6">
       <Transition name="slide-fade">
-        <section
+        <img
           v-if="transitionHelper"
-          class="mx-auto max-w-4xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-        >
-          <h1 class="text-xl font-semibold text-gray-900">Hello</h1>
-          <p class="mt-2 text-sm text-gray-600">Privacy screen page.</p>
-        </section>
+          :src="cleanedDocumentImage"
+          alt="Cleaned document"
+          class="block h-[92vh] max-h-[92vh] w-auto max-w-full object-contain object-center"
+        />
       </Transition>
     </div>
 
@@ -21,6 +20,7 @@
 import { onMounted, ref } from "vue";
 import FloatTopMenu from "@components/menu/topmenu-float-items.vue";
 import Sidebar from "@components/widgets/Sidebar.vue";
+import cleanedDocumentImage from "./../../assets/cleaned_document.jpg";
 
 export default {
   name: "UserPrivacy",
@@ -39,6 +39,7 @@ export default {
     });
 
     return {
+      cleanedDocumentImage,
       title,
       transitionHelper,
     };

@@ -1,59 +1,135 @@
 <template>
-  <div class="min-h-screen absolute left-0 top-12 right-0 flex flex-wrap system-layout" oncontextmenu="return false;">
+  <div class="dashboard-page min-h-screen absolute left-0 top-12 right-0 flex flex-wrap system-layout" oncontextmenu="return false;">
     <router-view v-slot="{ Component }">
       <component :is="Component" />
     </router-view>
-    <div class="relative w-full">
-      <div class="flex title-bar border-b border-gray-200 bg-white items-center">
-        <div class="flex w-64 h-10 py-1 title px-4 items-center">
-          <svg class="text-blue-500 h-6 w-6 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M326.1 231.9l-47.5 75.5a31 31 0 0 1-7 7a30.11 30.11 0 0 1-35-49l75.5-47.5a10.23 10.23 0 0 1 11.7 0a10.06 10.06 0 0 1 2.3 14z" fill="currentColor"></path><path d="M256 64C132.3 64 32 164.2 32 287.9a223.18 223.18 0 0 0 56.3 148.5c1.1 1.2 2.1 2.4 3.2 3.5a25.19 25.19 0 0 0 37.1-.1a173.13 173.13 0 0 1 254.8 0a25.19 25.19 0 0 0 37.1.1l3.2-3.5A223.18 223.18 0 0 0 480 287.9C480 164.2 379.7 64 256 64z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M256 128v32"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M416 288h-32"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M128 288H96"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M165.49 197.49l-22.63-22.63"></path><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M346.51 197.49l22.63-22.63"></path></svg>
-          <div class="font-moul ml-2 leading-9" v-html="model.title"></div>
+
+    <div class="dashboard-page__backdrop" aria-hidden="true">
+      <span class="dashboard-page__orb dashboard-page__orb--one"></span>
+      <span class="dashboard-page__orb dashboard-page__orb--two"></span>
+      <span class="dashboard-page__grid"></span>
+    </div>
+
+    <div class="relative w-full dashboard-page__content">
+      <section class="dashboard-hero dashboard-reveal">
+        <div class="dashboard-hero__copy">
+          <div class="dashboard-hero__eyebrow">Staff Analytics Dashboard</div>
+          <h1 class="dashboard-hero__title font-moul" v-html="model.title"></h1>
+          <p class="dashboard-hero__description">
+            Central overview for staff totals, gender balance, departments, positions, and education distribution.
+          </p>
+          <div class="dashboard-chip-row">
+            <span class="dashboard-chip">Year {{ selectedYearDisplay }}</span>
+            <span class="dashboard-chip">Total {{ totalStaffFormatted }}</span>
+            <span class="dashboard-chip">Women {{ femaleSharePercent }}%</span>
+            <span class="dashboard-chip">Departments {{ departmentCountFormatted }}</span>
+          </div>
         </div>
-        <div class="dashboard-year-wrap">
-          <span class="dashboard-year-label">ផ្ទាំងគ្រប់គ្រងតាមឆ្នាំ</span>
-          <n-select
-            v-model:value="selectedYear"
-            :options="yearOptions"
-            size="small"
-            placeholder="ឆ្នាំ"
-            clearable
-            class="dashboard-year-select"
-          />
-          <n-button
-            v-if="showClearYearButton"
-            type="tertiary"
-            size="small"
-            quaternary
-            @click="clearYearFilter"
-          >
-            សម្អាត
-          </n-button>
+
+        <div class="dashboard-hero__side dashboard-reveal dashboard-delay-1">
+          <div class="dashboard-filter-card">
+            <div class="dashboard-filter-card__top">
+              <div>
+                <div class="dashboard-filter-card__label">Focus year</div>
+                <div class="dashboard-filter-card__hint">Update the dashboard view by year.</div>
+              </div>
+              <div class="dashboard-filter-card__actions">
+                <n-select
+                  v-model:value="selectedYear"
+                  :options="yearOptions"
+                  size="small"
+                  placeholder="Year"
+                  clearable
+                  class="dashboard-year-select"
+                />
+                <n-button
+                  v-if="showClearYearButton"
+                  type="default"
+                  size="small"
+                  @click="clearYearFilter"
+                >
+                  Reset
+                </n-button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-quick-grid">
+            <article class="dashboard-quick-card">
+              <span class="dashboard-quick-card__label">Total staff</span>
+              <strong class="dashboard-quick-card__value">{{ totalStaffFormatted }}</strong>
+              <span class="dashboard-quick-card__meta" :class="trendMetaClass">{{ trendSummaryText }}</span>
+            </article>
+            <article class="dashboard-quick-card">
+              <span class="dashboard-quick-card__label">Departments</span>
+              <strong class="dashboard-quick-card__value">{{ departmentCountFormatted }}</strong>
+              <span class="dashboard-quick-card__meta">Tracked across the dashboard</span>
+            </article>
+            <article class="dashboard-quick-card">
+              <span class="dashboard-quick-card__label">Positions</span>
+              <strong class="dashboard-quick-card__value">{{ positionCountFormatted }}</strong>
+              <span class="dashboard-quick-card__meta">Visible in the position donut</span>
+            </article>
+            <article class="dashboard-quick-card">
+              <span class="dashboard-quick-card__label">Gender mix</span>
+              <strong class="dashboard-quick-card__value">{{ femaleSharePercent }}%</strong>
+              <span class="dashboard-quick-card__meta">Women, {{ maleSharePercent }}% men</span>
+            </article>
+          </div>
         </div>
-      </div>
-      <!-- Content area -->
-      <div class="p-4 space-y-4">
+      </section>
+
       <DashboardStats
         :totals="filteredStaffTotals"
         :increase-by-type="staffIncreaseByType"
         :trend="filteredTrend"
         :gender-ratio="filteredGenderRatio"
       />
-      <div class="grid grid-cols-1 gap-4 min-w-0">
-        <DashboardDepartmentChart :data="filteredEmployeesByDepartment" />
-      </div>
-      <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 min-w-0">
-        <DashboardBarChart :data="filteredEducationDistribution" />
-        <DashboardDonutChart :employees-by-position="filteredEmployeesByPosition" />
-      </div>
-      </div>
+
+      <section class="dashboard-panel-shell">
+        <div class="dashboard-panel-shell__header dashboard-reveal dashboard-delay-2">
+          <div>
+            <h2 class="dashboard-panel-shell__title">Department Overview</h2>
+            <p class="dashboard-panel-shell__description">
+              Staff distribution by department with current gender balance.
+            </p>
+          </div>
+        </div>
+        <DashboardDepartmentChart
+          class="dashboard-card dashboard-card--wide dashboard-reveal dashboard-delay-3"
+          :data="filteredEmployeesByDepartment"
+        />
+      </section>
+
+      <section class="dashboard-panel-shell">
+        <div class="dashboard-panel-shell__header dashboard-reveal dashboard-delay-4">
+          <div>
+            <h2 class="dashboard-panel-shell__title">Education And Positions</h2>
+            <p class="dashboard-panel-shell__description">
+              Compare education levels with position distribution in the same view.
+            </p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 min-w-0">
+          <DashboardBarChart
+            class="dashboard-card dashboard-card--wide dashboard-reveal dashboard-delay-5"
+            :data="filteredEducationDistribution"
+          />
+          <DashboardDonutChart
+            class="dashboard-card dashboard-card--compact dashboard-reveal dashboard-delay-6"
+            :employees-by-position="filteredEmployeesByPosition"
+          />
+        </div>
+      </section>
     </div>
-    <float-top-menu v-bind:title="title" />
+
+    <float-top-menu :title="title" />
     <sidebar />
   </div>
 </template>
 
 <script>
-import { ref , reactive , computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { NSelect, NButton } from 'naive-ui'
 import FloatTopMenu from '@components/menu/topmenu-float-items.vue'
 import Sidebar from '@components/widgets/Sidebar.vue'
@@ -72,10 +148,11 @@ import {
 } from '@/data/dashboardMock'
 
 export default {
+  name: 'DashboardPage',
   components: {
-    FloatTopMenu ,
-    Sidebar ,
-    DashboardStats ,
+    FloatTopMenu,
+    Sidebar,
+    DashboardStats,
     DashboardDepartmentChart,
     DashboardBarChart,
     DashboardDonutChart,
@@ -83,46 +160,33 @@ export default {
     NButton
   },
   setup() {
-    const model = reactive({
-      name: 'DashboardWidgets' ,
-      title: 'សង្ខេបព័ត៌មាន'
-    })
-    const title = ref("សង្ខេបព័ត៌មាន")
-    const staffTotals = reactive({ ...staffTotalsMock })
-    /** Percent change vs last month per staff type. */
-    const staffIncreaseByType = reactive({ ...staffIncreaseByTypeMock })
-    /** Employees by department for department chart */
-    const employeesByDepartment = reactive(
-      employeesByDepartmentMock.map(d => ({ ...d }))
-    )
-    /** Education level distribution: [{ label: string, value: number }] */
-    const educationDistribution = reactive(
-      educationDistributionMock.map(d => ({ ...d }))
-    )
-    /** Male / female counts */
-    const genderRatio = reactive({ ...genderRatioMock })
-    /** Employees per position for donut chart: [{ label: string, value: number }] */
-    const employeesByPosition = reactive(
-      employeesByPositionMock.map(d => ({ ...d }))
-    )
-    /** Total employee trend by year for line chart (raw data) */
-    const totalEmployeeTrend = reactive(totalEmployeeTrendMock.map(d => ({ ...d })))
+    const dashboardTitle = decodeURIComponent('%E1%9E%9F%E1%9E%84%E1%9F%92%E1%9E%81%E1%9F%81%E1%9E%94%E1%9E%96%E1%9F%90%E1%9E%8F%E1%9F%8C%E1%9E%98%E1%9E%B6%E1%9E%93')
 
-    /** Years from trend data, for dropdown (newest first). */
+    const model = reactive({
+      name: 'DashboardWidgets',
+      title: dashboardTitle
+    })
+    const title = ref(dashboardTitle)
+
+    const staffIncreaseByType = reactive({ ...staffIncreaseByTypeMock })
+    const totalEmployeeTrend = reactive(totalEmployeeTrendMock.map((item) => ({ ...item })))
+
     const yearOptions = computed(() =>
       totalEmployeeTrendMock
-        .map(e => ({ label: String(e.year), value: Number(e.year) }))
+        .map((entry) => ({ label: String(entry.year), value: Number(entry.year) }))
         .sort((a, b) => b.value - a.value)
     )
 
-    /** Latest year in trend data  */
     const latestYear = totalEmployeeTrendMock.length > 0
       ? Number(totalEmployeeTrendMock[totalEmployeeTrendMock.length - 1].year)
       : new Date().getFullYear()
 
+    const latestTotal = totalEmployeeTrendMock.length > 0
+      ? Number(totalEmployeeTrendMock[totalEmployeeTrendMock.length - 1].value) || 2949
+      : 2949
+
     const selectedYear = ref(latestYear)
 
-    // back to current year (Clear)
     const showClearYearButton = computed(() =>
       selectedYear.value != null && selectedYear.value !== latestYear
     )
@@ -131,14 +195,10 @@ export default {
       selectedYear.value = latestYear
     }
 
-    const latestTotal = totalEmployeeTrendMock.length > 0
-      ? Number(totalEmployeeTrendMock[totalEmployeeTrendMock.length - 1].value) || 2949
-      : 2949
-
     const trendValueForSelectedYear = computed(() => {
       if (selectedYear.value == null) return latestTotal
-      const entry = totalEmployeeTrendMock.find(e => Number(e.year) === selectedYear.value)
-      return entry ? Number(entry.value) : latestTotal
+      const entry = totalEmployeeTrendMock.find((item) => Number(item.year) === selectedYear.value)
+      return entry ? Number(entry.value) || latestTotal : latestTotal
     })
 
     const scaleFactor = computed(() => {
@@ -150,7 +210,7 @@ export default {
 
     const filteredTrend = computed(() => {
       if (selectedYear.value == null) return totalEmployeeTrend
-      return totalEmployeeTrend.filter(entry => Number(entry.year) <= selectedYear.value)
+      return totalEmployeeTrend.filter((entry) => Number(entry.year) <= selectedYear.value)
     })
 
     const filteredStaffTotals = computed(() => ({
@@ -166,85 +226,521 @@ export default {
     }))
 
     const filteredEmployeesByDepartment = computed(() =>
-      employeesByDepartmentMock.map(d => ({
-        ...d,
-        total: round(d.total * scaleFactor.value)
+      employeesByDepartmentMock.map((item) => ({
+        ...item,
+        total: round(item.total * scaleFactor.value)
       }))
     )
 
     const filteredEducationDistribution = computed(() =>
-      educationDistributionMock.map(d => ({
-        label: d.label,
-        value: round(d.value * scaleFactor.value)
+      educationDistributionMock.map((item) => ({
+        label: item.label,
+        value: round(item.value * scaleFactor.value)
       }))
     )
 
     const filteredEmployeesByPosition = computed(() =>
-      employeesByPositionMock.map(d => ({
-        label: d.label,
-        value: round(d.value * scaleFactor.value)
+      employeesByPositionMock.map((item) => ({
+        label: item.label,
+        value: round(item.value * scaleFactor.value)
       }))
     )
 
+    const totalStaffCount = computed(() =>
+      Object.values(filteredStaffTotals.value).reduce((sum, value) => sum + (Number(value) || 0), 0)
+    )
+
+    const totalStaffFormatted = computed(() => totalStaffCount.value.toLocaleString('en-US'))
+    const departmentCountFormatted = computed(() => filteredEmployeesByDepartment.value.length.toLocaleString('en-US'))
+    const positionCountFormatted = computed(() => filteredEmployeesByPosition.value.length.toLocaleString('en-US'))
+
+    const femaleSharePercent = computed(() => {
+      const female = Number(filteredGenderRatio.value.female) || 0
+      const total = (Number(filteredGenderRatio.value.male) || 0) + female
+      if (total <= 0) return 0
+      return Math.round((female / total) * 100)
+    })
+
+    const maleSharePercent = computed(() => {
+      const male = Number(filteredGenderRatio.value.male) || 0
+      const total = male + (Number(filteredGenderRatio.value.female) || 0)
+      if (total <= 0) return 0
+      return Math.round((male / total) * 100)
+    })
+
+    const selectedYearDisplay = computed(() =>
+      selectedYear.value == null ? 'All Years' : String(selectedYear.value)
+    )
+
+    const trendPercentValue = computed(() => {
+      const data = filteredTrend.value || []
+      if (data.length < 2) return 0
+      const prev = Number(data[data.length - 2]?.value) || 0
+      const curr = Number(data[data.length - 1]?.value) || 0
+      if (prev === 0) return curr > 0 ? 100 : 0
+      return Math.round(((curr - prev) / prev) * 1000) / 10
+    })
+
+    const trendSummaryText = computed(() => {
+      if (trendPercentValue.value > 0) return `+${trendPercentValue.value}% vs previous year`
+      if (trendPercentValue.value < 0) return `${trendPercentValue.value}% vs previous year`
+      return 'Stable against previous year'
+    })
+
+    const trendMetaClass = computed(() => {
+      if (trendPercentValue.value > 0) return 'dashboard-quick-card__meta--up'
+      if (trendPercentValue.value < 0) return 'dashboard-quick-card__meta--down'
+      return 'dashboard-quick-card__meta--neutral'
+    })
+
     return {
-      model ,
-      title ,
-      staffTotals ,
-      staffIncreaseByType ,
-      totalEmployeeTrend: filteredTrend ,
-      filteredTrend ,
-      filteredStaffTotals ,
-      filteredGenderRatio ,
-      filteredEmployeesByDepartment ,
-      filteredEducationDistribution ,
-      filteredEmployeesByPosition ,
+      model,
+      title,
+      staffIncreaseByType,
+      filteredTrend,
+      filteredStaffTotals,
+      filteredGenderRatio,
+      filteredEmployeesByDepartment,
+      filteredEducationDistribution,
+      filteredEmployeesByPosition,
       selectedYear,
       yearOptions,
       showClearYearButton,
-      clearYearFilter
+      clearYearFilter,
+      totalStaffFormatted,
+      departmentCountFormatted,
+      positionCountFormatted,
+      femaleSharePercent,
+      maleSharePercent,
+      selectedYearDisplay,
+      trendSummaryText,
+      trendMetaClass
     }
-  },
-  name: "DashboardPage",
-  data() {
-    return {}
-  },
-  computed: {},
-  mounted() {},
-  methods: {}
+  }
 }
 </script>
 
 <style scoped>
-.dashboard-year-wrap {
-  flex: 1;
+.dashboard-page {
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #f7fbff 0%, #ffffff 48%, #f8fafc 100%);
+}
+
+.dashboard-page__backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dashboard-page__orb {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.5;
+  filter: blur(10px);
+  animation: dashboardFloat 16s ease-in-out infinite;
+}
+
+.dashboard-page__orb--one {
+  top: -8rem;
+  right: 8%;
+  width: 22rem;
+  height: 22rem;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent 68%);
+}
+
+.dashboard-page__orb--two {
+  left: -8rem;
+  top: 20rem;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 68%);
+  animation-delay: -6s;
+}
+
+.dashboard-page__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.14), transparent 78%);
+}
+
+.dashboard-page__content {
+  z-index: 1;
+  padding: 1.25rem;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dashboard-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+  gap: 1.25rem;
+  padding: 1.6rem;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(239, 246, 255, 0.95) 48%, rgba(236, 253, 245, 0.92));
+  box-shadow: 0 24px 48px rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.dashboard-hero::after {
+  content: '';
+  position: absolute;
+  right: -5rem;
+  bottom: -8rem;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.dashboard-hero__copy,
+.dashboard-hero__side {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-hero__eyebrow {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding-right: 1rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  color: #0369a1;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-.dashboard-year-label {
-  font-family: btb, 'Battambang', sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #6b7280;
-  white-space: nowrap;
+
+.dashboard-hero__title {
+  margin-top: 1rem;
+  color: #0f172a;
+  font-size: clamp(1.65rem, 2.6vw, 2.5rem);
+  line-height: 1.18;
 }
-.dashboard-year-select {
-  width: 88px !important;
-  min-width: 88px !important;
-  max-width: 88px !important;
+
+.dashboard-hero__description {
+  margin-top: 0.95rem;
+  max-width: 42rem;
+  color: #475569;
+  font-size: 0.98rem;
+  line-height: 1.8;
 }
-.dashboard-year-wrap :deep(.n-base-selection) {
-  min-width: 0;
+
+.dashboard-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.3rem;
 }
-.dashboard-year-wrap :deep(.n-base-selection .n-base-selection-label) {
-  min-width: 0;
+
+.dashboard-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  background: rgba(255, 255, 255, 0.94);
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(148, 163, 184, 0.1);
 }
+
+.dashboard-hero__side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.dashboard-filter-card {
+  padding: 1rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 34px rgba(148, 163, 184, 0.12);
+}
+
+.dashboard-filter-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-filter-card__label {
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.dashboard-filter-card__hint {
+  margin-top: 0.2rem;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.dashboard-filter-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dashboard-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.dashboard-quick-card {
+  min-height: 7rem;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: rgba(248, 250, 252, 0.86);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.dashboard-quick-card:hover {
+  transform: translateY(-4px);
+  border-color: #bfdbfe;
+  box-shadow: 0 18px 32px rgba(148, 163, 184, 0.16);
+}
+
+.dashboard-quick-card__label {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-quick-card__value {
+  display: block;
+  margin-top: 0.55rem;
+  color: #0f172a;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  line-height: 1.1;
+}
+
+.dashboard-quick-card__meta {
+  margin-top: 0.75rem;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.dashboard-quick-card__meta--up {
+  color: #0f766e;
+}
+
+.dashboard-quick-card__meta--down {
+  color: #dc2626;
+}
+
+.dashboard-quick-card__meta--neutral {
+  color: #64748b;
+}
+
+.dashboard-panel-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dashboard-panel-shell__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-panel-shell__title {
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dashboard-panel-shell__description {
+  margin-top: 0.32rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.dashboard-filter-card :deep(.dashboard-year-select) {
+  width: 132px !important;
+  min-width: 132px !important;
+}
+
+.dashboard-filter-card :deep(.dashboard-year-select .n-base-selection) {
+  min-height: 40px;
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.dashboard-filter-card :deep(.dashboard-year-select .n-base-selection:hover) {
+  border-color: #93c5fd;
+}
+
+.dashboard-filter-card :deep(.n-button) {
+  border-radius: 14px;
+  padding-inline: 0.85rem;
+  height: 40px;
+  font-weight: 600;
+}
+
+:deep(.dashboard-card) {
+  border-radius: 1.5rem !important;
+  border: 1px solid #dbe7f3 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%) !important;
+  box-shadow: 0 18px 34px rgba(148, 163, 184, 0.12) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+
+:deep(.dashboard-card:hover) {
+  transform: translateY(-4px);
+  border-color: #bfdbfe !important;
+  box-shadow: 0 22px 40px rgba(148, 163, 184, 0.16) !important;
+}
+
+:deep(.dashboard-card--hero) {
+  background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%) !important;
+}
+
+:deep(.dashboard-card--compact) {
+  background: linear-gradient(180deg, #ffffff 0%, #f3fffb 100%) !important;
+}
+
+:deep(.dashboard-card--stat),
+:deep(.dashboard-card--wide) {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+}
+
+:deep(.dashboard-card .border-b) {
+  border-color: #eef2ff !important;
+}
+
+:deep(.dashboard-card .text-gray-800) {
+  color: #0f172a !important;
+}
+
+:deep(.dashboard-card .text-gray-700) {
+  color: #334155 !important;
+}
+
+:deep(.dashboard-card .text-gray-500),
+:deep(.dashboard-card .text-gray-400) {
+  color: #64748b !important;
+}
+
+.dashboard-reveal {
+  opacity: 0;
+  transform: translateY(22px) scale(0.985);
+  animation: dashboardReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.dashboard-delay-1 { animation-delay: 0.08s; }
+.dashboard-delay-2 { animation-delay: 0.14s; }
+.dashboard-delay-3 { animation-delay: 0.2s; }
+.dashboard-delay-4 { animation-delay: 0.26s; }
+.dashboard-delay-5 { animation-delay: 0.32s; }
+.dashboard-delay-6 { animation-delay: 0.38s; }
+
 .system-layout {
   margin-left: 60px;
 }
+
 .app_snav_open .system-layout {
   margin-left: 230px;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-page__content {
+    padding: 1rem;
+  }
+
+  .dashboard-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .dashboard-page__content {
+    gap: 1rem;
+  }
+
+  .dashboard-hero {
+    padding: 1.15rem;
+    border-radius: 1.45rem;
+  }
+
+  .dashboard-filter-card__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-filter-card__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-filter-card :deep(.dashboard-year-select) {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .dashboard-quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-chip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .system-layout,
+  .app_snav_open .system-layout {
+    margin-left: 0;
+  }
+}
+
+@keyframes dashboardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dashboardFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, 18px, 0) scale(1.03);
+  }
 }
 </style>

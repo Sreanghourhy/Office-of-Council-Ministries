@@ -154,12 +154,19 @@ export default {
         .y1(d => yScale(Number(d.value) || 0))
         .curve(d3.curveMonotoneX)
 
-      g.append('path')
+      const areaPath = g.append('path')
         .datum(data)
         .attr('fill', areaFill)
         .attr('d', area)
+        .attr('opacity', 0)
 
-      g.append('path')
+      areaPath
+        .transition()
+        .duration(650)
+        .ease(d3.easeCubicOut)
+        .attr('opacity', 1)
+
+      const linePath = g.append('path')
         .datum(data)
         .attr('fill', 'none')
         .attr('stroke', lineColor)
@@ -168,6 +175,20 @@ export default {
         .attr('stroke-linejoin', 'round')
         .attr('d', line)
 
+      const lineLength = typeof linePath.node()?.getTotalLength === 'function'
+        ? linePath.node().getTotalLength()
+        : 0
+
+      if (lineLength > 0) {
+        linePath
+          .attr('stroke-dasharray', `${lineLength} ${lineLength}`)
+          .attr('stroke-dashoffset', lineLength)
+          .transition()
+          .duration(900)
+          .ease(d3.easeCubicOut)
+          .attr('stroke-dashoffset', 0)
+      }
+
       const dots = g
         .selectAll('.dot-visual')
         .data(data)
@@ -175,11 +196,18 @@ export default {
         .attr('class', 'dot-visual')
         .attr('cx', d => xScale(d.year))
         .attr('cy', d => yScale(Number(d.value) || 0))
-        .attr('r', 4)
+        .attr('r', 0)
         .attr('fill', lineColor)
         .attr('stroke', '#fff')
         .attr('stroke-width', 1.5)
         .style('pointer-events', 'none')
+
+      dots
+        .transition()
+        .delay((_, i) => 260 + (i * 70))
+        .duration(260)
+        .ease(d3.easeCubicOut)
+        .attr('r', 4)
 
       function getTooltipHtml(d, dataArr) {
         const currVal = Number(d.value) || 0

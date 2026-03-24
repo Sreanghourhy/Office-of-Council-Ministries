@@ -171,15 +171,28 @@ class OfficerController extends Controller
             }
         ],false ,[
             'current_job' => function( $officer ){
-                $officer = RecordModel::find( $officer['id'] ) ;
-                $job = $officer == null ? null : $officer->getCurrentJob() ;
+                if( $officer == null ){
+                    return null ;
+                }
+
+                if( $officer->relationLoaded('jobs') ){
+                    return $officer->jobs
+                        ->filter(function( $job ){
+                            return $job->end == null ;
+                        })
+                        ->sortByDesc('start')
+                        ->first();
+                }
+
+                $job = $officer->getCurrentJob() ;
                 if( $job != null && $job->organizationStructurePosition != null ){
                     $job->organizationStructurePosition->position;
                     if( $job->organizationStructurePosition->organizationStructure != null ){
                         $job->organizationStructurePosition->organizationStructure->organization;
                     }
                 }
-                return $officer == null || $job == null ? null : $job ;
+
+                return $job ;
             }
         ]);
         $crud->setRelationshipFunctions([
@@ -354,7 +367,34 @@ class OfficerController extends Controller
             ]
         ]);
 
-        $builder = $crud->getListBuilder()->whereNull('deleted_at');
+        $builder = $crud->getListBuilder()
+        ->with([
+            'user.roles',
+            'rank',
+            'countesy',
+            'people.addressProvince',
+            'people.addressDistrict',
+            'people.addressCommune',
+            'people.addressVillage',
+            'people.currentAddressProvince',
+            'people.currentAddressDistrict',
+            'people.currentAddressCommune',
+            'people.currentAddressVillage',
+            'people.pobProvince',
+            'people.pobDistrict',
+            'people.pobCommune',
+            'people.pobVillage',
+            'people.emergencyProvince',
+            'people.emergencyDistrict',
+            'people.emergencyCommune',
+            'people.emergencyVillage',
+            'people.weddingCertificates',
+            'jobs.organizationStructurePosition.position',
+            'jobs.organizationStructurePosition.organizationStructure.organization',
+            'card.author',
+            'card.editor'
+        ])
+        ->whereNull('deleted_at');
         // $builder->doesntHave('jobs');
         // $builder->whereHas('jobs');
 

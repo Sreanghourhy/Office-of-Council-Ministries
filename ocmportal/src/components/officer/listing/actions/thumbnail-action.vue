@@ -92,21 +92,46 @@
       </div>
     </Transition>
 
-    <update-form v-bind:model="model" v-bind:record="record" v-bind:show="editModal.show" :onClose="closeUpdate" />
-    <detail-form v-bind:model="model" v-bind:record="record" v-bind:show="detailModal.show" :onClose="closeDetail" />
-    <official-card-form v-bind:model="model" v-bind:record="record" v-bind:show="officialCardModal.show" :onClose="closeOfficialCard" />
-    <profile-form v-bind:model="model" v-bind:record="record" v-bind:show="profileModal.show" :onClose="closeProfileModal" />
+    <update-form
+      v-if="editModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="editModal.show"
+      :onClose="closeUpdate"
+    />
+    <detail-form
+      v-if="detailModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="detailModal.show"
+      :onClose="closeDetail"
+    />
+    <official-card-form
+      v-if="officialCardModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="officialCardModal.show"
+      :onClose="closeOfficialCard"
+    />
+    <profile-form
+      v-if="profileModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="profileModal.show"
+      :onClose="closeProfileModal"
+    />
   </div>
 </template>
 
 <script>
-import { reactive, ref, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
 import { useDialog, useMessage, useNotification } from 'naive-ui'
-import UpdateForm from './../../widgets/update.vue'
-import DetailForm from './../../widgets/detail.vue'
-import OfficialCardForm from './../../widgets/officialcard.vue'
-import ProfileForm from './../../widgets/profile.vue'
+
+const UpdateForm = defineAsyncComponent(() => import('./../../widgets/update.vue'))
+const DetailForm = defineAsyncComponent(() => import('./../../widgets/detail.vue'))
+const OfficialCardForm = defineAsyncComponent(() => import('./../../widgets/officialcard.vue'))
+const ProfileForm = defineAsyncComponent(() => import('./../../widgets/profile.vue'))
 
 export default {
   name: 'ThumbnailActions',

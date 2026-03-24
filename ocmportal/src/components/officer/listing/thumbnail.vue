@@ -227,22 +227,28 @@
       </div>
     </section>
 
-    <create-form v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
-    <create-non-officer-form v-bind:model="model" v-bind:show="createNonOfficerModal.show" :onClose="closeCreateNonOfficerModal" />
+    <create-form v-if="createModal.show" v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
+    <create-non-officer-form
+      v-if="createNonOfficerModal.show"
+      v-bind:model="model"
+      v-bind:show="createNonOfficerModal.show"
+      :onClose="closeCreateNonOfficerModal"
+    />
   </div>
 </template>
 
 <script>
-import { reactive, ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, ref, computed, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { useNotification } from 'naive-ui'
 import dateFormat from 'dateformat'
 
 import defaultOfficerAvatar from './../../../assets/logo copy.png'
-import CreateForm from './../widgets/create.vue'
-import CreateNonOfficerForm from './../widgets/createnonofficer.vue'
 import ThumbnailActionsForm from './actions/thumbnail-action.vue'
+
+const CreateForm = defineAsyncComponent(() => import('./../widgets/create.vue'))
+const CreateNonOfficerForm = defineAsyncComponent(() => import('./../widgets/createnonofficer.vue'))
 
 export default {
   name: 'People',

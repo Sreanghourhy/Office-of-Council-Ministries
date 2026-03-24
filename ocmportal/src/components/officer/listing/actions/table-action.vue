@@ -77,23 +77,54 @@
 
     <span v-if="record.card != undefined && record.card != null" class="action-status">Card Ready</span>
 
-    <update-form v-bind:model="model" v-bind:record="record" v-bind:show="editModal.show" :onClose="closeUpdate" />
-    <detail-form v-bind:model="model" v-bind:record="record" v-bind:show="detailModal.show" :onClose="closeDetail" />
-    <preview-card-form v-bind:model="model" v-bind:record="record" v-bind:show="previewCardModal.show" :onClose="closePreviewCard" />
-    <official-card-form v-bind:model="model" v-bind:record="record" v-bind:show="officialCardModal.show" :onClose="closeOfficialCard" />
-    <profile-form v-bind:model="model" v-bind:record="record" v-bind:show="profileModal.show" :onClose="closeProfileModal" />
+    <update-form
+      v-if="editModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="editModal.show"
+      :onClose="closeUpdate"
+    />
+    <detail-form
+      v-if="detailModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="detailModal.show"
+      :onClose="closeDetail"
+    />
+    <preview-card-form
+      v-if="previewCardModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="previewCardModal.show"
+      :onClose="closePreviewCard"
+    />
+    <official-card-form
+      v-if="officialCardModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="officialCardModal.show"
+      :onClose="closeOfficialCard"
+    />
+    <profile-form
+      v-if="profileModal.show"
+      v-bind:model="model"
+      v-bind:record="record"
+      v-bind:show="profileModal.show"
+      :onClose="closeProfileModal"
+    />
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue'
+import { reactive, defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
 import { useDialog, useMessage, useNotification } from 'naive-ui'
-import UpdateForm from './../../widgets/update.vue'
-import DetailForm from './../../widgets/detail.vue'
-import PreviewCardForm from './../../widgets/card1.vue'
-import OfficialCardForm from './../../widgets/officialcard.vue'
-import ProfileForm from './../../widgets/profile.vue'
+
+const UpdateForm = defineAsyncComponent(() => import('./../../widgets/update.vue'))
+const DetailForm = defineAsyncComponent(() => import('./../../widgets/detail.vue'))
+const PreviewCardForm = defineAsyncComponent(() => import('./../../widgets/card1.vue'))
+const OfficialCardForm = defineAsyncComponent(() => import('./../../widgets/officialcard.vue'))
+const ProfileForm = defineAsyncComponent(() => import('./../../widgets/profile.vue'))
 
 export default {
   name: 'ThumbnailActions',

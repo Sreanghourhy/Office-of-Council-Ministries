@@ -109,6 +109,45 @@
             <span>Filters</span>
             <span class="table-toolbar-chip-count">{{ $toKhmer(activeFilterCount) }}</span>
           </button>
+
+          <n-popover trigger="click" placement="bottom-end">
+            <template #trigger>
+              <button
+                type="button"
+                class="table-toolbar-chip"
+                :class="{ 'table-toolbar-chip-active': visibleColumnCount < columnOptions.length }"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path
+                    d="M5 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3V5H5zm5 14h4V5h-4v14zm6 0h3a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3v14z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+                <span>Table View</span>
+                <span class="table-toolbar-chip-count">{{ $toKhmer(visibleColumnCount) }}</span>
+              </button>
+            </template>
+
+            <div class="table-view-panel">
+              <div class="table-view-header">
+                <strong>Choose Columns</strong>
+                <button type="button" class="table-view-reset" @click="resetColumnVisibility()">
+                  Show All
+                </button>
+              </div>
+
+              <div class="table-view-list">
+                <label v-for="column in columnOptions" :key="column.key" class="table-view-option">
+                  <n-checkbox
+                    v-model:checked="columnVisibility[column.key]"
+                    :disabled="visibleColumnCount === 1 && columnVisibility[column.key]"
+                  >
+                    {{ column.label }}
+                  </n-checkbox>
+                </label>
+              </div>
+            </div>
+          </n-popover>
         </div>
       </div>
 
@@ -154,28 +193,24 @@
           <table class="otc-table">
             <thead>
               <tr class="otc-header-row">
-                <th class="w-16">No.</th>
-                <th class="text-center">Staff</th>
-                <th class="text-center">National ID</th>
-                <th class="text-center">Birth Date</th>
-                <th class="text-center">Start Date</th>
-                <th class="text-center">Official Date</th>
-                <th class="text-center">Rank</th>
-                <th class="text-center">Organization / Position</th>
-                <th class="text-center">Email</th>
-                <th class="w-24 text-center">Actions</th>
+                <th v-if="columnVisibility.serial" class="w-16">No.</th>
+                <th v-if="columnVisibility.staff" class="text-center">Staff</th>
+                <th v-if="columnVisibility.nationalId" class="text-center">National ID</th>
+                <th v-if="columnVisibility.birthDate" class="text-center">Birth Date</th>
+                <th v-if="columnVisibility.startDate" class="text-center">Start Date</th>
+                <th v-if="columnVisibility.officialDate" class="text-center">Official Date</th>
+                <th v-if="columnVisibility.rank" class="text-center">Rank</th>
+                <th v-if="columnVisibility.organization" class="text-center">Organization / Position</th>
+                <th v-if="columnVisibility.email" class="text-center">Email</th>
+                <th v-if="columnVisibility.actions" class="w-24 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(record, index) in table.records.matched"
-                :key="index"
-                class="otc-body-row"
-              >
-                <td class="serial-cell">
+              <tr v-for="(record, index) in table.records.matched" :key="record?.id ?? index" class="otc-body-row">
+                <td v-if="columnVisibility.serial" class="serial-cell">
                   {{ $toKhmer(((table.pagination.page - 1) * table.pagination.perPage) + (index + 1)) }}
                 </td>
-                <td class="text-center">
+                <td v-if="columnVisibility.staff" class="text-center">
                   <div class="person-cell">
                     <div class="person-avatar">
                       <img
@@ -195,21 +230,29 @@
                     </div>
                   </div>
                 </td>
-                <td class="text-center cell-quiet">{{ $toKhmer(getNationalId(record)) }}</td>
-                <td class="text-center cell-quiet">{{ $toKhmer(formatDateLabel(record?.people?.dob)) }}</td>
-                <td class="text-center cell-quiet">{{ $toKhmer(formatDateLabel(record?.unofficial_date)) }}</td>
-                <td class="text-center cell-quiet">{{ $toKhmer(formatDateLabel(record?.official_date)) }}</td>
-                <td class="text-center">
+                <td v-if="columnVisibility.nationalId" class="text-center cell-quiet">
+                  {{ $toKhmer(getNationalId(record)) }}
+                </td>
+                <td v-if="columnVisibility.birthDate" class="text-center cell-quiet">
+                  {{ $toKhmer(formatDateLabel(record?.people?.dob)) }}
+                </td>
+                <td v-if="columnVisibility.startDate" class="text-center cell-quiet">
+                  {{ $toKhmer(formatDateLabel(record?.unofficial_date)) }}
+                </td>
+                <td v-if="columnVisibility.officialDate" class="text-center cell-quiet">
+                  {{ $toKhmer(formatDateLabel(record?.official_date)) }}
+                </td>
+                <td v-if="columnVisibility.rank" class="text-center">
                   <span class="rank-pill">{{ getRankName(record) }}</span>
                 </td>
-                <td class="text-center">
+                <td v-if="columnVisibility.organization" class="text-center">
                   <div class="job-cell">
                     <div class="job-primary">{{ getOrganizationName(record) }}</div>
                     <div class="job-secondary">{{ getPositionName(record) }}</div>
                   </div>
                 </td>
-                <td class="text-center cell-quiet email-cell">{{ getEmail(record) }}</td>
-                <td class="text-center action-cell">
+                <td v-if="columnVisibility.email" class="text-center cell-quiet email-cell">{{ getEmail(record) }}</td>
+                <td v-if="columnVisibility.actions" class="text-center action-cell">
                   <table-actions-form v-bind:model="model" v-bind:record="record" :onClose="closeActions" />
                 </td>
               </tr>
@@ -291,22 +334,28 @@
       </div>
     </div>
 
-    <create-form v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
-    <create-non-officer-form v-bind:model="model" v-bind:show="createNonOfficerModal.show" :onClose="closeCreateNonOfficerModal" />
+    <create-form v-if="createModal.show" v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
+    <create-non-officer-form
+      v-if="createNonOfficerModal.show"
+      v-bind:model="model"
+      v-bind:show="createNonOfficerModal.show"
+      :onClose="closeCreateNonOfficerModal"
+    />
   </div>
 </template>
 
 <script>
-import { reactive, ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, ref, computed, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { useNotification } from 'naive-ui'
 import dateFormat from 'dateformat'
 
 import defaultOfficerAvatar from './../../../assets/logo copy.png'
-import CreateForm from './../widgets/create.vue'
-import CreateNonOfficerForm from './../widgets/createnonofficer.vue'
 import TableActionsForm from './actions/table-action.vue'
+
+const CreateForm = defineAsyncComponent(() => import('./../widgets/create.vue'))
+const CreateNonOfficerForm = defineAsyncComponent(() => import('./../widgets/createnonofficer.vue'))
 
 export default {
   name: 'People',
@@ -378,6 +427,32 @@ export default {
     const selectedPositions = ref([])
     const selectedOrganizations = ref([])
     const filter = ref(false)
+    const columnStorageKey = 'officer-listing-table-columns'
+    const columnOptions = [
+      { key: 'serial', label: 'No.' },
+      { key: 'staff', label: 'Staff' },
+      { key: 'nationalId', label: 'National ID' },
+      { key: 'birthDate', label: 'Birth Date' },
+      { key: 'startDate', label: 'Start Date' },
+      { key: 'officialDate', label: 'Official Date' },
+      { key: 'rank', label: 'Rank' },
+      { key: 'organization', label: 'Organization / Position' },
+      { key: 'email', label: 'Email' },
+      { key: 'actions', label: 'Actions' }
+    ]
+    const defaultColumnVisibility = {
+      serial: true,
+      staff: true,
+      nationalId: true,
+      birthDate: true,
+      startDate: true,
+      officialDate: true,
+      rank: true,
+      organization: true,
+      email: true,
+      actions: true
+    }
+    const columnVisibility = reactive({ ...defaultColumnVisibility })
     let filterTimeout = null
 
     function countSelectedEntries(values) {
@@ -387,6 +462,15 @@ export default {
     }
 
     const hasRecords = computed(() => Array.isArray(table.records.matched) && table.records.matched.length > 0)
+    const columnVisibilityState = computed(() =>
+      columnOptions.reduce((state, column) => {
+        state[column.key] = columnVisibility[column.key]
+        return state
+      }, {})
+    )
+    const visibleColumnCount = computed(() => {
+      return columnOptions.filter((column) => columnVisibility[column.key]).length
+    })
 
     const activeFilterCount = computed(() => {
       return countSelectedEntries(selectedPositions.value) + countSelectedEntries(selectedOrganizations.value)
@@ -536,6 +620,37 @@ export default {
         event.target.onerror = null
         event.target.src = defaultOfficerAvatar
         event.target.classList.add('person-avatar-image-default')
+      }
+    }
+
+    function resetColumnVisibility() {
+      Object.assign(columnVisibility, defaultColumnVisibility)
+    }
+
+    function loadColumnVisibility() {
+      if (typeof window === 'undefined') {
+        return
+      }
+
+      try {
+        const storedValue = window.localStorage.getItem(columnStorageKey)
+        if (!storedValue) {
+          return
+        }
+
+        const parsedValue = JSON.parse(storedValue)
+        columnOptions.forEach((column) => {
+          if (typeof parsedValue?.[column.key] === 'boolean') {
+            columnVisibility[column.key] = parsedValue[column.key]
+          }
+        })
+
+        if (!columnOptions.some((column) => columnVisibility[column.key])) {
+          resetColumnVisibility()
+        }
+      } catch (error) {
+        console.log(error)
+        resetColumnVisibility()
       }
     }
 
@@ -852,7 +967,20 @@ export default {
       router.push('/hr/officer')
     }
 
+    watch(
+      columnVisibilityState,
+      (value) => {
+        if (typeof window === 'undefined') {
+          return
+        }
+
+        window.localStorage.setItem(columnStorageKey, JSON.stringify(value))
+      },
+      { deep: true }
+    )
+
     onMounted(() => {
+      loadColumnVisibility()
       window.addEventListener('keydown', handleKeydown)
     })
 
@@ -869,6 +997,9 @@ export default {
       hasRecords,
       activeFilterCount,
       summaryTabs,
+      columnOptions,
+      columnVisibility,
+      visibleColumnCount,
       filterRecords,
       goTo,
       previous,
@@ -902,7 +1033,8 @@ export default {
       getInitials,
       hasAvatar,
       getAvatarUrl,
-      setFallbackAvatar
+      setFallbackAvatar,
+      resetColumnVisibility
     }
   }
 }
@@ -1083,7 +1215,7 @@ export default {
   margin-bottom: 0;
   overflow: hidden;
   border: 1px solid #dbe4f0;
-  border-radius: 32px;
+  border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 26px 56px rgba(15, 23, 42, 0.07);
 }
@@ -1115,7 +1247,7 @@ export default {
   height: 48px;
   padding: 0 18px 0 46px;
   border: 1px solid #dbe4f0;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #f8fafc;
   color: #0f172a;
   font-size: 13px;
@@ -1144,7 +1276,7 @@ export default {
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid #dbe4f0;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #ffffff;
   color: #334155;
   font-size: 13px;
@@ -1196,7 +1328,7 @@ export default {
 .table-scroll-shell {
   overflow: auto;
   border: 1px solid #edf2f7;
-  border-radius: 24px;
+  border-radius: 14px;
 }
 
 .otc-table {
@@ -1468,7 +1600,7 @@ export default {
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid #dbe4f0;
-  border-radius: 16px;
+  border-radius: 12px;
   background: #ffffff;
   color: #0f172a;
   font-size: 13px;
@@ -1519,7 +1651,7 @@ export default {
   height: 40px;
   padding: 0 12px;
   border: 1px solid #dbe4f0;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #ffffff;
   color: #475569;
   font-size: 13px;
@@ -1547,7 +1679,7 @@ export default {
   margin: 16px 0 20px;
   padding: 16px;
   border: 1px solid #dbe4f0;
-  border-radius: 20px;
+  border-radius: 14px;
   background: #f8fbff;
 }
 
@@ -1575,7 +1707,7 @@ export default {
   min-height: 46px;
   padding: 0 16px;
   border: 1px solid #dbe4f0;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #ffffff;
   color: #334155;
   font-size: 12px;
@@ -1592,13 +1724,65 @@ export default {
 
 .table-inline-filters :deep(.n-base-selection) {
   min-height: 46px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #ffffff;
 }
 
 .table-inline-filters :deep(.n-base-selection__border),
 .table-inline-filters :deep(.n-base-selection__state-border) {
-  border-radius: 14px;
+  border-radius: 12px;
+}
+
+.table-view-panel {
+  width: min(280px, 75vw);
+}
+
+.table-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.table-view-header strong {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.table-view-reset {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.table-view-list {
+  display: grid;
+  gap: 10px;
+}
+
+.table-view-option {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 2px;
+}
+
+.table-view-panel :deep(.n-checkbox) {
+  width: 100%;
+}
+
+.table-view-panel :deep(.n-checkbox__label) {
+  color: #334155;
+  font-size: 13px;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 @media (max-width: 1100px) {
@@ -1619,7 +1803,7 @@ export default {
   .table-hero,
   .staff-table-card {
     padding: 20px;
-    border-radius: 24px;
+    border-radius: 16px;
   }
 
   .table-hero-copy {

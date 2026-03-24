@@ -44,7 +44,7 @@
                             />
                         </div>
                         <!-- End user profile -->
-                        <template v-if="!personalOnlyMode">
+                        <template v-if="showFamilySection">
                         <div
                             :ref="(el) => setFormSectionAnchor('family', el)"
                             class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
@@ -67,16 +67,24 @@
                                                 
                                                 <!-- <SpouseInformationComponent v-bind:officer="officer" /> -->
                                                 <SpouseInformationComponent 
-                                                :ref="(el) => { 
-                                                    spouseInformationSectionRef = el; // FIXED: Added 'Information'
-                                                    setCareerSectionAnchor('spouseInformation', el); 
-                                                }" 
+                                                    v-if="shouldMountSpousePanel"
+                                                    v-show="isMarriedStatus"
+                                                    :ref="(el) => { 
+                                                        spouseInformationSectionRef = el;
+                                                        setCareerSectionAnchor('spouseInformation', el); 
+                                                    }" 
                                                     :officer="officer" 
                                                     :status="formData.people.marry_status"
                                                     @changed="(val) => onCareerSectionChanged('spouseInformation', val)" 
-                                                    />
+                                                />
+                                                <div v-if="!isMarriedStatus" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                    សូមជ្រើសស្ថានភាពគ្រួសារ = រៀបការហើយ ដើម្បីបំពេញព័ត៌មានប្តីឬប្រពន្ធ។
+                                                </div>
+                                                <div v-else-if="!shouldMountSpousePanel" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                    កំពុងបង្ហាញព័ត៌មានប្តីឬប្រពន្ធ...
+                                                </div>
     
-                                                <div class="relative">
+                                                <div v-if="shouldMountChildrenPanel" v-show="isMarriedStatus" class="relative">
                                                     <ChildrenInformationComponent 
                                                         :ref="(el) => { 
                                                             childrenInformationSectionRef  = el; 
@@ -85,13 +93,12 @@
                                                         :officer="officer" 
                                                         @changed="(val) => onCareerSectionChanged('childrenInformation', val)" 
                                                     />
-
-                                                    <div 
-                                                        v-if="officer?.people?.marry_status !== 'married'"
-                                                        class="absolute inset-0 flex items-center justify-center bg-white/80 text-gray-600 text-sm"
-                                                    >
-                                                        <span class="text-gray-600 text-sm -translate-y-4">សូមបញ្ចូលព័ត៌មានអាពាហ៍ពិពាហ៍ជាមុនសិន</span>
-                                                    </div>
+                                                </div>
+                                                <div v-if="!isMarriedStatus" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                    សូមជ្រើសស្ថានភាពគ្រួសារ = រៀបការហើយ មុនបន្ថែមព័ត៌មានកូន។
+                                                </div>
+                                                <div v-else-if="!shouldMountChildrenPanel" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                    កំពុងបង្ហាញព័ត៌មានកូន...
                                                 </div>
                                                     <!-- <ParentsInformationComponent v-bind:officer="officer" /> -->
                                                     <ParentsInformationComponent 
@@ -110,6 +117,8 @@
                                 </table>
                             </div>
                         </div>
+                        </template>
+                        <template v-if="showAdditionalSections">
                         <div
                             :ref="(el) => setFormSectionAnchor('emergency', el)"
                             class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
@@ -245,7 +254,7 @@
                             @save-all="saveAllCareerSections"
                         />
 <!-- ///////////////////////////////////////////////////////////////////////////////// -->
-                        <template v-if="!personalOnlyMode">
+                        <template v-if="showAdditionalSections">
                         <!-- Reward & Penalty -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('medalHistory', el)"
@@ -271,6 +280,7 @@
                                 </div>
                             </div> 
                         </div>
+                        <template v-if="showStatusSection">
                         <div
                             :ref="(el) => setFormSectionAnchor('status', el)"
                             class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
@@ -337,6 +347,7 @@
                                 officer.people.lastname + ' ' + officer.people.firstname }}</span></p>
                             </div>
                         </div>
+                        </template>
                         </template>
                     </div>
                     </n-scrollbar>
@@ -456,7 +467,11 @@ import Crud from '../../../classes/Crud'
             const childrenInformationSectionRef = ref(null) 
             const emergencyInformationSectionRef = ref(null) 
             const spouseSectionRef = ref(null)
-            const personalOnlyMode = true
+            const showFamilySection = true
+            const showAdditionalSections = true
+            const showStatusSection = true
+            const backgroundSection = ''
+            const personalOnlyMode = false
             const careerSectionChanged = reactive({    //2. define here, but doesn't need to be in order
                 personal: false,
                 maritalStatus: false,
@@ -482,9 +497,11 @@ import Crud from '../../../classes/Crud'
                     marry_status: props.officer?.people?.marry_status || 'single'
                 }
             })
-            const careerSectionOrder = personalOnlyMode
-                ? ['personal']
-                : ['personal', 'maritalStatus', 'spouseInformation', 'parentsInformation', 'childrenInformation', 'emergencyInformation', 'language', 'krobKhan', 'public', 'private', 'rankWorking', 'rankCertificate', 'outKrobKhan', 'otherStatus', 'medalHistory', 'penaltyHistory']  //3. define it here but have to be in order
+            const careerSectionOrder = showAdditionalSections
+                ? ['personal', 'maritalStatus', 'spouseInformation', 'parentsInformation', 'childrenInformation', 'emergencyInformation', 'language', 'krobKhan', 'public', 'private', 'rankWorking', 'rankCertificate', 'outKrobKhan', 'otherStatus', 'medalHistory', 'penaltyHistory']
+                : (showFamilySection
+                    ? ['personal', 'maritalStatus', 'spouseInformation', 'parentsInformation', 'childrenInformation']
+                    : ['personal'])  //3. define it here but have to be in order
             const careerSectionAnchors = reactive({   //4. define the here too, and it disorder
                 personal: null,
                 maritalStatus: null,
@@ -508,10 +525,17 @@ import Crud from '../../../classes/Crud'
             const isInitializingCareerSections = ref(true)
             const hasCareerUserInteraction = ref(false)
             let focusResetTimer = null
+            let scrollSyncFrame = 0
+            let lastScrollContainer = null
+            let marriedPanelFrame = 0
+            let childrenPanelTimer = null
 
             const mainScrollbarRef = ref(null)
             const activeNavIndex = ref(0)
             const isProgrammaticScroll = ref(false)
+            const isMarriedStatus = computed(() => formData.people.marry_status === 'married')
+            const shouldMountSpousePanel = ref(isMarriedStatus.value)
+            const shouldMountChildrenPanel = ref(isMarriedStatus.value)
             const formSectionAnchors = reactive({  //5. this is optional 
                 family: null,
                 emergency: null,
@@ -540,6 +564,29 @@ import Crud from '../../../classes/Crud'
             ]
             if (personalOnlyMode) {
                 sectionNavItems.splice(1)
+            }
+            sectionNavItems.splice(
+                0,
+                sectionNavItems.length,
+                { id: 'personal', label: 'ក. ព័ត៌មានផ្ទាល់ខ្លួន' },
+                ...(showFamilySection ? [{ id: 'family', label: 'ខ. ព័ត៌មានគ្រួសារ' }] : []),
+                ...(showAdditionalSections
+                    ? [
+                        { id: 'emergency', label: 'គ. ព័ត៌មានទំនាក់ទំនងក្នុងករណីមានអាសន្ន' },
+                        { id: 'education', label: 'ឃ. កំរិតវប្បធម៌ទូទៅ' },
+                        { id: 'language', label: 'ង. ភាសាបរទេស' },
+                        { id: 'krobKhan', label: 'ច. ប្រវត្តិការងារ' },
+                        { id: 'medalHistory', label: 'ឆ-ការលើកសរសើរ ឬដាក់វិន័យ' },
+                        { id: 'status', label: 'ជ. ការបញ្ជាក់អំពីស្ថានភាព' }
+                    ]
+                    : [])
+            )
+
+            if (!showStatusSection) {
+                const statusIndex = sectionNavItems.findIndex((item) => item.id === 'status')
+                if (statusIndex >= 0) {
+                    sectionNavItems.splice(statusIndex, 1)
+                }
             }
 
             const additional_officer_types = ref([
@@ -575,7 +622,7 @@ import Crud from '../../../classes/Crud'
 
             store.dispatch('officer/mybackground',{
                 id: route.params.id,
-                section: personalOnlyMode ? 'personal' : undefined
+                section: backgroundSection
             }).then( async (res) => {
                 officer.value = ( res.data.ok == true ) ? res.data.record : null
                 if (officer.value != null) {
@@ -611,10 +658,13 @@ import Crud from '../../../classes/Crud'
 
             // Function សម្រាប់​តាម marry status របស់user នៅពេលកំពុងជ្រើសរើស
             const onMaritalStatusChanged = (hasChanged, newVal) => {
-                console.log("Radio clicked! New value is:", newVal); // Check your F12 console
                 if (newVal) {
                     // Direct assignment is usually the most reliable for reactivity
                     formData.people.marry_status = newVal;
+                }
+                if (newVal !== 'married') {
+                    careerSectionChanged.spouseInformation = false
+                    careerSectionChanged.childrenInformation = false
                 }
                 onCareerSectionChanged('maritalStatus', hasChanged);
             }
@@ -700,7 +750,44 @@ import Crud from '../../../classes/Crud'
                 if (focusResetTimer) {
                     clearTimeout(focusResetTimer)
                 }
+                if (scrollSyncFrame) {
+                    window.cancelAnimationFrame(scrollSyncFrame)
+                }
+                if (marriedPanelFrame) {
+                    window.cancelAnimationFrame(marriedPanelFrame)
+                }
+                if (childrenPanelTimer) {
+                    window.clearTimeout(childrenPanelTimer)
+                }
             })
+
+            function scheduleMarriedPanelsMount() {
+                if (shouldMountSpousePanel.value && shouldMountChildrenPanel.value) return
+
+                if (marriedPanelFrame) {
+                    window.cancelAnimationFrame(marriedPanelFrame)
+                }
+                marriedPanelFrame = window.requestAnimationFrame(() => {
+                    shouldMountSpousePanel.value = true
+                    marriedPanelFrame = 0
+                })
+
+                if (!shouldMountChildrenPanel.value) {
+                    if (childrenPanelTimer) {
+                        window.clearTimeout(childrenPanelTimer)
+                    }
+                    childrenPanelTimer = window.setTimeout(() => {
+                        shouldMountChildrenPanel.value = true
+                        childrenPanelTimer = null
+                    }, 40)
+                }
+            }
+
+            watch(isMarriedStatus, (married) => {
+                if (married) {
+                    scheduleMarriedPanelsMount()
+                }
+            }, { immediate: true })
 
             function setCareerSectionAnchor(section, el) {
                 if (Object.prototype.hasOwnProperty.call(careerSectionAnchors, section)) {
@@ -783,6 +870,18 @@ import Crud from '../../../classes/Crud'
                 const container = e?.target
                 if (!container) return
 
+                lastScrollContainer = container
+                if (scrollSyncFrame) return
+
+                scrollSyncFrame = window.requestAnimationFrame(() => {
+                    scrollSyncFrame = 0
+                    syncActiveNavFromScroll(lastScrollContainer)
+                })
+            }
+
+            function syncActiveNavFromScroll(container) {
+                if (!container || sectionNavItems.length <= 1) return
+
                 const scrollTop = container.scrollTop || container.scrollTop === 0 ? container.scrollTop : 0
                 const scrollHeight = container.scrollHeight || 0
                 const clientHeight = container.clientHeight || container.offsetHeight || 0
@@ -797,8 +896,8 @@ import Crud from '../../../classes/Crud'
                     return
                 }
 
-                const containerTop = container.getBoundingClientRect().top
-                const thresholdTop = containerTop + clientHeight * 0.15
+                const containerRect = container.getBoundingClientRect()
+                const viewportAnchor = scrollTop + clientHeight * 0.18
 
                 let bestIndex = activeNavIndex.value
                 let bestDistance = Number.POSITIVE_INFINITY
@@ -808,7 +907,8 @@ import Crud from '../../../classes/Crud'
                     if (!el || typeof el.getBoundingClientRect !== 'function') return
 
                     const rect = el.getBoundingClientRect()
-                    const distance = Math.abs(rect.top - thresholdTop)
+                    const topInContainer = rect.top - containerRect.top + scrollTop
+                    const distance = Math.abs(topInContainer - viewportAnchor)
 
                     if (distance < bestDistance) {
                         bestDistance = distance
@@ -979,7 +1079,7 @@ import Crud from '../../../classes/Crud'
 
                     const res = await store.dispatch('officer/mybackground', {
                         id: route.params.id,
-                        section: personalOnlyMode ? 'personal' : undefined
+                        section: backgroundSection
                     })
                     if (res?.data?.ok === true) {
                         officer.value = res.data.record
@@ -1005,9 +1105,9 @@ import Crud from '../../../classes/Crud'
             }
 
             // PARENT SCRIPT
-            watch(() => props.officer, (newVal) => {
-                if (newVal?.people?.marry_status) {
-                    formData.people.marry_status = newVal.people.marry_status;
+            watch(() => officer.value?.people?.marry_status, (newStatus) => {
+                if (newStatus) {
+                    formData.people.marry_status = newStatus;
                 }
             }, { immediate: true });
 
@@ -1026,6 +1126,9 @@ import Crud from '../../../classes/Crud'
                 printDateError ,
                 printDateErrorAnchorRef ,
                 personalOnlyMode,
+                showFamilySection,
+                showAdditionalSections,
+                showStatusSection,
                 officer ,
                 dateFormat ,
                 getPrintCardUrl ,
@@ -1064,6 +1167,9 @@ import Crud from '../../../classes/Crud'
                 mainScrollbarRef,
                 activeNavIndex,
                 sectionNavItems,
+                isMarriedStatus,
+                shouldMountSpousePanel,
+                shouldMountChildrenPanel,
                 setFormSectionAnchor,
                 scrollToSection,
                 onSectionNavSelect,

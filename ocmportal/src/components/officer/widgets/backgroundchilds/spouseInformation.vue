@@ -246,8 +246,25 @@
                             formData.national ? 'text-[#1E3A8A] border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.national || 'ជ្រើសរើស' }}
               </div>
-              <div v-else class="flex items-center gap-1 relative flex-1">
-                <input v-model="formData.national" v-focus type="text" class="field-input-green px-2 py-1" />
+              <div v-else class="flex items-start gap-1 relative flex-1">
+                <div class="flex-1 space-y-2">
+                  <select
+                    ref="nationalSelectRef"
+                    v-model="nationalSelection"
+                    class="field-input-green px-2 py-1 w-full"
+                    @change="onNationalSelectionChange(nationalSelection)"
+                  >
+                    <option value="khmer">ážáŸ’áž˜áŸ‚ážš</option>
+                    <option value="other">áž•áŸ’ážŸáŸáž„áŸ—</option>
+                  </select>
+                  <input
+                    v-if="nationalSelection === 'other'"
+                    v-model="formData.national"
+                    v-focus
+                    type="text"
+                    class="field-input-green px-2 py-1 w-full"
+                  />
+                </div>
                 <button @click="cancelEdit('national')" class="text-gray-400 hover:text-red-500">×</button>
               </div>
             </div>
@@ -258,8 +275,25 @@
                             formData.nationality ? 'text-[#1E3A8A] border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.nationality || 'ជ្រើសរើស' }}
               </div>
-              <div v-else class="flex items-center gap-1 relative flex-1">
-                <input v-model="formData.nationality" v-focus type="text" class="field-input-green px-2 py-1" />
+              <div v-else class="flex items-start gap-1 relative flex-1">
+                <div class="flex-1 space-y-2">
+                  <select
+                    ref="nationalitySelectRef"
+                    v-model="nationalitySelection"
+                    class="field-input-green px-2 py-1 w-full"
+                    @change="onNationalitySelectionChange(nationalitySelection)"
+                  >
+                    <option value="khmer">ខ្មែរ</option>
+                    <option value="other">ផ្សេងៗ</option>
+                  </select>
+                  <input
+                    v-if="nationalitySelection === 'other'"
+                    v-model="formData.nationality"
+                    v-focus
+                    type="text"
+                    class="field-input-green px-2 py-1 w-full"
+                  />
+                </div>
                 <button @click="cancelEdit('nationality')" class="text-gray-400 hover:text-red-500">×</button>
               </div>
             </div>
@@ -404,7 +438,7 @@
 </template>
 
 <script>
-import { ref, watch, computed , reactive } from 'vue'
+import { ref, watch, computed , reactive, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import PdfPreview from './pdfpreview.vue'
 import { useRowDocumentUpload } from './use-row-document-upload'
@@ -441,8 +475,18 @@ export default {
     })
 
     const originalSnapshot = ref({})
+    const originalSnapshotKey = ref('')
     const editModeFields = ref(new Set())
     const weddingCertificateId = ref(null)
+    const KHMER_OPTION_VALUE = 'khmer'
+    const OTHER_OPTION_VALUE = 'other'
+    const KHMER_LABEL = 'ខ្មែរ'
+    const KHMER_LABEL_UNICODE = '\u1781\u17d2\u1798\u17c2\u179a'
+    const OTHER_LABEL_UNICODE = '\u1795\u17d2\u179f\u17c1\u1784\u17d7'
+    const nationalSelection = ref(KHMER_OPTION_VALUE)
+    const nationalitySelection = ref(KHMER_OPTION_VALUE)
+    const nationalSelectRef = ref(null)
+    const nationalitySelectRef = ref(null)
 
     const {
       rowHasDownload,
@@ -475,6 +519,87 @@ export default {
     function formatDateForAPI(value) {
       if (!value) return null
       return value
+    }
+
+    function normalizeString(value) {
+      if (value === null || value === undefined) return ''
+      return String(value)
+    }
+
+    function syncSelectionField(fieldKey, selectionRef, rawValue) {
+      const normalized = normalizeString(rawValue).trim()
+
+      if (normalized === '' || normalized === KHMER_LABEL_UNICODE) {
+        selectionRef.value = KHMER_OPTION_VALUE
+        formData.value[fieldKey] = KHMER_LABEL_UNICODE
+        return
+      }
+
+      selectionRef.value = OTHER_OPTION_VALUE
+      formData.value[fieldKey] = rawValue || ''
+    }
+
+    function onNationalSelectionChange(value) {
+      nationalSelection.value = value
+      if (value === KHMER_OPTION_VALUE) {
+        formData.value.national = KHMER_LABEL_UNICODE
+      } else if (normalizeString(formData.value.national).trim() === KHMER_LABEL_UNICODE) {
+        formData.value.national = ''
+      }
+    }
+
+    function onNationalitySelectionChange(value) {
+      nationalitySelection.value = value
+      if (value === KHMER_OPTION_VALUE) {
+        formData.value.nationality = KHMER_LABEL_UNICODE
+      } else if (normalizeString(formData.value.nationality).trim() === KHMER_LABEL_UNICODE) {
+        formData.value.nationality = ''
+      }
+    }
+
+    function syncSelectionOptionLabels() {
+      const pairs = [
+        nationalSelectRef.value,
+        nationalitySelectRef.value
+      ]
+
+      for (const selectElement of pairs) {
+        if (!selectElement?.options || selectElement.options.length < 2) {
+          continue
+        }
+        selectElement.options[0].text = KHMER_LABEL_UNICODE
+        selectElement.options[1].text = OTHER_LABEL_UNICODE
+      }
+    }
+
+    function buildSnapshot(source = formData.value) {
+      const current = source || {}
+      return JSON.stringify({
+        firstname_kh: current.firstname_kh || '',
+        lastname_kh: current.lastname_kh || '',
+        firstname_en: current.firstname_en || '',
+        lastname_en: current.lastname_en || '',
+        dob: current.dob || '',
+        nid: current.nid || '',
+        pob: current.pob || '',
+        current_address: current.current_address || '',
+        occupation: current.occupation || '',
+        national: current.national || '',
+        nationality: current.nationality || '',
+        spouse_death: current.spouse_death ?? '',
+        profession_organization: current.profession_organization || '',
+        existing_pdf_name: current.existing_pdf_name || '',
+        pdf: current.pdf || '',
+        upload_name: current.pdf_file instanceof File ? current.pdf_file.name : '',
+        upload_size: current.pdf_file instanceof File ? current.pdf_file.size : 0,
+        upload_modified: current.pdf_file instanceof File ? current.pdf_file.lastModified : 0,
+        id: current.id ?? null
+      })
+    }
+
+    function markSnapshot(source = formData.value) {
+      originalSnapshot.value = { ...source }
+      originalSnapshotKey.value = buildSnapshot(source)
     }
 
     // Hydrate data from officer prop
@@ -516,16 +641,49 @@ export default {
       }
 
       formData.value = { ...mapped }
-      originalSnapshot.value = JSON.parse(JSON.stringify(mapped))
+      syncSelectionField('national', nationalSelection, source.spouse_national)
+      syncSelectionField('nationality', nationalitySelection, source.spouse_nationality)
+      markSnapshot(formData.value)
       editModeFields.value.clear()
       
       // Reset initial load flag after hydration
       isInitialLoad.value = true
     }
 
+    function mergeWeddingCertificate(record) {
+      if (!record || !props.officer?.people) {
+        return
+      }
+
+      const people = props.officer.people
+      const currentRecords = Array.isArray(people.wedding_certificates)
+        ? [...people.wedding_certificates]
+        : []
+      const existingIndex = currentRecords.findIndex((item) => item?.id === record.id)
+      const baseRecord = existingIndex >= 0
+        ? currentRecords[existingIndex]
+        : currentRecords[0] || {}
+      const mergedRecord = {
+        ...baseRecord,
+        ...record,
+        birth_certificates: record.birth_certificates ?? baseRecord.birth_certificates ?? []
+      }
+
+      if (existingIndex >= 0) {
+        currentRecords.splice(existingIndex, 1, mergedRecord)
+      } else if (currentRecords.length > 0) {
+        currentRecords.splice(0, 1, mergedRecord)
+      } else {
+        currentRecords.push(mergedRecord)
+      }
+
+      people.wedding_certificates = currentRecords
+      people.wedding_certificate = mergedRecord
+      people.weddingCertificates = currentRecords
+      weddingCertificateId.value = mergedRecord.id ?? weddingCertificateId.value
+    }
+
 const persistChanges = async () => {
-  console.log('🔵 CHILD (Spouse): persistChanges started')
-  
   try {
     if (!isEnabled.value) {
       return false
@@ -533,28 +691,32 @@ const persistChanges = async () => {
 
     const pid = getPeopleId()
     if (!pid) {
-      console.error('🔴 CHILD (Spouse): No people_id found')
       return false
     }
 
-    const payload = JSON.parse(JSON.stringify(props.officer))
-    
-    if (!payload.people) {
-      payload.people = {}
+    if (nationalSelection.value === OTHER_OPTION_VALUE && !normalizeString(formData.value.national).trim()) {
+      window.alert('\u179f\u17bc\u1798\u1794\u17c6\u1796\u17c1\u1789\u1787\u1793\u1787\u17b6\u178f\u17b7')
+      return false
     }
-    
-    if (!payload.people.wedding_certificates || !Array.isArray(payload.people.wedding_certificates)) {
-      payload.people.wedding_certificates = []
+
+    if (nationalitySelection.value === OTHER_OPTION_VALUE && !normalizeString(formData.value.nationality).trim()) {
+      window.alert('\u179f\u17bc\u1798\u1794\u17c6\u1796\u17c1\u1789\u179f\u1789\u17d2\u1787\u17b6\u178f\u17b7')
+      return false
     }
-    
-    if (payload.people.wedding_certificates.length === 0) {
-      payload.people.wedding_certificates.push({})
-    }
-    
-    const cert = payload.people.wedding_certificates[0]
+
+    const normalizedNational = nationalSelection.value === KHMER_OPTION_VALUE
+      ? KHMER_LABEL_UNICODE
+      : normalizeString(formData.value.national).trim()
+    const normalizedNationality = nationalitySelection.value === KHMER_OPTION_VALUE
+      ? KHMER_LABEL_UNICODE
+      : normalizeString(formData.value.nationality).trim()
+
+    formData.value.national = normalizedNational
+    formData.value.nationality = normalizedNationality
 
     // ==================== MAP SPOUSE DATA TO BIRTH CERTIFICATE FIELDS ====================
-    const mappedData = {
+    const cert = {
+      people_id: pid,
       // Map spouse fields to birth certificate fields
       spouse_firstname: formData.value.firstname_kh || '',
       spouse_lastname: formData.value.lastname_kh || '',
@@ -565,8 +727,8 @@ const persistChanges = async () => {
       spouse_pob: formData.value.pob || '',
       spouse_address: formData.value.current_address || '',
       spouse_profession: formData.value.occupation || '',
-      spouse_national: formData.value.national || '',
-      spouse_nationality: formData.value.nationality || '',
+      spouse_national: normalizedNational,
+      spouse_nationality: normalizedNationality,
       spouse_death: formData.value.spouse_death ?? '',
       spouse_profession_organization: formData.value.profession_organization || '',
       
@@ -582,38 +744,22 @@ const persistChanges = async () => {
       issued_date: new Date().toISOString().split('T')[0],
       issued_location: '',
     }
-    
-    // Copy mapped data to cert
-    Object.assign(cert, mappedData)
-    // ==================== END MAPPING ====================
 
     let response
+    let latestRecord = null
     const isNewWeddingCertificate = !weddingCertificateId.value
     
     if (isNewWeddingCertificate) {
-      console.log('🔵 CHILD (Spouse): Creating new wedding certificate')
-      
-      // Make sure we have people_id for create
-      cert.people_id = pid
-      
-      // Don't send id for new records
-      delete cert.id
-      
-      console.log('🔵 CHILD (Spouse): Sending payload:', cert)
-      
       response = await store.dispatch('weddingcertificate/create', cert)
-      console.log('🔵 CHILD (Spouse): Create response:', response)
+      latestRecord = response?.data?.record || null
       
       if (response?.data?.record?.id) {
         weddingCertificateId.value = response.data.record.id
       }
     } else {
-      console.log('🔵 CHILD (Spouse): Updating existing wedding certificate')
-      
       cert.id = weddingCertificateId.value
-      
       response = await store.dispatch('weddingcertificate/update', cert)
-      console.log('🔵 CHILD (Spouse): Update response:', response)
+      latestRecord = response?.data?.record || null
     }
 
     if (response?.data?.ok || response?.status === 200) {
@@ -623,12 +769,16 @@ const persistChanges = async () => {
           const formDataUpload = new FormData()
           formDataUpload.append('id', recordId)
           formDataUpload.append('file', formData.value.pdf_file)
-          await store.dispatch('weddingcertificate/upload', formDataUpload)
+          const uploadResponse = await store.dispatch('weddingcertificate/upload', formDataUpload)
+          latestRecord = uploadResponse?.data?.record || latestRecord
         }
       }
 
-      originalSnapshot.value = JSON.parse(JSON.stringify(formData.value))
-      editModeFields.value.clear()
+      if (latestRecord) {
+        mergeWeddingCertificate(latestRecord)
+      }
+
+      hydrateData()
       emit('changed', false)
       return true
     }
@@ -636,11 +786,7 @@ const persistChanges = async () => {
     return false
     
   } catch (err) {
-    console.error("🔴 CHILD (Spouse): Failed to save spouse info:", err)
-    if (err.response) {
-      console.error('🔴 CHILD: Error response:', err.response.data)
-      console.error('🔴 CHILD: Error status:', err.response.status)
-    }
+    console.error('Failed to save spouse info:', err)
     return false
   }
 }
@@ -652,7 +798,7 @@ const persistChanges = async () => {
     }
 
     const markSaved = () => {
-      originalSnapshot.value = JSON.parse(JSON.stringify(formData.value))
+      markSnapshot(formData.value)
       editModeFields.value.clear()
       emit('changed', false)
     }
@@ -662,12 +808,28 @@ const persistChanges = async () => {
     
     const enableEdit = (field) => {
       if (!isEnabled.value) return
+      if (field === 'national') {
+        syncSelectionField('national', nationalSelection, formData.value.national)
+      }
+      if (field === 'nationality') {
+        syncSelectionField('nationality', nationalitySelection, formData.value.nationality)
+      }
       editModeFields.value.add(field)
+      if (field === 'national' || field === 'nationality') {
+        nextTick(syncSelectionOptionLabels)
+      }
     }
 
     const cancelEdit = (field) => {
       formData.value[field] = originalSnapshot.value[field]
       editModeFields.value.delete(field)
+
+      if (field === 'national') {
+        syncSelectionField('national', nationalSelection, originalSnapshot.value.national)
+      }
+      if (field === 'nationality') {
+        syncSelectionField('nationality', nationalitySelection, originalSnapshot.value.nationality)
+      }
       
       if (field === 'firstname_kh' || field === 'lastname_kh') {
         formData.value.name_kh = `${formData.value.firstname_kh} ${formData.value.lastname_kh}`.trim()
@@ -731,9 +893,7 @@ const cancelFileUpload = () => {
 };
 
     // --- COMPUTED ---
-    const isDirty = computed(() => {
-      return JSON.stringify(formData.value) !== JSON.stringify(originalSnapshot.value)
-    })
+    const isDirty = computed(() => buildSnapshot(formData.value) !== originalSnapshotKey.value)
 
     // FIXED: Watch with initial load flag
     watch(formData, () => {
@@ -750,7 +910,11 @@ const cancelFileUpload = () => {
       emit('changed', isDirty.value)
     }, { deep: true })
 
-    watch(() => props.officer, hydrateData, { immediate: true, deep: true })
+    watch(
+      [() => props.status, () => props.officer?.people?.marry_status, () => props.officer?.people?.wedding_certificates?.[0]],
+      hydrateData,
+      { immediate: true }
+    )
 
     /**
      * Upload functions
@@ -778,7 +942,6 @@ const cancelFileUpload = () => {
     const selectedCertificate = ref(null)
     const pdfToggle = ref(false)
     function togglePdfModal(cert) {
-      console.log(cert)
       selectedCertificate.value = cert == undefined || cert == null ? null : cert 
       pdfToggle.value = !pdfToggle.value
     }
@@ -921,6 +1084,12 @@ const cancelFileUpload = () => {
       markSaved,
       isEnabled,
       isDirty,
+      nationalSelection,
+      nationalitySelection,
+      nationalSelectRef,
+      nationalitySelectRef,
+      onNationalSelectionChange,
+      onNationalitySelectionChange,
       downloadRowDocument,
       rowHasDownload
     }

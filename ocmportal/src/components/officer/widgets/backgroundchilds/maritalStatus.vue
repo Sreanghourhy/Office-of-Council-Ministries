@@ -66,7 +66,7 @@ export default {
       }
     }
 
-    watch(() => props.officer, hydrateData, { immediate: true, deep: true })
+    watch(() => props.officer?.people?.marry_status, hydrateData, { immediate: true })
 
     watch(() => formData.value.marry_status, (newVal) => {
       emit('changed', newVal !== originalValue.value, newVal)

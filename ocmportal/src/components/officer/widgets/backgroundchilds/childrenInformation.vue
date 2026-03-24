@@ -372,6 +372,8 @@ export default {
     const backupData = ref({}) 
 
     const originalSnapshot = ref([])
+    const originalSnapshotKey = ref('[]')
+    const isHydratingRows = ref(true)
     const loading = ref(false)
     
     // Store provinces with their nested districts and communes
@@ -388,6 +390,40 @@ export default {
         return Math.max(max, num)
       }, 0)
       return `child-${maxId + 1}`
+    }
+
+    function normalizeRow(row = {}) {
+      return {
+        _key: row._key || '',
+        id: row.id ?? null,
+        lastname: row.lastname || '',
+        firstname: row.firstname || '',
+        gender: row.gender || '',
+        profession: row.profession || '',
+        custody: row.custody || '',
+        dob: row.dob || '',
+        province_id: row.province_id || 0,
+        district_id: row.district_id || 0,
+        commune_id: row.commune_id || 0,
+        province_name: row.province_name || '',
+        district_name: row.district_name || '',
+        commune_name: row.commune_name || '',
+        fileName: row.fileName || '',
+        attachment: row.attachment || '',
+        pdf: row.pdf || '',
+        upload_name: row.file instanceof File ? row.file.name : '',
+        upload_size: row.file instanceof File ? row.file.size : 0,
+        upload_modified: row.file instanceof File ? row.file.lastModified : 0
+      }
+    }
+
+    function buildRowsSnapshot(source = rows.value) {
+      return JSON.stringify((source || []).map((row) => normalizeRow(row)))
+    }
+
+    function markRowsSnapshot(source = rows.value) {
+      originalSnapshot.value = (source || []).map((row) => ({ ...row }))
+      originalSnapshotKey.value = buildRowsSnapshot(source)
     }
 
     function addRow() {
@@ -442,10 +478,11 @@ export default {
         pdf: child.pdf
       }))
       
-      originalSnapshot.value = JSON.parse(JSON.stringify(rows.value))
+      markRowsSnapshot(rows.value)
       editModeMap.value = {}
       backupData.value = {}
       loading.value = false
+      isHydratingRows.value = true
     }
 
     // Edit Mode
@@ -521,8 +558,8 @@ export default {
 
     // Load provinces (which include nested districts and communes)
     const loadProvinces = async () => {
+      if (provinces.value.length > 0) return
       try {
-        console.log('Loading provinces...')
         const response = await store.dispatch('province/list', { 
           search: '',
           perPage: 1000,
@@ -647,7 +684,6 @@ function onFileChange(row, event) {
 
   // 4. IMPORTANT: Clear the previous file reference first
   if (row.file) {
-    console.log('🔵 Clearing previous file:', row.file.name)
     row.file = null
   }
 
@@ -655,15 +691,11 @@ function onFileChange(row, event) {
   row.file = file
   row.fileName = file.name
   
-  console.log('🔵 New file selected:', file.name, 'for row:', row._key)
-  
   // 6. Tell the parent component to enable the "Save" button
   emit('changed', true)
 }
 
 function clearFile(row) {
-  console.log('🔵 Clearing file for row:', row._key, 'current file:', row.file?.name)
-  
   // Reset the data state
   row.file = null
   row.fileName = '' // Set to empty string to show no file
@@ -676,7 +708,6 @@ function clearFile(row) {
     // Create a new file input to completely reset it
     fileInput.type = 'text'
     fileInput.type = 'file'
-    console.log('🔵 File input reset for:', inputId)
   }
   
   emit('changed', true)
@@ -692,11 +723,8 @@ function clearFile(row) {
     }
 
 const persistChanges = async () => {
-  console.log('🔵 CHILD: persistChanges started')
-  
   const weddingCertificateId = props.officer?.people?.wedding_certificates?.[0]?.id
   if (!weddingCertificateId) {
-    console.error('🔴 CHILD: No wedding certificate found')
     return false
   }
 
@@ -707,32 +735,13 @@ const persistChanges = async () => {
     // Identify changed rows by comparing with originalSnapshot
     for (const row of rows.value) {
       const originalRow = originalSnapshot.value.find(r => r.id === row.id)
-      
-      // Create a copy without file for comparison
-      const rowForComparison = { ...row, file: undefined }
-      const originalForComparison = originalRow ? { ...originalRow, file: undefined } : null
-      
-      // Check if there's a file to upload
       const hasFileToUpload = row.file instanceof File
+      const hasDataChanged = !originalRow || buildRowsSnapshot([row]) !== buildRowsSnapshot([originalRow])
       
-      // Check if any field has changed (excluding file)
-      const hasDataChanged = !originalRow || JSON.stringify(rowForComparison) !== JSON.stringify(originalForComparison)
-      
-      // Row is changed if either data changed OR there's a file to upload
       if (hasDataChanged || hasFileToUpload) {
         changedRows.push(row)
-        console.log(`🔵 CHILD: Row ${row._key} changed:`, {
-          hasDataChanged,
-          hasFileToUpload,
-          fileName: hasFileToUpload ? row.file.name : null
-        })
       }
     }
-    
-    console.log('🔵 CHILD: Changed rows:', changedRows.length, 'details:', changedRows.map(r => ({
-      key: r._key,
-      hasFile: !!(r.file instanceof File)
-    })))
 
     // Handle deleted rows
     const originalIds = originalSnapshot.value.map(r => r.id).filter(id => id)
@@ -740,7 +749,6 @@ const persistChanges = async () => {
     const deletedIds = originalIds.filter(id => !currentIds.includes(id))
 
     for (const id of deletedIds) {
-      console.log(`🔵 CHILD: Deleting child ID: ${id}`)
       await store.dispatch('childcertificate/delete', id)
     }
 
@@ -762,18 +770,14 @@ const persistChanges = async () => {
         pdf: row.pdf || ''
       }
 
-      console.log('🔵 CHILD: Sending payload for row:', row.id || 'new', payload)
-
       let response
       if (row.id) {
         // Update existing record
         payload.id = row.id
         response = await store.dispatch('childcertificate/update', payload)
-        console.log('🔵 CHILD: Update response:', response)
       } else {
         // Create new record
         response = await store.dispatch('childcertificate/create', payload)
-        console.log('🔵 CHILD: Create response:', response)
         
         // Update the row with the new ID from response
         if (response?.data?.record?.id) {
@@ -786,29 +790,14 @@ const persistChanges = async () => {
       if (row.file && row.file instanceof File) {
         const recordId = row.id || response?.data?.record?.id || response?.data?.id
         if (recordId) {
-          console.log('🔵 CHILD: File upload details:', {
-            recordId: recordId,
-            fileName: row.file.name,
-            fileSize: row.file.size,
-            fileType: row.file.type,
-            lastModified: new Date(row.file.lastModified).toISOString()
-          })
-          
           const formData = new FormData()
           formData.append('id', recordId)
           formData.append('file', row.file)
-          
-          console.log('🔵 CHILD: FormData created with:')
-          console.log('  - id:', recordId)
-          console.log('  - file:', row.file.name, `(${row.file.type}, ${row.file.size} bytes)`)
-          
+
           try {
-            console.log('🔵 CHILD: Dispatching to childcertificate/upload...')
             const uploadResponse = await store.dispatch('childcertificate/upload', formData)
-            console.log('🔵 CHILD: Upload response:', uploadResponse)
             
             if (uploadResponse?.data?.pdf) {
-              console.log('🔵 CHILD: File uploaded successfully, new filename:', uploadResponse.data.pdf)
               row.pdf = uploadResponse.data.pdf
               row.fileName = uploadResponse.data.pdf
               row.attachment = uploadResponse.data.pdf
@@ -822,33 +811,22 @@ const persistChanges = async () => {
             const fileInput = document.getElementById(inputId);
             if (fileInput) {
               fileInput.value = '';
-              console.log('🔵 CHILD: File input cleared for:', inputId)
             }
             
           } catch (uploadError) {
-            console.error("🔴 CHILD: File upload failed:", uploadError)
-            if (uploadError.response) {
-              console.error('🔴 CHILD: Upload error response:', uploadError.response.data)
-              console.error('🔴 CHILD: Upload error status:', uploadError.response.status)
-            }
+            console.error('Child file upload failed:', uploadError)
           }
         }
       }
     }
 
     // Update originalSnapshot to match current rows
-    originalSnapshot.value = JSON.parse(JSON.stringify(rows.value))
-    
-    console.log('🔵 CHILD: persistChanges completed successfully')
+    markRowsSnapshot(rows.value)
     emit('changed', false)
     return true
     
   } catch (err) {
-    console.error("🔴 CHILD: Failed to save children info:", err)
-    if (err.response) {
-      console.error('🔴 CHILD: Error response:', err.response.data)
-      console.error('🔴 CHILD: Error status:', err.response.status)
-    }
+    console.error('Failed to save children info:', err)
     return false
   }
 }
@@ -861,47 +839,35 @@ const persistChanges = async () => {
     }
 
     const markSaved = () => {
-      originalSnapshot.value = JSON.parse(JSON.stringify(rows.value))
+      markRowsSnapshot(rows.value)
       editModeMap.value = {}
       backupData.value = {}
+      isHydratingRows.value = true
       emit('changed', false)
     }
 
     // --- COMPUTED ---
     const isDirty = computed(() => {
-      return JSON.stringify(rows.value) !== JSON.stringify(originalSnapshot.value)
+      return buildRowsSnapshot(rows.value) !== originalSnapshotKey.value
     })
 
     // --- WATCHERS ---
-    watch(() => props.officer, async (newVal) => {
-      if (newVal) {
-        await Promise.all([
-          loadProvinces(),
-          initializeRows() // REPLACED fetchChildren with initializeRows
-        ])
-      }
-    }, { immediate: true, deep: true })
+    watch(
+      [() => props.officer?.people?.lastname, () => props.officer?.people?.firstname, () => props.officer?.people?.wedding_certificates?.[0]?.birth_certificates],
+      ([lastname, firstname, children]) => {
+        if (lastname !== undefined || firstname !== undefined || children !== undefined) {
+          initializeRows()
+        }
+      },
+      { immediate: true }
+    )
     
     watch(rows, () => {
+      if (isHydratingRows.value) {
+        isHydratingRows.value = false
+        return
+      }
       emit('changed', isDirty.value)
-    }, { deep: true })
-
-    // Watch for commune changes to update the name
-    watch(() => rows.value.map(r => r.commune_id), (newCommuneIds) => {
-      rows.value.forEach((row) => {
-        if (row.commune_id && row.commune_id > 0) {
-          const province = provinces.value.find(p => p.id === row.province_id)
-          if (province) {
-            const district = province.districts.find(d => d.id === row.district_id)
-            if (district) {
-              const commune = district.communes.find(c => c.id === row.commune_id)
-              if (commune && row.commune_name !== commune.name_kh) {
-                row.commune_name = commune.name_kh
-              }
-            }
-          }
-        }
-      })
     }, { deep: true })
 
     
@@ -931,7 +897,6 @@ const persistChanges = async () => {
     const selectedCertificate = ref(null)
     const pdfToggle = ref(false)
     function togglePdfModal(cert) {
-      console.log(cert)
       selectedCertificate.value = cert == undefined || cert == null ? null : cert 
       pdfToggle.value = !pdfToggle.value
     }

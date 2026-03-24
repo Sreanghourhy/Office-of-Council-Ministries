@@ -482,6 +482,7 @@ export default {
     const store = useStore()
     const editModeFields = ref(new Set())
     const originalSnapshot = ref({})
+    const originalSnapshotKey = ref('')
     
     // ADD THIS - initial load flag to prevent emitting on first load
     const isInitialLoad = ref(true)
@@ -509,6 +510,39 @@ export default {
       if (!value) return ''
       const d = new Date(value)
       return Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10)
+    }
+
+    function buildSnapshot(source = formData.value) {
+      const current = source || {}
+      return JSON.stringify({
+        f_firstname: current.f_firstname || '',
+        f_lastname: current.f_lastname || '',
+        f_en_firstname: current.f_en_firstname || '',
+        f_en_lastname: current.f_en_lastname || '',
+        f_dob: current.f_dob || '',
+        f_pob: current.f_pob || '',
+        f_address: current.f_address || '',
+        f_occupation: current.f_occupation || '',
+        f_national: current.f_national || '',
+        f_nationality: current.f_nationality || '',
+        f_death: current.f_death ?? '',
+        m_firstname: current.m_firstname || '',
+        m_lastname: current.m_lastname || '',
+        m_en_firstname: current.m_en_firstname || '',
+        m_en_lastname: current.m_en_lastname || '',
+        m_dob: current.m_dob || '',
+        m_pob: current.m_pob || '',
+        m_address: current.m_address || '',
+        m_occupation: current.m_occupation || '',
+        m_national: current.m_national || '',
+        m_nationality: current.m_nationality || '',
+        m_death: current.m_death ?? ''
+      })
+    }
+
+    function markSnapshot(source = formData.value) {
+      originalSnapshot.value = { ...source }
+      originalSnapshotKey.value = buildSnapshot(source)
     }
 
     function hydrateData() {
@@ -546,7 +580,7 @@ export default {
       }
 
       formData.value = { ...mapped }
-      originalSnapshot.value = JSON.parse(JSON.stringify(mapped))
+      markSnapshot(mapped)
       editModeFields.value.clear()
       
       // Reset initial load flag after hydration
@@ -554,18 +588,14 @@ export default {
     }
 
     const persistChanges = async () => {
-      console.log('🔵 CHILD (Parents): persistChanges started')
-      
       // IMPORTANT: Check if there are actually any changes
       if (!isDirty.value) {
-        console.log('🔵 CHILD (Parents): No changes detected, skipping save')
         return true
       }
       
       try {
         const pid = getPeopleId()
         if (!pid) {
-          console.error('🔴 CHILD (Parents): No people_id found')
           return false
         }
 
@@ -597,35 +627,25 @@ export default {
           }
         }
 
-
-        console.log('🔵 CHILD (Parents): Sending payload with updates:', payload)
-
         // Dispatch to Vuex - using the officer update endpoint
         const res = await store.dispatch('officer/update', payload)
 
         if (res?.data?.ok || res?.status === 200) {
-          console.log('🔵 CHILD (Parents): Save successful')
-
           if (props.officer?.people) {
             Object.assign(props.officer.people, payload.people)
           }
           
           // Update the original snapshot with the new values
-          originalSnapshot.value = JSON.parse(JSON.stringify(formData.value))
+          markSnapshot(formData.value)
           editModeFields.value.clear()
           emit('changed', false)
           return true
         }
         
-        console.error('🔴 CHILD (Parents): Save failed - response not OK:', res)
         return false
         
       } catch (err) {
-        console.error("🔴 CHILD (Parents): Failed to save parents info:", err)
-        if (err.response) {
-          console.error('🔴 CHILD: Error response data:', err.response.data)
-          console.error('🔴 CHILD: Error response status:', err.response.status)
-        }
+        console.error('Failed to save parents info:', err)
         return false
       }
     }
@@ -636,9 +656,7 @@ export default {
         emit('changed', false)
     }
 
-    const isDirty = computed(() => {
-      return JSON.stringify(formData.value) !== JSON.stringify(originalSnapshot.value)
-    })
+    const isDirty = computed(() => buildSnapshot(formData.value) !== originalSnapshotKey.value)
 
     // MODIFIED THIS WATCHER - with initial load flag
     watch(formData, () => {
@@ -650,7 +668,7 @@ export default {
       emit('changed', isDirty.value)
     }, { deep: true })
 
-    watch(() => props.officer, hydrateData, { immediate: true, deep: true })
+    watch(() => props.officer?.people, hydrateData, { immediate: true })
 
     return { 
       formData, 
@@ -669,6 +687,7 @@ export default {
       persistChanges,  // Make sure this is exposed
       cancelChanges,   // Make sure this is exposed
       markSaved: () => {  // Add this method for compatibility
+        markSnapshot(formData.value)
         editModeFields.value.clear();
         emit('changed', false);
       },

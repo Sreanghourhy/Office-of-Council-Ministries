@@ -401,6 +401,70 @@ class PeopleController extends Controller
         $person = isset( $request->id ) && $request->id > 0 ? RecordModel::find($request->id) : (
             isset( $request->email ) && $request->email != "" ? RecordModel::where('email',$request->email)->first() : null
         );
+        if( $person == null ){
+            return response([
+                'record' => null ,
+                'message' => 'People record not found.' ,
+                'ok' => false
+            ], 403);
+        }
+
+        $normalizeUppercaseLatin = function( $value ){
+            return preg_replace('/[^A-Z\s]+/', '', strtoupper( (string) $value ) );
+        };
+        $normalizeDigits = function( $value ){
+            return preg_replace('/\D+/', '', (string) $value );
+        };
+
+        $updateData = [
+            'firstname' => $request->exists('firstname') ? $request->firstname : $person->firstname ,
+            'lastname' => $request->exists('lastname') ? $request->lastname : $person->lastname ,
+            'enfirstname' => $request->exists('enfirstname') ? $normalizeUppercaseLatin( $request->enfirstname ) : $person->enfirstname ,
+            'enlastname' => $request->exists('enlastname') ? $normalizeUppercaseLatin( $request->enlastname ) : $person->enlastname ,
+            'email' => $request->exists('email') ? $request->email : $person->email ,
+            'dob' => $request->exists('dob') ? $request->dob : $person->dob ,
+            'nid' => $request->exists('nid') ? $normalizeDigits( $request->nid ) : $person->nid ,
+            'mobile_phone' => $request->exists('mobile_phone') ? $normalizeDigits( $request->mobile_phone ) : $person->mobile_phone ,
+            'office_phone' => $request->exists('office_phone') ? $request->office_phone : $person->office_phone ,
+            'marry_status' => $request->exists('marry_status')
+                ? ( $request->marry_status != null && $request->marry_status != '' ? $request->marry_status : 'single' )
+                : ( $person->marry_status != null && $person->marry_status != '' ? $person->marry_status : 'single' ) ,
+            'national' => $request->exists('national') ? $request->national : $person->national ,
+            'nationality' => $request->exists('nationality') ? $request->nationality : $person->nationality ,
+            'pob' => $request->exists('pob') ? $request->pob : $person->pob ,
+            'address' => $request->exists('address') ? $request->address : $person->address ,
+            'current_address' => $request->exists('current_address') ? $request->current_address : $person->current_address ,
+            'body_condition' => $request->exists('body_condition') ? intval($request->body_condition) : intval($person->body_condition ?? 0) ,
+            'body_condition_desp' => $request->exists('body_condition_desp') ? $request->body_condition_desp : $person->body_condition_desp ,
+        ];
+        $updateData['gender'] = $request->exists('gender')
+            ? ( intval($request->gender) >= 0 ? $request->gender : 1 )
+            : $person->gender;
+
+        if( $person->update($updateData) == true ){
+            $person = $person->fresh();
+            if( isset( $request->organizations ) && is_array( $request->organizations ) && $person->organizations != null ){
+                $person->organizations()->sync( $request->organizations );
+            }
+            if( isset( $request->positions ) && is_array( $request->positions ) && $person->positions != null ){
+                $person->positions()->sync( $request->positions );
+            }
+            if( isset( $request->countesies ) && is_array( $request->countesies ) && $person->countesies != null ){
+                $person->countesies()->sync( $request->countesies );
+            }
+            return response()->json([
+                'record' => $person ,
+                'message' => 'Updated successfully.' ,
+                'ok' => true
+            ], 200);
+        }
+
+        return response([
+            'record' => null ,
+            'message' => 'Unable to update people record.' ,
+            'ok' => false
+        ], 403);
+        /*
         if( $person && $person->update([
             'firstname' => $request->firstname ,
             'lastname' => $request->lastname ,
@@ -434,6 +498,7 @@ class PeopleController extends Controller
                 'ok' => false
             ], 403);
         }
+    */
     }
     /**
      * Active function of the account

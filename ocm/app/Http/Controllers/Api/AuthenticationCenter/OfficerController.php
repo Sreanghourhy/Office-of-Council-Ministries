@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\MobilePasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use App\Models\Officer\Officer as RecordModel ;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
@@ -1012,9 +1013,399 @@ class OfficerController extends Controller
         ], 200);
     }
     /**
-     * Create an account
+     * Update an officer
      */
     public function update(Request $request){
+        $user = \Auth::user() == null ? null : \Auth::user() ;
+        $officer = intval( $request->id ) > 0 ? RecordModel::find( $request->id ) : null ;
+
+        if( $officer == null ){
+            return response()->json([
+                'record' => null ,
+                'message' => 'Officer not found.' ,
+                'ok' => false
+            ], 404);
+        }
+
+        $now = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+        $peoplePayloadProvided = $request->exists('people');
+        $peoplePayload = $request->input('people', []);
+
+        if( $peoplePayloadProvided && !is_array( $peoplePayload ) ){
+            return response()->json([
+                'record' => null ,
+                'message' => 'Invalid people payload.' ,
+                'ok' => false
+            ], 422);
+        }
+
+        $organizationStructurePositionRequested = $request->exists('organization_structure_position_id');
+        $organizationStructurePosition = null ;
+        if( $organizationStructurePositionRequested ){
+            if( intval( $request->organization_structure_position_id ) <= 0 ){
+                return response()->json([
+                    'record' => null ,
+                    'message' => 'Organization structure position is required.' ,
+                    'ok' => false
+                ], 422);
+            }
+
+            $organizationStructurePosition = \App\Models\Organization\OrganizationStructurePosition::find( $request->organization_structure_position_id );
+            if( $organizationStructurePosition == null ){
+                return response()->json([
+                    'record' => null ,
+                    'message' => 'Selected organization structure position was not found.' ,
+                    'ok' => false
+                ], 422);
+            }
+        }
+
+        $position = $organizationStructurePosition != null && $organizationStructurePosition->position != null ? $organizationStructurePosition->position : null ;
+        $organization = $organizationStructurePosition != null
+            && $organizationStructurePosition->organizationStructure != null
+            && $organizationStructurePosition->organizationStructure->organization != null
+                ? $organizationStructurePosition->organizationStructure->organization
+                : null ;
+        if( $organization == null && $request->exists('organization_id') && intval( $request->organization_id ) > 0 ){
+            $organization = \App\Models\Organization\Organization::find( $request->organization_id );
+        }
+
+        $unofficialPositionRequested = $request->exists('unofficial_position_id');
+        $unofficialPosition = $unofficialPositionRequested && intval( $request->unofficial_position_id ) > 0
+            ? \App\Models\Position\Position::find( $request->unofficial_position_id )
+            : null ;
+
+        $rankFields = [ 'ank' , 'krobkhan' , 'rank' , 'thnak' ];
+        $rankPayload = [];
+        $hasAnyRankField = false;
+        $hasAllRankFields = true;
+        foreach( $rankFields as $field ){
+            $value = $request->exists( $field ) ? trim( (string) $request->$field ) : '';
+            $rankPayload[$field] = $value;
+            if( $request->exists( $field ) ){
+                $hasAnyRankField = true;
+            }
+            if( strlen( $value ) == 0 ){
+                $hasAllRankFields = false;
+            }
+        }
+
+        if( $hasAnyRankField && !$hasAllRankFields ){
+            return response()->json([
+                'record' => null ,
+                'message' => 'Rank information is incomplete.' ,
+                'ok' => false
+            ], 422);
+        }
+
+        $rankObject = null ;
+        if( $hasAllRankFields ){
+            $rankObject = \App\Models\Officer\Rank::where([
+                'ank' => $rankPayload['ank'] ,
+                'krobkhan' => $rankPayload['krobkhan'] ,
+                'rank' => $rankPayload['rank'] ,
+                'thnak' => $rankPayload['thnak']
+            ])->first();
+
+            if( $rankObject == null ){
+                return response()->json([
+                    'record' => null ,
+                    'message' => 'Selected rank was not found.' ,
+                    'ok' => false
+                ], 422);
+            }
+        }
+
+        $parseDate = function( $value, $emptyValue = '' ){
+            if( $value === null ){
+                return null;
+            }
+
+            if( is_string( $value ) && strlen( trim( $value ) ) == 0 ){
+                return $emptyValue;
+            }
+
+            return \Carbon\Carbon::parse( $value )->format('Y-m-d');
+        };
+        $setStringFields = function( &$target , $source , $fields , $emptyValue = '' ){
+            foreach( $fields as $field ){
+                if( array_key_exists( $field , $source ) ){
+                    $target[$field] = $source[$field] ?? $emptyValue;
+                }
+            }
+        };
+        $setIntegerFields = function( &$target , $source , $fields , $emptyValue = 0 ){
+            foreach( $fields as $field ){
+                if( array_key_exists( $field , $source ) ){
+                    $target[$field] = intval( $source[$field] ?? $emptyValue );
+                }
+            }
+        };
+        $setLocationFields = function( &$target , $source , $fields ){
+            foreach( $fields as $field ){
+                if( array_key_exists( $field , $source ) ){
+                    $target[$field] = intval( $source[$field] ?? 0 ) > 0 ? intval( $source[$field] ) : 0;
+                }
+            }
+        };
+        $normalizeUppercaseLatin = function( $value ){
+            return preg_replace('/[^A-Z\s]+/', '', strtoupper( (string) $value ) );
+        };
+        $normalizeDigits = function( $value ){
+            return preg_replace('/\D+/', '', (string) $value );
+        };
+
+        try{
+            DB::transaction(function() use (
+                $request,
+                $officer,
+                $user,
+                $now,
+                $peoplePayloadProvided,
+                $peoplePayload,
+                $organizationStructurePositionRequested,
+                $organizationStructurePosition,
+                $position,
+                $organization,
+                $unofficialPositionRequested,
+                $unofficialPosition,
+                $rankObject,
+                $parseDate,
+                $setStringFields,
+                $setIntegerFields,
+                $setLocationFields,
+                $normalizeUppercaseLatin,
+                $normalizeDigits
+            ){
+                if( $peoplePayloadProvided ){
+                    if( $officer->people == null ){
+                        throw new \RuntimeException('Officer does not have a linked people record.');
+                    }
+
+                    $peopleUpdateData = [];
+                    $setStringFields( $peopleUpdateData , $peoplePayload , [
+                        'firstname' ,
+                        'lastname' ,
+                        'enfirstname' ,
+                        'enlastname' ,
+                        'email' ,
+                        'nid' ,
+                        'mobile_phone' ,
+                        'office_phone' ,
+                        'address' ,
+                        'current_address' ,
+                        'pob' ,
+                        'body_condition_desp' ,
+                        'nationality' ,
+                        'national' ,
+                        'father_firstname' ,
+                        'father_lastname' ,
+                        'father_enfirstname' ,
+                        'father_enlastname' ,
+                        'father_dob' ,
+                        'father_nationality' ,
+                        'father_national' ,
+                        'father_nid' ,
+                        'father_pob' ,
+                        'father_address' ,
+                        'father_profession' ,
+                        'mother_firstname' ,
+                        'mother_lastname' ,
+                        'mother_enfirstname' ,
+                        'mother_enlastname' ,
+                        'mother_dob' ,
+                        'mother_nationality' ,
+                        'mother_national' ,
+                        'mother_nid' ,
+                        'mother_pob' ,
+                        'mother_address' ,
+                        'mother_profession' ,
+                        'emergency_lastname' ,
+                        'emergency_firstname' ,
+                        'emergency_relationship' ,
+                        'emergency_profession' ,
+                        'emergency_phone' ,
+                        'emergency_email' ,
+                        'emergency_address'
+                    ]);
+                    $setIntegerFields( $peopleUpdateData , $peoplePayload , [
+                        'body_condition' ,
+                        'father_death' ,
+                        'mother_death' ,
+                        'emergency_gender'
+                    ]);
+                    $setLocationFields( $peopleUpdateData , $peoplePayload , [
+                        'address_province_id' ,
+                        'address_district_id' ,
+                        'address_commune_id' ,
+                        'address_village_id' ,
+                        'current_address_province_id' ,
+                        'current_address_district_id' ,
+                        'current_address_commune_id' ,
+                        'current_address_village_id' ,
+                        'pob_province_id' ,
+                        'pob_district_id' ,
+                        'pob_commune_id' ,
+                        'pob_village_id' ,
+                        'father_address_province_id' ,
+                        'father_address_district_id' ,
+                        'father_address_commune_id' ,
+                        'father_address_village_id' ,
+                        'mother_address_province_id' ,
+                        'mother_address_district_id' ,
+                        'mother_address_commune_id' ,
+                        'mother_address_village_id' ,
+                        'emergency_address_province_id' ,
+                        'emergency_address_district_id' ,
+                        'emergency_address_commune_id' ,
+                        'emergency_address_village_id'
+                    ]);
+
+                    if( array_key_exists( 'gender' , $peoplePayload ) ){
+                        $peopleUpdateData['gender'] = intval( $peoplePayload['gender'] ) >= 0 ? intval( $peoplePayload['gender'] ) : 1;
+                    }
+                    if( array_key_exists( 'dob' , $peoplePayload ) ){
+                        $peopleUpdateData['dob'] = $parseDate( $peoplePayload['dob'] , null );
+                    }
+                    if( array_key_exists( 'marry_status' , $peoplePayload ) ){
+                        $peopleUpdateData['marry_status'] = $peoplePayload['marry_status'] != null && $peoplePayload['marry_status'] != '' ? $peoplePayload['marry_status'] : 'single';
+                    }
+                    if( array_key_exists( 'enfirstname' , $peopleUpdateData ) ){
+                        $peopleUpdateData['enfirstname'] = $normalizeUppercaseLatin( $peopleUpdateData['enfirstname'] );
+                    }
+                    if( array_key_exists( 'enlastname' , $peopleUpdateData ) ){
+                        $peopleUpdateData['enlastname'] = $normalizeUppercaseLatin( $peopleUpdateData['enlastname'] );
+                    }
+                    if( array_key_exists( 'mobile_phone' , $peopleUpdateData ) ){
+                        $peopleUpdateData['mobile_phone'] = $normalizeDigits( $peopleUpdateData['mobile_phone'] );
+                    }
+                    if( array_key_exists( 'nid' , $peopleUpdateData ) ){
+                        $peopleUpdateData['nid'] = $normalizeDigits( $peopleUpdateData['nid'] );
+                    }
+
+                    if( !empty( $peopleUpdateData ) ){
+                        $peopleUpdateData['updated_by'] = $user == null ? 0 : $user->id ;
+                        $peopleUpdateData['updated_at'] = $now;
+                        $officer->people->update( $peopleUpdateData );
+                    }
+                }
+
+                $officerUpdateData = [
+                    'updated_by' => $user == null ? 0 : $user->id ,
+                    'updated_at' => $now
+                ];
+                $setStringFields( $officerUpdateData , $request->all() , [
+                    'code' ,
+                    'passport' ,
+                    'email' ,
+                    'phone' ,
+                    'salary_rank' ,
+                    'officer_type' ,
+                    'additional_officer_type'
+                ]);
+                if( array_key_exists( 'code' , $officerUpdateData ) ){
+                    $officerUpdateData['code'] = $normalizeDigits( $officerUpdateData['code'] );
+                }
+
+                if( $organizationStructurePositionRequested ){
+                    $officerUpdateData['organization_id'] = $organization != null && intval( $organization->id ) > 0 ? $organization->id : null;
+                    $officerUpdateData['position_id'] = $position != null && intval( $position->id ) > 0 ? $position->id : null;
+                }else{
+                    if( $request->exists('organization_id') ){
+                        $officerUpdateData['organization_id'] = intval( $request->organization_id ) > 0 ? intval( $request->organization_id ) : null;
+                    }
+                    if( $request->exists('position_id') ){
+                        $officerUpdateData['position_id'] = intval( $request->position_id ) > 0 ? intval( $request->position_id ) : null;
+                    }
+                }
+                if( $request->exists('countesy_id') ){
+                    $officerUpdateData['countesy_id'] = intval( $request->countesy_id );
+                }
+                if( $request->exists('official_date') ){
+                    $officerUpdateData['official_date'] = $parseDate( $request->official_date );
+                }
+                if( $request->exists('unofficial_date') ){
+                    $officerUpdateData['unofficial_date'] = $parseDate( $request->unofficial_date );
+                }
+                if( $rankObject != null ){
+                    $officerUpdateData['rank_id'] = $rankObject->id;
+                }
+
+                $officer->update( $officerUpdateData );
+
+                $currentJob = $officer->getCurrentJob();
+                $jobUpdateData = [];
+                if( $organizationStructurePositionRequested ){
+                    $jobUpdateData['organization_structure_position_id'] = $organizationStructurePosition->id;
+                }
+                if( $unofficialPositionRequested ){
+                    $jobUpdateData['unofficial_position_id'] = $unofficialPosition == null ? 0 : $unofficialPosition->id;
+                }
+                if( $request->exists('countesy_id') ){
+                    $jobUpdateData['countesy_id'] = intval( $request->countesy_id );
+                }
+
+                if( !empty( $jobUpdateData ) ){
+                    $jobUpdateData['updated_by'] = $user == null ? 0 : $user->id ;
+                    $jobUpdateData['updated_at'] = $now;
+
+                    if( $currentJob == null ){
+                        if( $organizationStructurePositionRequested ){
+                            $officer->jobs()->create( array_merge( $jobUpdateData , [
+                                'officer_id' => $officer->id ,
+                                'start' => $now ,
+                                'end' => null ,
+                                'created_by' => $user == null ? 0 : $user->id ,
+                                'created_at' => $now
+                            ] ) );
+                        }
+                    }else{
+                        $currentJob->update( $jobUpdateData );
+                    }
+                }
+            });
+        }catch( \RuntimeException $exception ){
+            return response()->json([
+                'record' => null ,
+                'message' => $exception->getMessage() ,
+                'ok' => false
+            ], 422);
+        }
+
+        $officer = $officer->fresh();
+        $officer->user ;
+        $officer->organization;
+        $officer->countesy;
+        $officer->currentJobs;
+        $officer->position;
+        $officer->people;
+        $officer->rank;
+        $officer->jobs;
+
+        $job = $officer == null ? null : $officer->getCurrentJob() ;
+        if( $job != null && $job->organizationStructurePosition != null ){
+            $job->organizationStructurePosition->position;
+            if( $job->organizationStructurePosition->organizationStructure != null ){
+                $job->organizationStructurePosition->organizationStructure->organization;
+            }
+        }
+        $officer->current_job = $job ;
+
+
+        if( $officer->people != null ){
+            $officer->people->weddingCertificates ;
+        }
+
+        return response()->json([
+            'record' => $officer ,
+            'message' => 'áž€áŸ‚áž”áŸ’ážšáŸ‚áž–áŸážáŸŒáž˜áž¶áž“ážšáž½áž…ážšáž¶áž›áŸ‹ !' ,
+            'ok' => true
+        ], 200);
+    }
+    /**
+     * Create an account
+     */
+    public function updateLegacy(Request $request){
         // Check whether the officer has been assigned a position yet
         $organizationStructurePosition = intval( $request->organization_structure_position_id ) > 0 ? \App\Models\Organization\OrganizationStructurePosition::find( $request->organization_structure_position_id ) : null ;
         $position = $organizationStructurePosition != null && $organizationStructurePosition->position != null ? $organizationStructurePosition->position : null ;
@@ -1487,6 +1878,7 @@ class OfficerController extends Controller
         ], 200);
     }
     public function mybackground(Request $request){
+        $personalOnly = trim( (string) $request->query('section','') ) === 'personal';
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
                 'ok' => false ,
@@ -1510,40 +1902,61 @@ class OfficerController extends Controller
         $record->people;
 
         if( $record->people != null ){
-            $record->people->wedding_certificates = $record->people->weddingCertificates->map(function( $weddingCertificate ){
-                $weddingCertificate->birthCertificates;
-                return $weddingCertificate;
-            }) ;
+            $record->people->birth_certificates = $record->people->birthCertificates()
+            ->where(function($query){
+                $query->whereNull('wedding_certificate_id')
+                ->orWhere('wedding_certificate_id',0);
+            })
+            ->orderBy('id','asc')
+            ->get()
+            ->map(function( $birthCertificate ){
+                $birthCertificate->province;
+                $birthCertificate->district;
+                $birthCertificate->commune;
+                return $birthCertificate;
+            });
+            $record->people->birth_certificate = $record->people->birth_certificates->count() > 0
+                ? $record->people->birth_certificates[ $record->people->birth_certificates->count() - 1 ]
+                : null;
             $record->people->passports;
-            $certificates['first'] = $record->people->certificatesHighSchool();
-            $certificates['middle'] = $record->people->certificatesPostGraduated();
-            $certificates['others'] = $record->people->certificatesOthers();
-            $record->people->certificates = $certificates ;
-            $record->people->languages;
-            $record->jobBackgrounds;
-            $record->ranking_by_certificates = $record->rankingByCertificates->map(function($rank){
-                $rank->rank;
-                $rank->previousRank;
-                return $rank;
-            });
-            $record->ranking_by_workings = $record->rankingByWorkings->map(function($rank){
-                $rank->rank;
-                $rank->previousRank;
-                return $rank;
-            });
-            $record->rankingByWorkings;
-            $record->pendingWorks;
-            $record->paneltyHistories;
-            $record->medalHistories;
+
+            if( !$personalOnly ){
+                $record->people->wedding_certificates = $record->people->weddingCertificates->map(function( $weddingCertificate ){
+                    $weddingCertificate->birthCertificates;
+                    return $weddingCertificate;
+                }) ;
+                $certificates['first'] = $record->people->certificatesHighSchool();
+                $certificates['middle'] = $record->people->certificatesPostGraduated();
+                $certificates['others'] = $record->people->certificatesOthers();
+                $record->people->certificates = $certificates ;
+                $record->people->languages;
+                $record->jobBackgrounds;
+                $record->ranking_by_certificates = $record->rankingByCertificates->map(function($rank){
+                    $rank->rank;
+                    $rank->previousRank;
+                    return $rank;
+                });
+                $record->ranking_by_workings = $record->rankingByWorkings->map(function($rank){
+                    $rank->rank;
+                    $rank->previousRank;
+                    return $rank;
+                });
+                $record->rankingByWorkings;
+                $record->pendingWorks;
+                $record->paneltyHistories;
+                $record->medalHistories;
+            }
 
         }
 
-        $record->job = $record->getCurrentJob();
-        if( $record->job != null && $record->job->organizationStructurePosition != null ){
-            $record->job->organizationStructurePosition->position;
-            $record->job->organizationStructurePosition->permissions;
-            if( $record->job->organizationStructurePosition->organizationStructure != null ){
-                $record->job->organizationStructurePosition->organizationStructure->organization;
+        if( !$personalOnly ){
+            $record->job = $record->getCurrentJob();
+            if( $record->job != null && $record->job->organizationStructurePosition != null ){
+                $record->job->organizationStructurePosition->position;
+                $record->job->organizationStructurePosition->permissions;
+                if( $record->job->organizationStructurePosition->organizationStructure != null ){
+                    $record->job->organizationStructurePosition->organizationStructure->organization;
+                }
             }
         }
         $record->image = $record->image != null && trim($record->image ) != "" && \Storage::disk('public')->exists( $record->image )

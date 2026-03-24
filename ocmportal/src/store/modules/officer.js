@@ -38,7 +38,14 @@ const actions = {
     return await crud.read(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+'/read')
   },
   async mybackground ({ state, commit, rootState },params) {
-    return await crud.read(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+'/mybackground')
+    const query = new URLSearchParams()
+    if (params?.section) {
+      query.set('section', params.section)
+    }
+    const queryString = query.toString()
+    return await crud.read(
+      import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+'/mybackground'+(queryString ? '?'+queryString : '')
+    )
   },
   async publicphoto({ state, commit, rootState },params) {
     return await crud.read(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+'/publicphoto')

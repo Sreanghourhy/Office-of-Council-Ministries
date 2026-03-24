@@ -83,14 +83,14 @@ export default {
 }
 
 .profile-section-nav-item {
-  flex: 1 1 0;
-  min-height: 44px;
+  flex: 0 0 auto;
+  min-height: 52px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 12px 14px;
-  font-size: 13px;
-  text-align: center;
+  justify-content: flex-start;
+  padding: 12px 18px;
+  font-size: 14px;
+  text-align: left;
   cursor: pointer;
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.2s, color 0.2s;
@@ -107,14 +107,14 @@ export default {
 }
 
 .profile-section-nav-item-active {
-  background-color: #ffcd00;
-  color: #000;
+  font-weight: 600;
+  background-color: #e5f0ff;
+  color: #0f172a;
+  border-left: 3px solid #1d4ed8;
 }
 
 .profile-section-nav-item-active:hover {
-  /* background-color: #4a7ae6;
-  color: white; */
-  background-color: #ffcd00;
+  background-color: #e5f0ff;
   color: #000;
 }
 </style>

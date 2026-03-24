@@ -126,6 +126,7 @@
 <script>
 import { reactive, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import { useDialog, useMessage, useNotification } from 'naive-ui'
 
 const UpdateForm = defineAsyncComponent(() => import('./../../widgets/update.vue'))
@@ -154,6 +155,7 @@ export default {
   },
   setup(props) {
     const store = useStore()
+    const router = useRouter()
     const dialog = useDialog()
     const message = useMessage()
     const notify = useNotification()
@@ -219,7 +221,7 @@ export default {
 
     function showEditModal() {
       closeMenu()
-      editModal.show = true
+      router.push('/hr/officer/profile/' + props.record.id)
     }
 
     function showProfileModal() {

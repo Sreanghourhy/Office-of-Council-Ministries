@@ -43,6 +43,7 @@ import UserPrivacyComponent from './../components/notification/Privacy.vue'
 import OfficerCrud from './../components/officer/index.vue'
 import OfficerThumbnailCrud from './../components/officer/listing/thumbnail.vue'
 import OfficerTableCrud from './../components/officer/listing/table.vue'
+import OfficerProfile from './../components/officer/listing/profile.vue'
 import PrintOfficerProfileComponent from './../layouts/staff/printprofile.vue'
 
 /**
@@ -313,6 +314,14 @@ export const getRoutes = () => {
                         name: "OfficerThumbnail" ,
                         path: '' ,
                         component: OfficerThumbnailCrud , // UserTableCrud
+                        permissions: [
+                            'portal_staff_listing'
+                        ],
+                    },
+                    {
+                        name: "OfficerProfile" ,
+                        path: 'profile/:id' ,
+                        component: OfficerProfile ,
                         permissions: [
                             'portal_staff_listing'
                         ],

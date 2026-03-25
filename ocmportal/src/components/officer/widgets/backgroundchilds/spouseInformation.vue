@@ -17,18 +17,18 @@
         <!-- Khmer Name Field (Lastname + Firstname) -->
 <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
   <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះប្តីឬប្រពន្ធ</label>
-  <div class="w-full relative group">
+  <div :class="['w-full relative group', fieldStateClass(['lastname_kh', 'firstname_kh'])]">
     <div v-if="shouldShowDisplay('name_kh')" @click="enableEdit('name_kh')" class="flex gap-1">
       <div 
            :class="[
-             'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+             'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
              formData.lastname_kh ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
            ]">
         {{ formData.lastname_kh || 'គោត្តនាម' }}
       </div> 
       <div
            :class="[
-             'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+             'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
              formData.firstname_kh ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
            ]">
         {{ formData.firstname_kh || 'នាម' }}
@@ -64,19 +64,19 @@
 <!-- English Name Field (Firstname + Lastname) - Keep same order as Khmer for consistency -->
 <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
   <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះជាអក្សរពុម្ពឡាតាំង</label>
-  <div class="w-full relative">
+  <div :class="['w-full relative', fieldStateClass(['lastname_en', 'firstname_en'])]">
     <div v-if="shouldShowDisplay('name_en')" @click="enableEdit('name_en')" class="flex gap-1">
       <!-- In display mode, show in same order as Khmer: Lastname then Firstname -->
       <div 
            :class="[
-             'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+             'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
              formData.lastname_en ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
            ]">
         {{ formData.lastname_en || 'lastname' }}
       </div> 
       <div
            :class="[
-             'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+             'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
              formData.firstname_en ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
            ]">
         {{ formData.firstname_en || 'firstname' }}
@@ -109,10 +109,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ថ្ងៃខែឆ្នាំកំណើត</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('dob')]">
             <div v-if="shouldShowDisplay('dob')" @click="enableEdit('dob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
                    formData.dob ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.dob || 'ថ្ងៃ-ខែ-ឆ្នាំ' }}
@@ -129,10 +129,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">លេខអត្តសញ្ញាណខ្មែរ</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('nid')]">
             <div v-if="shouldShowDisplay('nid')" @click="enableEdit('nid')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.nid ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.nid || 'លេខអត្តសញ្ញាណខ្មែរ' }}
@@ -149,10 +149,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ទីកន្លែងកំណើត</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('pob')]">
             <div v-if="shouldShowDisplay('pob')" @click="enableEdit('pob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.pob ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.pob || 'មិនទាន់មានទិន្នន័យ' }}
@@ -169,10 +169,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">មុខរបរ/មុខតំណែង</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('occupation')]">
             <div v-if="shouldShowDisplay('occupation')" @click="enableEdit('occupation')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.occupation ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.occupation || 'មិនទាន់មានទិន្នន័យ' }}
@@ -196,10 +196,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះអង្គភាព</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('profession_organization')]">
             <div v-if="shouldShowDisplay('profession_organization')" @click="enableEdit('profession_organization')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.profession_organization ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.profession_organization || 'មិនទាន់មានទិន្នន័យ' }}
@@ -215,10 +215,10 @@
 
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">អាសយដ្ឋានបច្ចុប្បន្ន</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('current_address')]">
             <div v-if="shouldShowDisplay('current_address')" @click="enableEdit('current_address')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.current_address ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.current_address || 'មិនទាន់មានទិន្នន័យ' }}
@@ -238,11 +238,11 @@
         <div class="flex flex-col gap-2">
           <!-- <label class="text-[13px] text-left font-medium text-[#2C3E50]">អត្តសញ្ញាណ</label> -->
           <div class="flex flex-row gap-4">
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('national')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ជនជាតិ ៖</span>
               <!-- :class="['text-[13px] font-semibold cursor-pointer border-b border-dashed hover:text-[#22C55E]',  -->
               <div v-if="shouldShowDisplay('national')" @click="enableEdit('national')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
                             formData.national ? 'text-[#1E3A8A] border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.national || 'ជ្រើសរើស' }}
               </div>
@@ -268,10 +268,10 @@
                 <button @click="cancelEdit('national')" class="text-gray-400 hover:text-red-500">×</button>
               </div>
             </div>
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('nationality')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">សញ្ជាតិ ៖</span>
               <div v-if="shouldShowDisplay('nationality')" @click="enableEdit('nationality')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
                             formData.nationality ? 'text-[#1E3A8A] border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.nationality || 'ជ្រើសរើស' }}
               </div>
@@ -393,7 +393,7 @@
 
         <div class="flex flex-col gap-2">
           <div class="flex flex-row gap-4">
-            <div class="flex items-center gap-4 flex-1">
+            <div :class="['flex items-center gap-4 flex-1', fieldStateClass('spouse_death')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ស្ថានភាព ៖</span>
               <div class="flex items-center gap-6">
                 <!-- Alive Option (value = 0) -->
@@ -843,6 +843,13 @@ const persistChanges = async () => {
       return (formData.value[field] !== originalSnapshot.value[field]) ? originalSnapshot.value[field] : null
     }
 
+    const fieldChanged = (fields) => {
+      const fieldList = Array.isArray(fields) ? fields : [fields]
+      return fieldList.some((field) => JSON.stringify(formData.value?.[field]) !== JSON.stringify(originalSnapshot.value?.[field]))
+    }
+
+    const fieldStateClass = (fields) => (fieldChanged(fields) ? 'changed-cell changed-cell-offset' : '')
+
 const handleFileUpload = (event) => {
   const file = event.target.files[0]; // We only need one file for the wedding certificate
   if (!file) return;
@@ -1077,6 +1084,8 @@ const cancelFileUpload = () => {
       enableEdit,
       cancelEdit,
       getPrevious,
+      fieldChanged,
+      fieldStateClass,
       handleFileUpload,
       cancelFileUpload,
       persistChanges,
@@ -1098,6 +1107,20 @@ const cancelFileUpload = () => {
 </script>
 
 <style scoped>
+.changed-cell-offset {
+  margin-left: -6px;
+  padding-left: 6px;
+  border-radius: 0;
+}
+
+.flex.flex-col.relative > button {
+  display: none;
+}
+
+.flex.items-start.gap-1.relative.flex-1 > button {
+  display: none;
+}
+
 .field-input-green {
   width: 100%;
   border: 1px solid #E2E8F0;

@@ -5,7 +5,7 @@
       class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]"
     >
       <div
-        class="relative w-full mb-6 border-b border-[#D8DEE8] pb-3 font-moul text-[#1E3A8A] text-left text-xl md:text-2xl leading-tight"
+        class="w-full pr-4 text-left text-[15px] font-semibold text-[#1E3A8A] leading-7"
       >
         ឃ. កំរិតវប្បធម៌ទូទៅ ការបណ្ដុះបណ្ដាលមុខវិជ្ជាជីវៈ និងការបណ្ដុះបណ្ដាលបន្ត
       </div>

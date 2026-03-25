@@ -10,18 +10,18 @@
         <!-- Father Name Khmer -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឪពុកឈ្មោះ</label>
-          <div class="w-full relative group">
+          <div :class="['w-full relative group', fieldStateClass(['f_lastname', 'f_firstname'])]">
             <div v-if="shouldShowDisplay('f_name_kh')" @click="enableEdit('f_name_kh')" class="flex gap-1">
               <div 
                    :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.f_lastname ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.f_lastname || 'ត្រកូល ' }}
               </div> 
               <div
                    :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.f_firstname ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.f_firstname || 'នាម ' }}
@@ -43,7 +43,7 @@
         <!-- Father Name English -->
         <!-- <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះជាអក្សរពុម្ពឡាតាំង</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('f_dob')]">
             <div v-if="shouldShowDisplay('f_name_en')" @click="enableEdit('f_name_en')" class="flex gap-1">
               <div
               :class="[
@@ -79,7 +79,7 @@
           <div class="w-full relative">
             <div v-if="shouldShowDisplay('f_dob')" @click="enableEdit('f_dob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
                    formData.f_dob ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.f_dob || 'ថ្ងៃ-ខែ-ឆ្នាំ' }}
@@ -97,10 +97,10 @@
         <!-- Father Place of Birth -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ទីកន្លែងកំណើត</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('f_pob')]">
             <div v-if="shouldShowDisplay('f_pob')" @click="enableEdit('f_pob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.f_pob ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.f_pob || 'មិនទាន់មានទិន្នន័យ' }}
@@ -118,10 +118,10 @@
         <!-- Father Current Address -->
         <!-- <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">អាសយដ្ឋានបច្ចុប្បន្ន</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('f_occupation')]">
             <div v-if="shouldShowDisplay('f_address')" @click="enableEdit('f_address')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.f_address ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.f_address || 'មិនទាន់មានទិន្នន័យ' }}
@@ -163,10 +163,10 @@
         <div class="flex flex-col gap-2">
           <div class="flex flex-row gap-4">
             <!-- Father National -->
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('f_national')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ជនជាតិ ៖</span>
               <div v-if="shouldShowDisplay('f_national')" @click="enableEdit('f_national')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green  hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green  hover:border-[#22C55E] duration-150', 
                             formData.f_national ? ' border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.f_national || 'ជ្រើសរើស' }}
               </div>
@@ -176,10 +176,10 @@
               </div>
             </div>
             <!-- Father Nationality -->
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('f_nationality')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">សញ្ជាតិ ៖</span>
               <div v-if="shouldShowDisplay('f_nationality')" @click="enableEdit('f_nationality')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
                             formData.f_nationality ? ' border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.f_nationality || 'ជ្រើសរើស' }}
               </div>
@@ -193,7 +193,7 @@
 
         <div class="flex flex-col gap-2">
               <div class="flex flex-row gap-4">
-                <div class="flex items-center gap-4 flex-1">
+                <div :class="['flex items-center gap-4 flex-1', fieldStateClass('f_death')]">
                   <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ស្ថានភាព ៖</span>
                   <div class="flex items-center gap-6">
                     <!-- Alive Option (value = 0) -->
@@ -243,18 +243,18 @@
         <!-- Mother Name Khmer -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ម្ដាយឈ្មោះ</label>
-          <div class="w-full relative group">
+          <div :class="['w-full relative group', fieldStateClass(['m_firstname', 'm_lastname'])]">
             <div v-if="shouldShowDisplay('m_name_kh')" @click="enableEdit('m_name_kh')" class="flex gap-1">
               <div
               :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.m_firstname ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.m_firstname || 'នាម ' }}
               </div>
               <div 
                    :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.m_lastname ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.m_lastname || 'ត្រកូល ' }}
@@ -276,7 +276,7 @@
         <!-- Mother Name English -->
         <!-- <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះជាអក្សរពុម្ពឡាតាំង</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('m_dob')]">
             <div v-if="shouldShowDisplay('m_name_en')" @click="enableEdit('m_name_en')" class="flex gap-1">
               <div 
                    :class="[
@@ -312,7 +312,7 @@
           <div class="w-full relative">
             <div v-if="shouldShowDisplay('m_dob')" @click="enableEdit('m_dob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-center hover:border-[#22C55E] duration-150',
                    formData.m_dob ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.m_dob || 'ថ្ងៃ-ខែ-ឆ្នាំ' }}
@@ -330,10 +330,10 @@
         <!-- Mother Place of Birth -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ទីកន្លែងកំណើត</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('m_pob')]">
             <div v-if="shouldShowDisplay('m_pob')" @click="enableEdit('m_pob')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.m_pob ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.m_pob || 'មិនទាន់មានទិន្នន័យ' }}
@@ -351,10 +351,10 @@
         <!-- Mother Current Address -->
         <!-- <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">អាសយដ្ឋានបច្ចុប្បន្ន</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('m_occupation')]">
             <div v-if="shouldShowDisplay('m_address')" @click="enableEdit('m_address')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.m_address ? 'border-[#E2E8F0] ' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.m_address || 'មិនទាន់មានទិន្នន័យ' }}
@@ -396,10 +396,10 @@
         <div class="flex flex-col gap-2">
           <div class="flex flex-row gap-4">
             <!-- Mother National -->
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('m_national')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ជនជាតិ ៖</span>
               <div v-if="shouldShowDisplay('m_national')" @click="enableEdit('m_national')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
                             formData.m_national ? ' border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.m_national || 'ជ្រើសរើស' }}
               </div>
@@ -409,10 +409,10 @@
               </div>
             </div>
             <!-- Mother Nationality -->
-            <div class="flex items-center gap-2 flex-1">
+            <div :class="['flex items-center gap-2 flex-1', fieldStateClass('m_nationality')]">
               <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">សញ្ជាតិ ៖</span>
               <div v-if="shouldShowDisplay('m_nationality')" @click="enableEdit('m_nationality')" 
-                   :class="['w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
+                   :class="['field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left field-input-green hover:border-[#22C55E] duration-150', 
                             formData.m_nationality ? ' border-gray-300' : 'text-gray-400 border-gray-200']">
                 {{ formData.m_nationality || 'ជ្រើសរើស' }}
               </div>
@@ -424,7 +424,7 @@
           </div>
           <div class="flex flex-col gap-2">
               <div class="flex flex-row gap-4">
-                <div class="flex items-center gap-4 flex-1">
+                <div :class="['flex items-center gap-4 flex-1', fieldStateClass('m_death')]">
                   <span class="text-[13px] whitespace-nowrap text-[#2C3E50]">ស្ថានភាព ៖</span>
                   <div class="flex items-center gap-6">
                     <!-- Alive Option (value = 0) -->
@@ -670,6 +670,13 @@ export default {
 
     watch(() => props.officer?.people, hydrateData, { immediate: true })
 
+    const fieldChanged = (fields) => {
+      const fieldList = Array.isArray(fields) ? fields : [fields]
+      return fieldList.some((field) => JSON.stringify(formData.value?.[field]) !== JSON.stringify(originalSnapshot.value?.[field]))
+    }
+
+    const fieldStateClass = (fields) => (fieldChanged(fields) ? 'changed-cell changed-cell-offset' : '')
+
     return { 
       formData, 
       shouldShowDisplay: (field) => !editModeFields.value.has(field),
@@ -684,6 +691,8 @@ export default {
         }
       },
       getPrevious: (field) => (formData.value[field] !== originalSnapshot.value[field]) ? originalSnapshot.value[field] : null,
+      fieldChanged,
+      fieldStateClass,
       persistChanges,  // Make sure this is exposed
       cancelChanges,   // Make sure this is exposed
       markSaved: () => {  // Add this method for compatibility
@@ -699,6 +708,20 @@ export default {
 </script>
 
 <style scoped>
+.changed-cell-offset {
+  margin-left: -6px;
+  padding-left: 6px;
+  border-radius: 0;
+}
+
+.flex.flex-col.relative > button {
+  display: none;
+}
+
+.flex.items-center.gap-1.relative.flex-1 > button {
+  display: none;
+}
+
 .field-input-green {
   width: 100%;
   border: 1px solid #E2E8F0;

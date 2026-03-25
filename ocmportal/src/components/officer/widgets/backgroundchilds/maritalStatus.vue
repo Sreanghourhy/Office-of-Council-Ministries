@@ -1,37 +1,89 @@
 <template>
-  <div class="flex flex-col p-[2%]">
-    <!-- <label class="w-full text-left text-[15px] font-semibold text-[#1E3A8A] mb-6 border-b pb-2">
-      ខ.១​​. ស្ថានភាពគ្រួសារ
-    </label> -->
+  <div class="family-status-selector">
+    <div class="family-status-copy">
+      <div class="family-status-title">ខ.១. ស្ថានភាពគ្រួសារ</div>
+      <div class="family-status-description">
+        ជ្រើសរើសស្ថានភាពគ្រួសារ មុនបំពេញព័ត៌មានប្តី ឬប្រពន្ធ និងព័ត៌មានកូន។
+      </div>
+    </div>
 
-    <n-radio-group v-model:value="formData.marry_status">
-      <n-space>
-        <n-radio value="single">នៅលីវ</n-radio>
-        <n-radio value="married">រៀបការហើយ</n-radio>
-        <n-radio value="divorced">ពោះម៉ាយ / មេមាយ</n-radio>
-      </n-space>
-    </n-radio-group>
+    <div class="family-status-grid">
+      <label
+        v-for="option in statusOptions"
+        :key="option.value"
+        :class="[
+          'family-status-option',
+          formData.marry_status === option.value ? 'family-status-option-active' : '',
+          isDirty && formData.marry_status === option.value ? 'changed-cell' : ''
+        ]"
+      >
+        <input
+          v-model="formData.marry_status"
+          :value="option.value"
+          type="radio"
+          class="family-status-input"
+        />
+        <div class="family-status-option-top">
+          <span class="family-status-chip">{{ option.shortLabel }}</span>
+          <svg
+            v-if="formData.marry_status === option.value"
+            class="family-status-check"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.24 7.3a1 1 0 0 1-1.42.004l-3.76-3.76a1 1 0 1 1 1.414-1.414l3.05 3.05l6.533-6.584a1 1 0 0 1 1.417-.01z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="family-status-option-title">{{ option.label }}</div>
+        <div class="family-status-option-text">{{ option.description }}</div>
+      </label>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
-  emits: ['changed'], // we need to inform parent that the child want to change, a child component is just blue it doesnt have life unless parent use it. If a child wants its changes to affect the parent or other parts of the app, it can’t just silently change its internal state. If a child wants its changes to affect the parent or other parts of the app, it can’t just silently change its internal state.
+  emits: ['changed'],
   props: {
-    officer: { type: Object, default: undefined }  // props over is actually a parameter for parents component to pass with the type of object if no prop pass it will take defualt value which data it can be ({people: {id: 1, name: 'john doe', marry_status: 'married'}}department: hr) or some props: ['message']
+    officer: { type: Object, default: undefined }
   },
-  setup(props, { emit }) {   // child to parent should with the brain
+  setup(props, { emit }) {
     const store = useStore()
 
     const formData = ref({
       marry_status: 'single'
-    })  //form data is use store the current. tell vue to update formdata, where marry status is single without this 
-        //with this it will show single at first render but without this when their a changes it will not render again
+    })
 
     const originalValue = ref(props.officer?.people?.marry_status || 'single')
+
+    const statusOptions = [
+      {
+        value: 'single',
+        shortLabel: 'នៅលីវ',
+        label: 'នៅលីវ',
+        description: 'មិនទាន់មានប្តី ឬប្រពន្ធ។'
+      },
+      {
+        value: 'married',
+        shortLabel: 'រៀបការ',
+        label: 'រៀបការហើយ',
+        description: 'អាចបំពេញព័ត៌មានប្តី ឬប្រពន្ធ និងព័ត៌មានកូនបាន។'
+      },
+      {
+        value: 'divorced',
+        shortLabel: 'បែកបាក់',
+        label: 'ពោះម៉ាយ / មេម៉ាយ',
+        description: 'ប្រើសម្រាប់មន្ត្រីដែលបានប្តូរស្ថានភាពគ្រួសារ។'
+      }
+    ]
 
     const hydrateData = () => {
       const status = props.officer?.people?.marry_status || 'single'
@@ -68,41 +120,132 @@ export default {
 
     watch(() => props.officer?.people?.marry_status, hydrateData, { immediate: true })
 
+    const isDirty = computed(() => formData.value.marry_status !== originalValue.value)
+
     watch(() => formData.value.marry_status, (newVal) => {
       emit('changed', newVal !== originalValue.value, newVal)
     })
 
     return {
       formData,
-      persistChanges
+      persistChanges,
+      statusOptions,
+      isDirty
     }
   }
 }
 </script>
 
+<style scoped>
+.family-status-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
+.family-status-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  text-align: left;
+}
 
+.family-status-title {
+  color: #1e3a8a;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.8;
+}
 
-<!-- 
-export → makes something from this file available to other files.
-export default → marks one “main thing” in the file that will be imported without curly braces.
-Example 1 – exporting multiple things:
-```
-export const pi = 3.14
-export const e = 2.71
-```
-To import:
-```
-import { pi, e } from './math.js'
-```
-Example 2 – default export:
-```
-const mathConstants = { pi: 3.14, e: 2.71 }
-export default mathConstants
-```
-To import:
-```
-import constants from './math.js'
-console.log(constants.pi) // 3.14
-```
--->
+.family-status-description {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+  max-width: 720px;
+}
+
+.family-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.family-status-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 148px;
+  padding: 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.family-status-option:hover {
+  border-color: #3158c6;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.family-status-option-active {
+  border-color: rgba(49, 88, 198, 0.4);
+  background: linear-gradient(180deg, #ffffff 0%, #edf3ff 100%);
+  box-shadow: 0 16px 28px rgba(30, 58, 138, 0.12);
+}
+
+.family-status-option.changed-cell {
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+  box-shadow: inset 3px 0 0 #d97706, 0 16px 28px rgba(30, 58, 138, 0.12);
+}
+
+.family-status-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.family-status-option-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.family-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  background: #e8efff;
+  color: #1e3a8a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.family-status-check {
+  width: 20px;
+  height: 20px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.family-status-option-title {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.family-status-option-text {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+</style>

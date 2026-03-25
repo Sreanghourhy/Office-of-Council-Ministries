@@ -9,18 +9,18 @@
         <!-- Khmer Name Fields -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ឈ្មោះជាភាសារខ្មែរ</label>
-          <div class="w-full relative group">
+          <div :class="['w-full relative group', fieldStateClass(['e_lastname', 'e_firstname'])]">
             <div v-if="shouldShowDisplay('e_lastname') && shouldShowDisplay('e_firstname')" @click="enableEdit('e_lastname')" class="flex gap-1">
               <div 
                    :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.e_lastname ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.e_lastname || 'នាមត្រកូល' }}
               </div> 
               <div @click="enableEdit('e_firstname')"
                    :class="[
-                     'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
+                     'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer hover:border-[#22C55E] duration-150 text-left',
                      formData.e_firstname ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                    ]">
                 {{ formData.e_firstname || 'នាមខ្លួន' }}
@@ -44,10 +44,10 @@
         <!-- Relationship Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ទំនាក់ទំនងត្រូវជា</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_relationship')]">
             <div v-if="shouldShowDisplay('e_relationship')" @click="enableEdit('e_relationship')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_relationship ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_relationship || 'ឧ. បងប្រុស' }}
@@ -65,10 +65,10 @@
         <!-- Address Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">អាសយដ្ឋានបច្ចុប្បន្ន</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_address')]">
             <div v-if="shouldShowDisplay('e_address')" @click="enableEdit('e_address')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_address ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_address || 'បញ្ចូលអាសយដ្ឋាន' }}
@@ -86,10 +86,10 @@
         <!-- Phone Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">លេខទូរសព្ទ</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_phone')]">
             <div v-if="shouldShowDisplay('e_phone')" @click="enableEdit('e_phone')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_phone ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_phone || 'បញ្ចូលលេខទូរសព្ទ' }}
@@ -109,10 +109,10 @@
         <!-- Gender Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">ភេទ</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_gender')]">
             <div v-if="shouldShowDisplay('e_gender')" @click="enableEdit('e_gender')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_gender != null ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_gender == 0 ? 'ស្រី' : 'ប្រុស' }}
@@ -133,10 +133,10 @@
         <!-- Profession Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">មុខរបរ</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_profession')]">
             <div v-if="shouldShowDisplay('e_profession')" @click="enableEdit('e_profession')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_profession ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_profession || 'បញ្ចូលមុខរបរ' }}
@@ -154,10 +154,10 @@
         <!-- Email Field -->
         <div class="grid grid-cols-[180px_1fr] items-center gap-4 min-h-[40px]">
           <label class="text-[13px] text-left font-medium text-[#2C3E50]">អ៊ីមែល</label>
-          <div class="w-full relative">
+          <div :class="['w-full relative', fieldStateClass('e_email')]">
             <div v-if="shouldShowDisplay('e_email')" @click="enableEdit('e_email')" 
                  :class="[
-                   'w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
+                   'field-display-box w-full border rounded px-3 py-2 text-[13px] font-medium cursor-pointer text-left hover:border-[#22C55E] duration-150',
                    formData.e_email ? 'border-[#E2E8F0]' : 'bg-white border-dashed border-gray-300 text-gray-400'
                  ]">
               {{ formData.e_email || 'example@mail.com' }}
@@ -305,6 +305,13 @@ export default {
       editModeFields.value.delete(field)
     }
 
+    const fieldChanged = (fields) => {
+      const fieldList = Array.isArray(fields) ? fields : [fields]
+      return fieldList.some((field) => JSON.stringify(formData.value?.[field]) !== JSON.stringify(originalSnapshot.value?.[field]))
+    }
+
+    const fieldStateClass = (fields) => (fieldChanged(fields) ? 'changed-cell changed-cell-offset' : '')
+
     // Watchers
     watch(() => props.officer, hydrateData, { immediate: true, deep: true })
 
@@ -325,6 +332,8 @@ export default {
       enableEdit, 
       saveEdit, 
       cancelEdit,
+      fieldChanged,
+      fieldStateClass,
       persistChanges,      // Required for Save All
       cancelChanges,       // Required for Cancel All
       markSaved,           // Required for compatibility
@@ -336,6 +345,16 @@ export default {
 </script>
 
 <style scoped>
+.changed-cell-offset {
+  margin-left: -6px;
+  padding-left: 6px;
+  border-radius: 0;
+}
+
+.flex.flex-col.relative > button {
+  display: none;
+}
+
 .table-display-box {
   width: 100%;
   height: 100%;

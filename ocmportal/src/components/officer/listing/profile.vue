@@ -25,17 +25,17 @@
                             <a v-if="officer!=undefined" href="#" class="py-1 px-4 border border-blue-400 rounded " @click.prevent="openPrintProfile(officer)">បោះពុម្ភ</a>
                         </div>
                     </div>
-                <div class="flex-1 min-h-0 flex flex-col min-w-0 p-4 pb-8">
-                    <n-scrollbar
+                <div class="profile-edit-shell flex-1 min-h-0 flex flex-col min-w-0 p-4 pb-8">
+                    <div
                         ref="mainScrollbarRef"
-                        class="flex-1 min-h-0"
-                        @scroll="onMainScroll"
+                        class="profile-main-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
+                        @scroll.passive="onMainScroll"
                     >
-                    <div :class="['body', hasCareerChanges ? 'pb-24' : '']" >
+                    <div :class="['body profile-edit-page', hasCareerChanges ? 'pb-24' : '']" >
                         <!-- User Profile -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('personal', el)"
-                            :class="['career-section-anchor', careerSectionChanged.personal ? 'career-section-modified' : '', focusedChangedSection === 'personal' ? 'career-section-focus' : '']"
+                            :class="['career-section-anchor', focusedChangedSection === 'personal' ? 'career-section-focus' : '']"
                         >
                             <profile-component
                                 ref="personalSectionRef"
@@ -47,14 +47,20 @@
                         <template v-if="showFamilySection">
                         <div
                             :ref="(el) => setFormSectionAnchor('family', el)"
-                            class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
+                            class="form-panel w-full mx-auto"
                         >
-                            <div class="w-full p-4 " >
-                                <div class="relative w-full mb-6 border-b border-[#D8DEE8] pb-3 font-moul text-[#1E3A8A] text-left text-xl md:text-2xl leading-tight " >ខ. ព័ត៌មានគ្រួសារ</div>
-                                <table class="w-full" style="border-spacing: 0px; " >
-                                    <tbody>
-                                        <tr>
-                                            <td>
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-badge">Family Profile</div>
+                                    <div class="profile-panel-title font-moul">ខ. ព័ត៌មានគ្រួសារ</div>
+                                    <div class="profile-panel-description">
+                                        រៀបចំព័ត៌មានគ្រួសារ អ្នកទំនាក់ទំនង និងប្រវត្តិពាក់ព័ន្ធឱ្យមានរចនាប័ទ្មដូចគ្នា ដើម្បីឱ្យការបំពេញ ការជ្រើសរើស និងការត្រួតពិនិត្យកាន់តែងាយស្រួល។
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-panel-body">
+                                <div class="profile-section-stack">
+                                    <div class="profile-inline-panel profile-inline-panel-compact">
                                                 <MaritalStatusComponent 
                                                     :ref="(el) => { 
                                                         maritalStatusSectionRef = el; 
@@ -64,8 +70,9 @@
                                                     :officer="officer" 
                                                     @changed="(hasChanged, newVal) => onMaritalStatusChanged(hasChanged, newVal)" 
                                                 />
+                                    </div>
                                                 
-                                                <!-- <SpouseInformationComponent v-bind:officer="officer" /> -->
+                                                <div v-if="shouldMountSpousePanel" v-show="isMarriedStatus" class="profile-inline-panel">
                                                 <SpouseInformationComponent 
                                                     v-if="shouldMountSpousePanel"
                                                     v-show="isMarriedStatus"
@@ -77,14 +84,15 @@
                                                     :status="formData.people.marry_status"
                                                     @changed="(val) => onCareerSectionChanged('spouseInformation', val)" 
                                                 />
-                                                <div v-if="!isMarriedStatus" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                </div>
+                                                <div v-if="!isMarriedStatus" class="profile-note-card">
                                                     សូមជ្រើសស្ថានភាពគ្រួសារ = រៀបការហើយ ដើម្បីបំពេញព័ត៌មានប្តីឬប្រពន្ធ។
                                                 </div>
-                                                <div v-else-if="!shouldMountSpousePanel" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                <div v-else-if="!shouldMountSpousePanel" class="profile-note-card">
                                                     កំពុងបង្ហាញព័ត៌មានប្តីឬប្រពន្ធ...
                                                 </div>
     
-                                                <div v-if="shouldMountChildrenPanel" v-show="isMarriedStatus" class="relative">
+                                                <div v-if="shouldMountChildrenPanel" v-show="isMarriedStatus" class="profile-inline-panel">
                                                     <ChildrenInformationComponent 
                                                         :ref="(el) => { 
                                                             childrenInformationSectionRef  = el; 
@@ -94,13 +102,13 @@
                                                         @changed="(val) => onCareerSectionChanged('childrenInformation', val)" 
                                                     />
                                                 </div>
-                                                <div v-if="!isMarriedStatus" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                <div v-if="!isMarriedStatus" class="profile-note-card">
                                                     សូមជ្រើសស្ថានភាពគ្រួសារ = រៀបការហើយ មុនបន្ថែមព័ត៌មានកូន។
                                                 </div>
-                                                <div v-else-if="!shouldMountChildrenPanel" class="rounded-md border border-dashed border-[#D8DEE8] bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">
+                                                <div v-else-if="!shouldMountChildrenPanel" class="profile-note-card">
                                                     កំពុងបង្ហាញព័ត៌មានកូន...
                                                 </div>
-                                                    <!-- <ParentsInformationComponent v-bind:officer="officer" /> -->
+                                                    <div class="profile-inline-panel">
                                                     <ParentsInformationComponent 
                                                     :ref="(el) => { 
                                                         parentsInformationSectionRef = el; 
@@ -109,29 +117,37 @@
                                                     :officer="officer" 
                                                     @changed="(val) => onCareerSectionChanged('parentsInformation', val)" 
                                                 />
-                                                <!-- <ChildrenInformationComponent v-bind:officer="officer"/> -->
+                                                </div>
                                                 
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                </div>
                             </div>
                         </div>
                         </template>
                         <template v-if="showAdditionalSections">
                         <div
                             :ref="(el) => setFormSectionAnchor('emergency', el)"
-                            class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
+                            class="form-panel w-full mx-auto"
                         >
-                            <div class="w-full p-4 " >
-                                <emergencyContactInformationomponent 
-                                    :ref="(el) => { 
-                                        emergencyInformationSectionRef = el;
-                                        setCareerSectionAnchor('emergencyInformation', el);
-                                    }" 
-                                    :officer="officer" 
-                                    @changed="(val) => onCareerSectionChanged('emergencyInformation', val)" 
-                                />
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-badge">Emergency Contact</div>
+                                    <div class="profile-panel-title font-moul">គ. ព័ត៌មានទំនាក់ទំនងក្នុងករណីមានអាសន្ន</div>
+                                    <div class="profile-panel-description">
+                                        ធ្វើឱ្យផ្នែកទំនាក់ទំនងបន្ទាន់មានរចនាសម្ព័ន្ធដូចគ្នាជាមួយព័ត៌មានគ្រួសារ ដើម្បីឱ្យការកែប្រែ និងពិនិត្យទិន្នន័យលឿនជាងមុន។
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-panel-body">
+                                <div class="profile-inline-panel">
+                                    <emergencyContactInformationomponent 
+                                        :ref="(el) => { 
+                                            emergencyInformationSectionRef = el;
+                                            setCareerSectionAnchor('emergencyInformation', el);
+                                        }" 
+                                        :officer="officer" 
+                                        @changed="(val) => onCareerSectionChanged('emergencyInformation', val)" 
+                                    />
+                                </div>
                             </div>
                         </div>
                         <!-- Education background -->
@@ -142,7 +158,7 @@
                         <!-- Language -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('language', el)"
-                            :class="['career-section-anchor', careerSectionChanged.language ? 'career-section-modified' : '', focusedChangedSection === 'language' ? 'career-section-focus' : '']"
+                            :class="['career-section-anchor', focusedChangedSection === 'language' ? 'career-section-focus' : '']"
                         >
                             <spoken-language-component
                                 ref="languageSectionRef"
@@ -154,17 +170,22 @@
                         <!-- Working background -->
                         <div
                             :ref="(el) => setFormSectionAnchor('workHistory', el)"
-                            class="form-panel border border-[#D8DEE8] rounded-sm m-4 bg-white w-full mx-auto"
+                            class="form-panel w-full mx-auto"
                             >
-                            <div class="w-full p-6" >
-                                <div class="relative w-full mb-6 border-b border-[#D8DEE8] pb-3 font-moul text-[#1E3A8A] text-left text-xl md:text-2xl leading-tight" >
-                                    ច. ប្រវត្តិការងារ
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-badge">Career Timeline</div>
+                                    <div class="profile-panel-title font-moul">ច. ប្រវត្តិការងារ</div>
+                                    <div class="profile-panel-description">
+                                        សម្របសម្រួលតារាងប្រវត្តិការងារ ទិន្នន័យជ្រើសរើស និងឯកសារភ្ជាប់ឱ្យមានរចនាប័ទ្មស្មើគ្នានៅគ្រប់ផ្នែក។
+                                    </div>
                                 </div>
+                            </div>
+                            <div class="profile-panel-body">
                                 <div
   :ref="(el) => setCareerSectionAnchor('krobKhan', el)"
   :class="[
     'career-section-anchor',
-    careerSectionChanged.krobKhan ? 'career-section-modified' : '',
     focusedChangedSection === 'krobKhan' ? 'career-section-focus' : ''
   ]"
 >
@@ -174,13 +195,11 @@
     @changed="onCareerSectionChanged('krobKhan', $event)"
   />
 </div>
-                                <div class="relative w-full mb-4 font-semibold text-[#1E3A8A] text-[15px] text-left px-4 py-3 ">
-                                    ច.១​​. មុខដំណែង (សូមបំពេញតាមលំដាប់ ពីថ្មីទៅចាស់)
-                                </div>
+                                <div class="profile-work-divider">ច.១. មុខតំណែង (សូមបំពេញតាមលំដាប់ ពីថ្មីទៅចាស់)</div>
 
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('public', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.public ? 'career-section-modified' : '', focusedChangedSection === 'public' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'public' ? 'career-section-focus' : '']"
                                 >
                                 
                                     <public-work-component
@@ -191,7 +210,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('private', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.private ? 'career-section-modified' : '', focusedChangedSection === 'private' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'private' ? 'career-section-focus' : '']"
                                 >
                                     <private-work-component
                                         ref="privateWorkSectionRef"
@@ -201,7 +220,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('rankWorking', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.rankWorking ? 'career-section-modified' : '', focusedChangedSection === 'rankWorking' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'rankWorking' ? 'career-section-focus' : '']"
                                 >
                                     <rank-by-working-component
                                         ref="rankByWorkingSectionRef"
@@ -211,7 +230,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('rankCertificate', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.rankCertificate ? 'career-section-modified' : '', focusedChangedSection === 'rankCertificate' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'rankCertificate' ? 'career-section-focus' : '']"
                                 >
                                     <rank-by-certificate-component
                                         ref="rankByCertificateSectionRef"
@@ -221,7 +240,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('outKrobKhan', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.outKrobKhan ? 'career-section-modified' : '', focusedChangedSection === 'outKrobKhan' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'outKrobKhan' ? 'career-section-focus' : '']"
                                 >
                                     <outkrobkhan-component
                                         ref="outKrobKhanSectionRef"
@@ -231,7 +250,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('otherStatus', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.otherStatus ? 'career-section-modified' : '', focusedChangedSection === 'otherStatus' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'otherStatus' ? 'career-section-focus' : '']"
                                 >
                                     <no-salary-component
                                         ref="noSalarySectionRef"
@@ -258,11 +277,19 @@
                         <!-- Reward & Penalty -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('medalHistory', el)"
-                            :class="['career-section-anchor', careerSectionChanged.medalHistory ? 'career-section-modified' : '', focusedChangedSection === 'medalHistory' ? 'career-section-focus' : '']"
-                            class="form-panel border border-[#D8DEE8] rounded-sm m-4 bg-white w-full mx-auto"
+                            :class="['career-section-anchor', focusedChangedSection === 'medalHistory' ? 'career-section-focus' : '']"
+                            class="form-panel w-full mx-auto"
                         >
-                            <div class="w-full p-6" >
-                                <div class="relative w-full mb-6 border-b border-[#D8DEE8] pb-3 font-moul text-[#1E3A8A] text-left text-xl md:text-2xl leading-tight" >ឆ. ការលើកសរសើរ ឬដាក់វិន័យ</div>
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-badge">Rewards & Discipline</div>
+                                    <div class="profile-panel-title font-moul">ឆ. ការលើកសរសើរ ឬដាក់វិន័យ</div>
+                                    <div class="profile-panel-description">
+                                        បង្រួបផ្នែកការលើកសរសើរ និងការដាក់វិន័យឱ្យមានប្លង់ដូចគ្នា សម្រាប់ការបញ្ចូលឯកសារ និងការត្រួតពិនិត្យប្រវត្តិ។
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-panel-body">
                                 <medal-history-component
                                     ref="medalHistorySectionRef"
                                     v-bind:officer="officer"
@@ -270,7 +297,7 @@
                                 />
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('penaltyHistory', el)"
-                                    :class="['career-section-anchor', careerSectionChanged.penaltyHistory ? 'career-section-modified' : '', focusedChangedSection === 'penaltyHistory' ? 'career-section-focus' : '']"
+                                    :class="['career-section-anchor', focusedChangedSection === 'penaltyHistory' ? 'career-section-focus' : '']"
                                 >
                                     <penalty-history-component
                                         ref="penaltyHistorySectionRef"
@@ -283,44 +310,80 @@
                         <template v-if="showStatusSection">
                         <div
                             :ref="(el) => setFormSectionAnchor('status', el)"
-                            class="form-panel border border-gray-200 rounded-md m-4  bg-white shadow w-full mx-auto "
+                            class="form-panel w-full mx-auto"
                         >
-                            <div class="w-full p-4 " >
-                                <div class="relative w-full border-b border-gray-200 pb-2 font-moul mb-4 " >ជ. ការបញ្ជាក់អំពីស្ថានភាព</div>
-                                <table class="w-full"  >  
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="flex leading-6 " >
-                                                <svg v-if="officer.additional_officer_type == 'politician'" class="w-6 h-6 mr-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M26 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 26V6h20v20z" fill="currentColor"></path><path d="M14 21.5l-5-4.96L10.59 15L14 18.35L21.41 11L23 12.58l-9 8.92z" fill="currentColor"></path></svg>
-                                                <svg v-if="officer.additional_officer_type != 'politician'" class="w-6 h-6 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
-                                                មន្ត្រីនយោបាយ
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="flex leading-6 " >
-                                                <svg v-if="officer.additional_officer_type == 'admin_official'" class="w-6 h-6 mr-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M26 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 26V6h20v20z" fill="currentColor"></path><path d="M14 21.5l-5-4.96L10.59 15L14 18.35L21.41 11L23 12.58l-9 8.92z" fill="currentColor"></path></svg>
-                                                <svg v-if="officer.additional_officer_type != 'admin_official'" class="w-6 h-6 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
-                                                មន្ត្រីមុខងារសាធារណៈ
-                                                </div>
-                                                </td>
-                                            <td>
-                                                <div class="flex leading-6 " >
-                                                <svg v-if="officer.additional_officer_type == 'admin_unofficial'" class="w-6 h-6 mr-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M26 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 26V6h20v20z" fill="currentColor"></path><path d="M14 21.5l-5-4.96L10.59 15L14 18.35L21.41 11L23 12.58l-9 8.92z" fill="currentColor"></path></svg>
-                                                <svg v-if="officer.additional_officer_type != 'admin_unofficial'" class="w-6 h-6 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
-                                                មន្ត្រីជាប់កិច្ចសន្យា
-                                                </div>
-                                                </td>
-                                            <td>
-                                                <div class="flex leading-6 " >
-                                                <svg v-if="officer.additional_officer_type == 'contracted_officer'" class="w-6 h-6 mr-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M26 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 26V6h20v20z" fill="currentColor"></path><path d="M14 21.5l-5-4.96L10.59 15L14 18.35L21.41 11L23 12.58l-9 8.92z" fill="currentColor"></path></svg>
-                                                <svg v-if="officer.additional_officer_type != 'contracted_officer'" class="w-6 h-6 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
-                                                មន្ត្រីផ្អែកលើកិច្ចព្រមព្រៀងការងារ
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="profile-panel-header">
+                                <div>
+                                    <div class="profile-panel-badge">Status Summary</div>
+                                    <div class="profile-panel-title font-moul">ជ. ការបញ្ជាក់អំពីស្ថានភាព</div>
+                                    <div class="profile-panel-description">
+                                        បង្ហាញប្រភេទមន្ត្រីបច្ចុប្បន្នជាកាតសង្ខេប ដើម្បីឱ្យងាយមើល និងងាយផ្ទៀងផ្ទាត់។
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-panel-body">
+                                <div class="profile-status-grid">
+                                    <div :class="['profile-status-card', officer.additional_officer_type == 'politician' ? 'profile-status-card-active' : '']">
+                                        <div class="profile-status-card-icon">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 2l7 4v6c0 5-3.4 8.6-7 10c-3.6-1.4-7-5-7-10V6l7-4z" />
+                                                <path d="M9.5 12l1.7 1.7L15 10" />
+                                            </svg>
+                                        </div>
+                                        <div class="profile-status-card-copy">
+                                            <div class="profile-status-card-title">មន្ត្រីនយោបាយ</div>
+                                            <div class="profile-status-card-text">សម្គាល់ស្ថានភាពមន្ត្រីផ្នែកនយោបាយរបស់មន្ត្រីរូបនេះ។</div>
+                                        </div>
+                                        <svg v-if="officer.additional_officer_type == 'politician'" class="profile-status-card-check w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.24 7.3a1 1 0 0 1-1.42.004l-3.76-3.76a1 1 0 1 1 1.414-1.414l3.05 3.05l6.533-6.584a1 1 0 0 1 1.417-.01z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div :class="['profile-status-card', officer.additional_officer_type == 'admin_official' ? 'profile-status-card-active' : '']">
+                                        <div class="profile-status-card-icon">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="4" y="3" width="16" height="18" rx="2" />
+                                                <path d="M8 7h8M8 11h8M8 15h5" />
+                                            </svg>
+                                        </div>
+                                        <div class="profile-status-card-copy">
+                                            <div class="profile-status-card-title">មន្ត្រីមុខងារសាធារណៈ</div>
+                                            <div class="profile-status-card-text">ប្រើសម្រាប់មន្ត្រីមានមុខងារផ្លូវការនៅក្នុងរដ្ឋបាលសាធារណៈ។</div>
+                                        </div>
+                                        <svg v-if="officer.additional_officer_type == 'admin_official'" class="profile-status-card-check w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.24 7.3a1 1 0 0 1-1.42.004l-3.76-3.76a1 1 0 1 1 1.414-1.414l3.05 3.05l6.533-6.584a1 1 0 0 1 1.417-.01z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div :class="['profile-status-card', officer.additional_officer_type == 'admin_unofficial' ? 'profile-status-card-active' : '']">
+                                        <div class="profile-status-card-icon">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4z" />
+                                                <path d="M5 21a7 7 0 0 1 14 0" />
+                                            </svg>
+                                        </div>
+                                        <div class="profile-status-card-copy">
+                                            <div class="profile-status-card-title">មន្ត្រីជាប់កិច្ចសន្យា</div>
+                                            <div class="profile-status-card-text">សម្រាប់មន្ត្រីដែលកំពុងបម្រើការងារតាមរយៈកិច្ចសន្យា។</div>
+                                        </div>
+                                        <svg v-if="officer.additional_officer_type == 'admin_unofficial'" class="profile-status-card-check w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.24 7.3a1 1 0 0 1-1.42.004l-3.76-3.76a1 1 0 1 1 1.414-1.414l3.05 3.05l6.533-6.584a1 1 0 0 1 1.417-.01z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div :class="['profile-status-card', officer.additional_officer_type == 'contracted_officer' ? 'profile-status-card-active' : '']">
+                                        <div class="profile-status-card-icon">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M8 3h8l3 3v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                                                <path d="M9 13l2 2l4-4" />
+                                            </svg>
+                                        </div>
+                                        <div class="profile-status-card-copy">
+                                            <div class="profile-status-card-title">មន្ត្រីផ្អែកលើកិច្ចព្រមព្រៀងការងារ</div>
+                                            <div class="profile-status-card-text">សម្រាប់មន្ត្រីដែលបំពេញការងារតាមកិច្ចព្រមព្រៀងការងារ។</div>
+                                        </div>
+                                        <svg v-if="officer.additional_officer_type == 'contracted_officer'" class="profile-status-card-check w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.24 7.3a1 1 0 0 1-1.42.004l-3.76-3.76a1 1 0 1 1 1.414-1.414l3.05 3.05l6.533-6.584a1 1 0 0 1 1.417-.01z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div> 
                             </div>
                         <div class="w-full relative" >
@@ -350,7 +413,7 @@
                         </template>
                         </template>
                     </div>
-                    </n-scrollbar>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -529,6 +592,10 @@ import Crud from '../../../classes/Crud'
             let lastScrollContainer = null
             let marriedPanelFrame = 0
             let childrenPanelTimer = null
+            let sectionMetricsFrame = 0
+            let sectionTopOffsets = []
+            let sectionAnchorResizeObserver = null
+            let programmaticScrollResetTimer = null
 
             const mainScrollbarRef = ref(null)
             const activeNavIndex = ref(0)
@@ -635,6 +702,7 @@ import Crud from '../../../classes/Crud'
                 await nextTick()
                 markAllCareerSectionsSaved()
                 clearCareerChangedState()
+                scheduleSectionMetricsRefresh(true)
                 isInitializingCareerSections.value = false
             }).catch( err => {
                 console.log( err )
@@ -654,6 +722,28 @@ import Crud from '../../../classes/Crud'
                 if (!signatureDateDay2.value) signatureDateDay2.value = parseNumber(dateFormat(today.value, 'dd'))
                 if (!signatureDateMonth2.value) signatureDateMonth2.value = getMonth(dateFormat(today.value, 'mm'))
                 if (!signatureDateYear2.value) signatureDateYear2.value = parseNumber(String(today.value.getFullYear()))
+
+                if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+                    sectionAnchorResizeObserver = new window.ResizeObserver(() => {
+                        scheduleSectionMetricsRefresh(true)
+                    })
+
+                    Object.values(careerSectionAnchors).forEach((el) => {
+                        const observedEl = resolveSectionElement(el)
+                        if (observedEl) {
+                            sectionAnchorResizeObserver.observe(observedEl)
+                        }
+                    })
+                    Object.values(formSectionAnchors).forEach((el) => {
+                        const observedEl = resolveSectionElement(el)
+                        if (observedEl) {
+                            sectionAnchorResizeObserver.observe(observedEl)
+                        }
+                    })
+                }
+
+                window.addEventListener('resize', handleViewportResize)
+                scheduleSectionMetricsRefresh(true)
             })
 
             // Function សម្រាប់​តាម marry status របស់user នៅពេលកំពុងជ្រើសរើស
@@ -756,9 +846,20 @@ import Crud from '../../../classes/Crud'
                 if (marriedPanelFrame) {
                     window.cancelAnimationFrame(marriedPanelFrame)
                 }
+                if (sectionMetricsFrame) {
+                    window.cancelAnimationFrame(sectionMetricsFrame)
+                }
                 if (childrenPanelTimer) {
                     window.clearTimeout(childrenPanelTimer)
                 }
+                if (programmaticScrollResetTimer) {
+                    window.clearTimeout(programmaticScrollResetTimer)
+                }
+                if (sectionAnchorResizeObserver) {
+                    sectionAnchorResizeObserver.disconnect()
+                    sectionAnchorResizeObserver = null
+                }
+                window.removeEventListener('resize', handleViewportResize)
             })
 
             function scheduleMarriedPanelsMount() {
@@ -787,24 +888,137 @@ import Crud from '../../../classes/Crud'
                 if (married) {
                     scheduleMarriedPanelsMount()
                 }
+                nextTick(() => {
+                    scheduleSectionMetricsRefresh(true)
+                })
             }, { immediate: true })
+
+            function handleViewportResize() {
+                scheduleSectionMetricsRefresh(true)
+            }
+
+            function resolveSectionElement(target) {
+                if (!target) return null
+                if (target instanceof Element) return target
+                if (target?.$el instanceof Element) return target.$el
+                return null
+            }
+
+            function getMainScrollContainer() {
+                if (lastScrollContainer) {
+                    return lastScrollContainer
+                }
+
+                const scrollbarInstance = mainScrollbarRef.value
+                if (scrollbarInstance instanceof Element) {
+                    return scrollbarInstance
+                }
+                if (scrollbarInstance?.containerRef) {
+                    return scrollbarInstance.containerRef
+                }
+
+                return scrollbarInstance?.$el?.querySelector?.('.n-scrollbar-container') || null
+            }
+
+            function getSectionAnchor(sectionId) {
+                return resolveSectionElement(careerSectionAnchors[sectionId] || formSectionAnchors[sectionId] || null)
+            }
+
+            function collectSectionMetrics(container = getMainScrollContainer()) {
+                if (!container || sectionNavItems.length <= 1) {
+                    sectionTopOffsets = []
+                    return
+                }
+
+                const containerRect = container.getBoundingClientRect()
+                const scrollTop = typeof container.scrollTop === 'number' ? container.scrollTop : 0
+
+                sectionTopOffsets = sectionNavItems
+                    .map((item, index) => {
+                        const el = getSectionAnchor(item.id)
+                        if (!el || typeof el.getBoundingClientRect !== 'function') {
+                            return null
+                        }
+
+                        const rect = el.getBoundingClientRect()
+                        return {
+                            id: item.id,
+                            index,
+                            top: rect.top - containerRect.top + scrollTop
+                        }
+                    })
+                    .filter(Boolean)
+            }
+
+            function scheduleSectionMetricsRefresh(syncAfter = false) {
+                if (sectionMetricsFrame) return
+
+                sectionMetricsFrame = window.requestAnimationFrame(() => {
+                    sectionMetricsFrame = 0
+                    const container = getMainScrollContainer()
+                    collectSectionMetrics(container)
+
+                    if (syncAfter) {
+                        syncActiveNavFromScroll(container)
+                    }
+                })
+            }
+
+            function getCachedSectionTop(sectionId) {
+                return sectionTopOffsets.find((item) => item.id === sectionId)?.top
+            }
+
+            function updateSectionAnchor(anchorMap, section, el) {
+                const nextEl = el || null
+                const previousEl = anchorMap[section] || null
+                const previousObservedEl = resolveSectionElement(previousEl)
+                const nextObservedEl = resolveSectionElement(nextEl)
+
+                if (previousEl === nextEl) {
+                    return
+                }
+
+                if (sectionAnchorResizeObserver && previousObservedEl) {
+                    sectionAnchorResizeObserver.unobserve(previousObservedEl)
+                }
+
+                anchorMap[section] = nextEl
+
+                if (sectionAnchorResizeObserver && nextObservedEl) {
+                    sectionAnchorResizeObserver.observe(nextObservedEl)
+                }
+
+                scheduleSectionMetricsRefresh(true)
+            }
 
             function setCareerSectionAnchor(section, el) {
                 if (Object.prototype.hasOwnProperty.call(careerSectionAnchors, section)) {
-                    careerSectionAnchors[section] = el || null
+                    updateSectionAnchor(careerSectionAnchors, section, el)
                 }
             }
 
             function setFormSectionAnchor(section, el) {
                 if (Object.prototype.hasOwnProperty.call(formSectionAnchors, section)) {
-                    formSectionAnchors[section] = el || null
+                    updateSectionAnchor(formSectionAnchors, section, el)
                 }
             }
 
             function scrollToSection(sectionId) {
-                const targetEl = careerSectionAnchors[sectionId] || formSectionAnchors[sectionId]
-                if (!targetEl || typeof targetEl.scrollIntoView !== 'function') return
-                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                const container = getMainScrollContainer()
+                const targetEl = getSectionAnchor(sectionId)
+                const targetTop = getCachedSectionTop(sectionId)
+
+                if (container && Number.isFinite(targetTop)) {
+                    container.scrollTo({
+                        top: Math.max(targetTop - 12, 0),
+                        behavior: 'smooth'
+                    })
+                } else if (targetEl && typeof targetEl.scrollIntoView === 'function') {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                } else {
+                    return
+                }
+
                 flashFocusedSection(sectionId)
             }
 
@@ -813,8 +1027,12 @@ import Crud from '../../../classes/Crud'
                 isProgrammaticScroll.value = true
                 scrollToSection(sectionId)
                 // Allow smooth scroll animation to finish before re-enabling scroll tracking
-                setTimeout(() => {
+                if (programmaticScrollResetTimer) {
+                    window.clearTimeout(programmaticScrollResetTimer)
+                }
+                programmaticScrollResetTimer = window.setTimeout(() => {
                     isProgrammaticScroll.value = false
+                    programmaticScrollResetTimer = null
                 }, 450)
             }
 
@@ -831,10 +1049,22 @@ import Crud from '../../../classes/Crud'
             }
 
             function scrollToCareerSection(section) {
-                const targetEl = careerSectionAnchors[section]
-                if (!targetEl || typeof targetEl.scrollIntoView !== 'function') return
+                const container = getMainScrollContainer()
+                const targetEl = getSectionAnchor(section)
+                const targetTop = getCachedSectionTop(section)
 
-                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                if (container && Number.isFinite(targetTop)) {
+                    const clientHeight = container.clientHeight || 0
+                    const centeredTop = clientHeight > 0
+                        ? Math.max(targetTop - clientHeight * 0.28, 0)
+                        : Math.max(targetTop - 12, 0)
+                    container.scrollTo({ top: centeredTop, behavior: 'smooth' })
+                } else if (targetEl && typeof targetEl.scrollIntoView === 'function') {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                } else {
+                    return
+                }
+
                 flashFocusedSection(section)
             }
 
@@ -882,7 +1112,7 @@ import Crud from '../../../classes/Crud'
             function syncActiveNavFromScroll(container) {
                 if (!container || sectionNavItems.length <= 1) return
 
-                const scrollTop = container.scrollTop || container.scrollTop === 0 ? container.scrollTop : 0
+                const scrollTop = typeof container.scrollTop === 'number' ? container.scrollTop : 0
                 const scrollHeight = container.scrollHeight || 0
                 const clientHeight = container.clientHeight || container.offsetHeight || 0
 
@@ -896,23 +1126,18 @@ import Crud from '../../../classes/Crud'
                     return
                 }
 
-                const containerRect = container.getBoundingClientRect()
                 const viewportAnchor = scrollTop + clientHeight * 0.18
+                const metrics = sectionTopOffsets.length > 0 ? sectionTopOffsets : (collectSectionMetrics(container), sectionTopOffsets)
 
                 let bestIndex = activeNavIndex.value
                 let bestDistance = Number.POSITIVE_INFINITY
 
-                sectionNavItems.forEach((item, index) => {
-                    const el = careerSectionAnchors[item.id] || formSectionAnchors[item.id]
-                    if (!el || typeof el.getBoundingClientRect !== 'function') return
-
-                    const rect = el.getBoundingClientRect()
-                    const topInContainer = rect.top - containerRect.top + scrollTop
-                    const distance = Math.abs(topInContainer - viewportAnchor)
+                metrics.forEach((item) => {
+                    const distance = Math.abs(item.top - viewportAnchor)
 
                     if (distance < bestDistance) {
                         bestDistance = distance
-                        bestIndex = index
+                        bestIndex = item.index
                     }
                 })
 
@@ -939,6 +1164,7 @@ import Crud from '../../../classes/Crud'
 
             function markCareerInteraction() {
                 hasCareerUserInteraction.value = true
+                scheduleSectionMetricsRefresh()
             }
 
             function clearCareerChangedState() {
@@ -1089,6 +1315,7 @@ import Crud from '../../../classes/Crud'
                     await nextTick()
                     markAllCareerSectionsSaved()
                     clearCareerChangedState()
+                    scheduleSectionMetricsRefresh(true)
                     isInitializingCareerSections.value = false
                     hasCareerUserInteraction.value = false
 
@@ -1208,16 +1435,6 @@ import Crud from '../../../classes/Crud'
 .signature-date-lines-wrap {
     min-width: 26rem;
     margin-left: -6rem; 
-}
-
-.career-section-anchor {
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    border-radius: 2px;
-}
-
-.career-section-modified {
-    background-color: #f8fbff;
-    box-shadow: inset 3px 0 0 #1e3a8a;
 }
 
 .career-section-focus {

@@ -850,9 +850,8 @@ export default {
         const uploadPhoto = async () => {
             if (!selectedFile.value || !props.officer) return
 
-            // Prefer the officer's own user id; fall back to authenticated user
-            const targetUserId = props.officer.user?.id || store.state.auth?.user?.id
-            if (!targetUserId) {
+            const targetPeopleId = props.officer.people?.id
+            if (!targetPeopleId) {
                 notify.error({
                     title: 'មានបញ្ហា',
                     content: 'រកមិនឃើញគណនីអ្នកប្រើប្រាស់សម្រាប់ដាក់រូបភាព។',
@@ -865,12 +864,10 @@ export default {
 
             try {
                 const formData = new FormData()
-                formData.append('id', targetUserId)
+                formData.append('id', targetPeopleId)
                 formData.append('files', selectedFile.value, selectedFile.value.name)
 
-                // Use the shared user profile photo endpoint:
-                // POST /users/profile/photo/change
-                const response = await store.dispatch('user/uploadProfilePicture', formData)
+                const response = await store.dispatch('people/upload', formData)
 
                 if (response.data && response.data.record) {
                     const record = response.data.record
@@ -881,13 +878,12 @@ export default {
                         duration: 2000
                     })
 
-                    const avatarUrl = record.avatar_url || null
-                    if (avatarUrl) {
-                        if (props.officer.user) {
-                            props.officer.user.avatar_url = avatarUrl
+                    const imageUrl = record.image || null
+                    if (imageUrl) {
+                        if (props.officer.people) {
+                            props.officer.people.image = imageUrl
                         }
-                        // Keep using officer.image for the card/profile photo
-                        props.officer.image = avatarUrl
+                        props.officer.image = imageUrl
                     }
 
                     cancelFileSelect()

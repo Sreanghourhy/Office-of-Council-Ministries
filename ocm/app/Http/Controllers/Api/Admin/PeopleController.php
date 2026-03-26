@@ -435,6 +435,60 @@ class PeopleController extends Controller
             ], 403);
         }
     }
+    public function upload(Request $request){
+        $user = \Auth::user();
+        if( $user == null ){
+            return response([
+                'ok' => false ,
+                'message' => 'Please login first.'
+            ],403);
+        }
+
+        if( !isset( $_FILES['files']['tmp_name'] ) || $_FILES['files']['tmp_name'] == "" ){
+            return response([
+                'ok' => false ,
+                'result' => $_FILES ,
+                'message' => 'No image file was uploaded.'
+            ],403);
+        }
+
+        $person = intval( $request->id ) > 0 ? RecordModel::find( intval( $request->id ) ) : null ;
+        if( $person == null ){
+            return response([
+                'ok' => false ,
+                'message' => 'People record not found.'
+            ],403);
+        }
+
+        $oldImage = $person->image ;
+        $uniqeName = Storage::disk('public')->putFile( 'people/'.$person->id , new File( $_FILES['files']['tmp_name'] ) );
+        $person->image = $uniqeName ;
+        $person->save();
+
+        if(
+            $oldImage != null &&
+            trim( $oldImage ) != "" &&
+            $oldImage != $uniqeName &&
+            Storage::disk('public')->exists( $oldImage )
+        ){
+            Storage::disk('public')->delete( $oldImage );
+        }
+
+        if( Storage::disk('public')->exists( $person->image ) ){
+            $person->image = Storage::disk('public')->url( $person->image  );
+            return response([
+                'record' => $person ,
+                'ok' => true ,
+                'message' => 'Image uploaded successfully.'
+            ],200);
+        }
+
+        return response([
+            'record' => $person ,
+            'ok' => false ,
+            'message' => 'Unable to save image.'
+        ],403);
+    }
     /**
      * Active function of the account
      */

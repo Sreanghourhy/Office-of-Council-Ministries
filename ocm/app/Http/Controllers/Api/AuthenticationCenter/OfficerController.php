@@ -161,11 +161,11 @@ class OfficerController extends Controller
                 return $officer['image'] != null && \Storage::disk('public')->exists( $officer['image'] )
                 ? \Storage::disk('public')->url( $officer['image'] )
                 : (
-                    isset( $officer['user'] ) && $officer['user']['avatar_url'] != null && \Storage::disk('public')->exists( $officer['user']['avatar_url'] )
-                    ? \Storage::disk('public')->url( $officer['user']['avatar_url'] )
-                    : ( 
-                        isset( $officer['people'] ) && $officer['people']['image'] != null && \Storage::disk('public')->exists( $officer['people']['image'] ) 
-                        ? \Storage::disk('public')->url( $officer['people']['image'] )
+                    isset( $officer['people'] ) && $officer['people']['image'] != null && \Storage::disk('public')->exists( $officer['people']['image'] ) 
+                    ? \Storage::disk('public')->url( $officer['people']['image'] )
+                    : (
+                        isset( $officer['user'] ) && $officer['user']['avatar_url'] != null && \Storage::disk('public')->exists( $officer['user']['avatar_url'] )
+                        ? \Storage::disk('public')->url( $officer['user']['avatar_url'] )
                         : false 
                     )
                 );
@@ -531,9 +531,13 @@ class OfficerController extends Controller
             $record['image'] = $record['image'] != null && \Storage::disk('public')->exists( $record['image'] )
                 ? \Storage::disk('public')->url( $record['image'] )
                 : (
-                    $record['user']['avatar_url'] != null && \Storage::disk('public')->exists( $record['user']['avatar_url'] )
-                    ? \Storage::disk('public')->url( $record['user']['avatar_url'] )
-                    : false
+                    isset( $record['people'] ) && $record['people']['image'] != null && \Storage::disk('public')->exists( $record['people']['image'] )
+                    ? \Storage::disk('public')->url( $record['people']['image'] )
+                    : (
+                        $record['user']['avatar_url'] != null && \Storage::disk('public')->exists( $record['user']['avatar_url'] )
+                        ? \Storage::disk('public')->url( $record['user']['avatar_url'] )
+                        : false
+                    )
                 );
             return $record;
         });
@@ -1688,9 +1692,13 @@ class OfficerController extends Controller
         $record->image = $record->image != null && trim($record->image ) != "" && \Storage::disk('public')->exists( $record->image )
             ? \Storage::disk('public')->url( $record->image )
             : (
-                $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
-                ? \Storage::disk('public')->url( $record->user->avatar_url )
-                : false
+                $record->people != null && $record->people->image != null && trim($record->people->image) != "" && \Storage::disk('public')->exists( $record->people->image )
+                ? \Storage::disk('public')->url( $record->people->image )
+                : (
+                    $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
+                    ? \Storage::disk('public')->url( $record->user->avatar_url )
+                    : false
+                )
             );
         return response()->json([
             'record' => $record ,
@@ -1741,9 +1749,13 @@ class OfficerController extends Controller
         $record->image = $record->image != null && trim($record->image ) != "" && \Storage::disk('public')->exists( $record->image )
             ? \Storage::disk('public')->url( $record->image )
             : (
-                $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
-                ? \Storage::disk('public')->url( $record->user->avatar_url )
-                : false
+                $record->people != null && $record->people->image != null && trim($record->people->image) != "" && \Storage::disk('public')->exists( $record->people->image )
+                ? \Storage::disk('public')->url( $record->people->image )
+                : (
+                    $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
+                    ? \Storage::disk('public')->url( $record->user->avatar_url )
+                    : false
+                )
             );
             
         return response()->json([
@@ -1780,11 +1792,11 @@ class OfficerController extends Controller
         $imagePath = $record->image != null && \Storage::disk('public')->exists($record->image )
             ? \Storage::path( 'public/'. $record->image )
             : (
-                isset( $record->user ) && $record->user->avatar_url != null && \Storage::disk('public')->exists( $record->user->avatar_url )
-                ? \Storage::path( 'public/'. $record->user->avatar_url )
-                : ( 
-                    isset( $record->people ) && $record->people->image != null && \Storage::disk('public')->exists( $record->people->image ) 
-                    ? \Storage::path( 'public/'. $record->people->image )
+                isset( $record->people ) && $record->people->image != null && \Storage::disk('public')->exists( $record->people->image ) 
+                ? \Storage::path( 'public/'. $record->people->image )
+                : (
+                    isset( $record->user ) && $record->user->avatar_url != null && \Storage::disk('public')->exists( $record->user->avatar_url )
+                    ? \Storage::path( 'public/'. $record->user->avatar_url )
                     : false 
                 )
             );
@@ -1962,9 +1974,13 @@ class OfficerController extends Controller
         $record->image = $record->image != null && trim($record->image ) != "" && \Storage::disk('public')->exists( $record->image )
             ? \Storage::disk('public')->url( $record->image )
             : (
-                $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
-                ? \Storage::disk('public')->url( $record->user->avatar_url )
-                : false
+                $record->people != null && $record->people->image != null && trim($record->people->image) != "" && \Storage::disk('public')->exists( $record->people->image )
+                ? \Storage::disk('public')->url( $record->people->image )
+                : (
+                    $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
+                    ? \Storage::disk('public')->url( $record->user->avatar_url )
+                    : false
+                )
             );
 
         return response()->json([
@@ -1987,11 +2003,11 @@ class OfficerController extends Controller
                         'image' => $officer['image'] != null && \Storage::disk('public')->exists( $officer['image'] )
                             ? \Storage::disk('public')->url( $officer['image'] )
                             : (
-                                isset( $officer['user'] ) && $officer['user']['avatar_url'] != null && \Storage::disk('public')->exists( $officer['user']['avatar_url'] )
-                                ? \Storage::disk('public')->url( $officer['user']['avatar_url'] )
-                                : ( 
-                                    isset( $officer['people'] ) && $officer['people']['image'] != null && \Storage::disk('public')->exists( $officer['people']['image'] ) 
-                                    ? \Storage::disk('public')->url( $officer['people']['image'] )
+                                isset( $officer['people'] ) && $officer['people']['image'] != null && \Storage::disk('public')->exists( $officer['people']['image'] ) 
+                                ? \Storage::disk('public')->url( $officer['people']['image'] )
+                                : (
+                                    isset( $officer['user'] ) && $officer['user']['avatar_url'] != null && \Storage::disk('public')->exists( $officer['user']['avatar_url'] )
+                                    ? \Storage::disk('public')->url( $officer['user']['avatar_url'] )
                                     : false 
                                 )
                         )

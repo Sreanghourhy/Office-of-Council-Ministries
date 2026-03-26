@@ -105,6 +105,7 @@ Route::group([
             Route::get('',[PeopleController::class,'index']);
             Route::post('create',[PeopleController::class,'store']);
             Route::put('update',[PeopleController::class,'update']);
+            Route::post('upload',[PeopleController::class,'upload']);
             // Route::get('{id}/read',[PeopleController::class,'read']);
             Route::delete('{id}/delete',[PeopleController::class,'destroy']);
             Route::put('update_organization_code',[PeopleController::class,'updateOrganizationCode']);

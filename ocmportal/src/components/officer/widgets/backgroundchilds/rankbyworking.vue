@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+  <section class="mb-10 bg-white border rounded-sm">
     <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
       <h3 class="text-[15px] font-semibold text-[#1E3A8A]">ច.២.ការដំឡើងឋានន្តរស័ក្តិ និងថ្នាក់តាមវេនជ្រើសរើស</h3>
       <button
@@ -133,6 +133,12 @@ import PdfDownloadActionButton from './pdf-download-action-button.vue'
 import PdfPreviewActionButton from './pdf-preview-action-button.vue'
 import PdfPreview from './pdfpreview.vue'
 import { useRowDocumentUpload } from './use-row-document-upload'
+import {
+  buildRowsSnapshot,
+  buildTrackedRowsPayload,
+  findIncompleteRows,
+  rowHasAnyInput
+} from './row-save-helpers'
 
 export default {
   emits: ['changed'],
@@ -183,6 +189,16 @@ export default {
         maxWidth: '80vw'
       }
     }
+    const trackedFields = ['date', 'organization', 'sub_organization', 'sub_sub_organization', 'previous_rank_id', 'rank_id', 'changing_type', 'pdf']
+    const requiredFields = [
+      { key: 'date', label: 'សុពលភាព' },
+      { key: 'organization', label: 'ស្ថាប័ន' },
+      { key: 'sub_organization', label: 'អង្គភាព' },
+      { key: 'sub_sub_organization', label: 'ការិយាល័យ' },
+      { key: 'previous_rank_id', label: 'ថ្នាក់ចាស់' },
+      { key: 'rank_id', label: 'ថ្នាក់ថ្មី' },
+      { key: 'changing_type', label: 'ប្រភេទ' }
+    ]
     const model = reactive({
       name: 'officerrankbyworking',
       module: 'officerrankbyworkings',
@@ -393,7 +409,11 @@ export default {
     }
 
     function toPayload() {
-      return rows.value.map(({ _key, _storedPdf, ...item }) => ({ ...item }))
+      return buildTrackedRowsPayload(
+        rows.value,
+        ({ _key, _storedPdf, ...item }) => ({ ...item }),
+        trackedFields
+      )
     }
 
     function normalizeRow(row) {
@@ -402,8 +422,7 @@ export default {
     }
 
     function markSaved() {
-      const payload = toPayload()
-      savedSnapshot.value = JSON.stringify(payload)
+      savedSnapshot.value = buildRowsSnapshot(rows.value, normalizeRow)
       const mapped = {}
       rows.value.forEach((row) => {
         mapped[row._key] = JSON.stringify(normalizeRow(row))
@@ -421,7 +440,7 @@ export default {
     }
 
     function notifyDirty() {
-      emit('changed', JSON.stringify(toPayload()) !== savedSnapshot.value)
+      emit('changed', buildRowsSnapshot(rows.value, normalizeRow) !== savedSnapshot.value)
     }
 
     function cancelChanges() {
@@ -461,11 +480,26 @@ export default {
       const officerId = parseInt(props.officer?.id || 0)
       if (officerId <= 0) return false
 
+      const incompleteRows = findIncompleteRows(rows.value, {
+        activityFields: trackedFields,
+        requiredFields,
+        includeBlankRows: true,
+        shouldValidateRow: (row) => rowEdited(row)
+      })
+
+      if (incompleteRows.length > 0) {
+        return false
+      }
+
       for (const id of deletedIds.value) {
         await store.dispatch('officerrankbyworking/delete', { id })
       }
 
       for (const row of rows.value) {
+        if (!rowEdited(row) || !rowHasAnyInput(row, trackedFields)) {
+          continue
+        }
+
         const payload = {
           officer_id: officerId,
           organization: row.organization || '',

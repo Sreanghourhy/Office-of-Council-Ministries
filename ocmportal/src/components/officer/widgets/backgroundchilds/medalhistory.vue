@@ -1,5 +1,5 @@
 <template>
-        <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm overflow-hidden">
+        <section class="mb-10 bg-white border rounded-sm overflow-hidden">
             <div class="flex items-start justify-between gap-3 px-4 py-3 border-b border-[#D8DEE8] bg-[#FCFDFE]">
                 <h3 class="text-[15px] font-semibold text-[#1E3A8A] text-left leading-6">
                     ឆ.១-ការលើកសរសើរ (គ្រឿងឥស្សរិយយស មេដាយ បណ្ណសរសើរ)
@@ -113,6 +113,12 @@ import { useStore } from 'vuex'
 import DeleteConfirmButtonComponent from './delete-confirm-button.vue'
 import PdfDownloadActionButton from './pdf-download-action-button.vue'
 import PdfPreview from './pdfpreview.vue'
+import {
+    buildRowsSnapshot,
+    buildTrackedRowsPayload,
+    findIncompleteRows,
+    rowHasAnyInput
+} from './row-save-helpers'
 export default {
     name: 'MedalHistoryComponent',
     emits: ['changed'],
@@ -142,6 +148,14 @@ export default {
         })
         const selectedRecord = ref(null)
         const pdfToggle = ref(false)
+        const trackedFields = ['fid', 'date', 'organization', 'desp', 'type', 'fileName']
+        const requiredFields = [
+            { key: 'fid', label: 'លេខលិខិត' },
+            { key: 'date', label: 'កាលបរិច្ឆេទ' },
+            { key: 'organization', label: 'ក្រសួង/ស្ថាប័ន' },
+            { key: 'desp', label: 'បរិយាយ' },
+            { key: 'type', label: 'ប្រភេទ' }
+        ]
 
 
         const nextKey = () => {
@@ -152,11 +166,15 @@ export default {
 
         const normalizeRow = (row) => {
             const { _key, file, fileName, ...item } = row
-            return item
+            return {
+                ...item,
+                pdf_state: file instanceof File ? file.name : (fileName || extractFileName(row?.pdf) || '')
+            }
         }
 
 
-        const toPayload = () => rows.value.map(normalizeRow)
+        const toPayload = () =>
+            buildTrackedRowsPayload(rows.value, normalizeRow, trackedFields)
 
 
         const toInputDate = (value) => {
@@ -202,8 +220,7 @@ export default {
 
 
         const markSaved = () => {
-            const payload = toPayload()
-            savedSnapshot.value = JSON.stringify(payload)
+            savedSnapshot.value = buildRowsSnapshot(rows.value, normalizeRow)
             const mapped = {}
             rows.value.forEach((row) => {
                 mapped[row._key] = JSON.stringify(normalizeRow(row))
@@ -222,7 +239,7 @@ export default {
 
 
         const notifyDirty = () => {
-            emit('changed', JSON.stringify(toPayload()) !== savedSnapshot.value)
+            emit('changed', buildRowsSnapshot(rows.value, normalizeRow) !== savedSnapshot.value)
         }
 
 
@@ -324,6 +341,17 @@ export default {
             const officerId = parseInt(props.officer?.id || 0)
             if (officerId <= 0) return false
 
+            const incompleteRows = findIncompleteRows(rows.value, {
+                activityFields: trackedFields,
+                requiredFields,
+                includeBlankRows: true,
+                shouldValidateRow: (row) => rowEdited(row)
+            })
+
+            if (incompleteRows.length > 0) {
+                return false
+            }
+
 
             for (const id of deletedIds.value) {
                 await store.dispatch('officermedalhistory/delete', { id })
@@ -331,6 +359,10 @@ export default {
 
 
             for (const row of rows.value) {
+                if (!rowEdited(row) || !rowHasAnyInput(row, trackedFields)) {
+                    continue
+                }
+
                 const payload = {
                     officer_id: officerId,
                     fid: row.fid || '',

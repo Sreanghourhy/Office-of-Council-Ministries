@@ -35,7 +35,7 @@
                         <!-- User Profile -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('personal', el)"
-                            :class="['career-section-anchor', focusedChangedSection === 'personal' ? 'career-section-focus' : '']"
+                            :class="focusedChangedSection === 'personal' ? 'career-section-focus' : ''"
                         >
                             <profile-component
                                 ref="personalSectionRef"
@@ -158,7 +158,7 @@
                         <!-- Language -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('language', el)"
-                            :class="['career-section-anchor', focusedChangedSection === 'language' ? 'career-section-focus' : '']"
+                            :class="focusedChangedSection === 'language' ? 'career-section-focus' : ''"
                         >
                             <spoken-language-component
                                 ref="languageSectionRef"
@@ -184,10 +184,7 @@
                             <div class="profile-panel-body">
                                 <div
   :ref="(el) => setCareerSectionAnchor('krobKhan', el)"
-  :class="[
-    'career-section-anchor',
-    focusedChangedSection === 'krobKhan' ? 'career-section-focus' : ''
-  ]"
+  :class="focusedChangedSection === 'krobKhan' ? 'career-section-focus' : ''"
 >
   <krob-khan-component
     ref="krobKhanSectionRef"
@@ -199,7 +196,7 @@
 
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('public', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'public' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'public' ? 'career-section-focus' : ''"
                                 >
                                 
                                     <public-work-component
@@ -210,7 +207,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('private', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'private' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'private' ? 'career-section-focus' : ''"
                                 >
                                     <private-work-component
                                         ref="privateWorkSectionRef"
@@ -220,7 +217,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('rankWorking', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'rankWorking' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'rankWorking' ? 'career-section-focus' : ''"
                                 >
                                     <rank-by-working-component
                                         ref="rankByWorkingSectionRef"
@@ -230,7 +227,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('rankCertificate', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'rankCertificate' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'rankCertificate' ? 'career-section-focus' : ''"
                                 >
                                     <rank-by-certificate-component
                                         ref="rankByCertificateSectionRef"
@@ -240,7 +237,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('outKrobKhan', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'outKrobKhan' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'outKrobKhan' ? 'career-section-focus' : ''"
                                 >
                                     <outkrobkhan-component
                                         ref="outKrobKhanSectionRef"
@@ -250,7 +247,7 @@
                                 </div>
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('otherStatus', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'otherStatus' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'otherStatus' ? 'career-section-focus' : ''"
                                 >
                                     <no-salary-component
                                         ref="noSalarySectionRef"
@@ -277,7 +274,7 @@
                         <!-- Reward & Penalty -->
                         <div
                             :ref="(el) => setCareerSectionAnchor('medalHistory', el)"
-                            :class="['career-section-anchor', focusedChangedSection === 'medalHistory' ? 'career-section-focus' : '']"
+                            :class="focusedChangedSection === 'medalHistory' ? 'career-section-focus' : ''"
                             class="form-panel w-full mx-auto"
                         >
                             <div class="profile-panel-header">
@@ -297,7 +294,7 @@
                                 />
                                 <div
                                     :ref="(el) => setCareerSectionAnchor('penaltyHistory', el)"
-                                    :class="['career-section-anchor', focusedChangedSection === 'penaltyHistory' ? 'career-section-focus' : '']"
+                                    :class="focusedChangedSection === 'penaltyHistory' ? 'career-section-focus' : ''"
                                 >
                                     <penalty-history-component
                                         ref="penaltyHistorySectionRef"
@@ -1290,7 +1287,13 @@ import Crud from '../../../classes/Crud'
                         if (typeof sectionRef.persistChanges === 'function') {
                             const persisted = await sectionRef.persistChanges()
                             if (persisted === false) {
-                                throw new Error(`Failed to save section: ${section}`)
+                                activeChangedSection.value = section
+                                focusedChangedSection.value = section
+                                isInitializingCareerSections.value = false
+                                hasCareerUserInteraction.value = true
+                                scrollToCareerSection(section)
+                                message.warning('សូមបំពេញព័ត៌មានឱ្យគ្រប់មុនរក្សាទុក')
+                                return
                             }
                             if (careerSectionChanged.hasOwnProperty(section)) {
                                 careerSectionChanged[section] = false
@@ -1315,6 +1318,8 @@ import Crud from '../../../classes/Crud'
                     await nextTick()
                     markAllCareerSectionsSaved()
                     clearCareerChangedState()
+                    focusedChangedSection.value = ''
+                    activeChangedSection.value = ''
                     scheduleSectionMetricsRefresh(true)
                     isInitializingCareerSections.value = false
                     hasCareerUserInteraction.value = false

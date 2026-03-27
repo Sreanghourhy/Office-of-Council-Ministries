@@ -7,5 +7,7 @@ Route::group([
   'middleware' => 'auth:api'
   ], function() {
       Route::get('',[RankController::class,'index']);
-      Route::get('structure',[RankController::class,'structure']);      
+      Route::get('structure',[RankController::class,'structure']);
+      Route::post('create', [RankController::class, 'create']);
+      Route::put('update', [RankController::class, 'update']);
 });

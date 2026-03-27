@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+  <section class="mb-10 bg-white border rounded-sm">
     <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
       <h3 class="text-[15px] font-semibold text-[#1E3A8A]">ប្រវត្តិក្របខ័ណ្ឌ</h3>
       <button

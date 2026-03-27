@@ -41,6 +41,14 @@ Route::group([
      */
     Route::put('activate',[OfficerController::class,'activate']);
     Route::put('deactivate',[OfficerController::class,'deactivate']);
+
+    Route::group([
+      'prefix' => 'reports',
+      'middleware' => 'auth:api'
+    ], function () {
+      Route::get('officersunderorganization', [OfficerController::class, 'officersOfGeneralDepartment']);
+    });
+
     /**
        * Officer Job 
        */

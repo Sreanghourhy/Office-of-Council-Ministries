@@ -1,5 +1,5 @@
 ﻿<template>
-  <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+  <section class="mb-10 bg-white border rounded-sm">
     <!-- HEADER -->
     <div
       class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]"
@@ -13,7 +13,7 @@
       <div class="flex items-center gap-2">
         <select
           v-model="selectedSectionIndex"
-          class="border border-[#D8DEE8] rounded px-3 py-1.5 text-[13px]"
+          class="border border-[#D8DEE8] rounded px-3 py-1.5 pr-9 text-[13px] bg-white appearance-none education-select"
         >
           <option
             v-for="(section, index) in sections"
@@ -70,7 +70,7 @@
               :key="row._key"
               :class="
                 isRowChangedFromBaseline(sectionIndex, row)
-                  ? 'bg-[#FEE2E2]'
+                  ? 'pending-row'
                   : 'bg-white'
               "
             >
@@ -91,7 +91,7 @@
               </td>
 
               <td class="td">
-                <select v-model="row.certificate" class="input">
+                <select v-model="row.certificate" class="input education-select">
                   <option value="">ជ្រើសរើស</option>
                   <option
                     v-for="cert in certificateOptions(sectionIndex)"
@@ -355,6 +355,16 @@ export default {
       "end",
     ];
 
+    const FIELD_LABELS = {
+      education_level: "វគ្គឬកម្រិតសិក្សា",
+      place_name: "គ្រឹះស្ថានសិក្សា",
+      location: "ទីតាំង",
+      certificate: "សញ្ញាបត្រ",
+      field_name: "ជំនាញ",
+      start: "ថ្ងៃចូល",
+      end: "ថ្ងៃបញ្ចប់",
+    };
+
     /* ---------------- STATE ---------------- */
 
     const sections = ref([
@@ -420,6 +430,7 @@ export default {
     const newRow = () => ({
       _key: `row-${++rowSeed}`,
       id: null,
+      _draftPending: true,
       education_level: "",
       place_name: "",
       location: "",
@@ -452,7 +463,16 @@ export default {
 
       return {
         title: section.title || "",
-        rows: (section.rows || []).map((row) => normalizeComparableRow(row)),
+        rows: (section.rows || [])
+          .filter((row) => {
+            const rowId = Number(row?.id || 0) > 0 ? Number(row.id) : null;
+            return (
+              rowId != null ||
+              row?._draftPending === true ||
+              !isEmptyEducationRow(normalizeEducationBackgroundRow(row))
+            );
+          })
+          .map((row) => normalizeComparableRow(row)),
       };
     }
 
@@ -487,6 +507,8 @@ export default {
     }
 
     function isRowChangedFromBaseline(sectionIndex, row) {
+      if (row?._draftPending === true) return true;
+
       const baselineSection = baselineSections.value[sectionIndex];
       if (!baselineSection) return true;
 
@@ -499,7 +521,7 @@ export default {
         return rowSignature(row) !== rowSignature(baselineRow);
       }
 
-      return true;
+      return !isEmptyEducationRow(normalizeEducationBackgroundRow(row));
     }
 
     function snapshotSectionsState() {
@@ -645,6 +667,10 @@ export default {
     }
 
     function hasEditableRowValues(row) {
+      if (row?.pendingPdfFile instanceof File || Boolean(row?.pdf)) {
+        return true;
+      }
+
       return EDITABLE_ROW_FIELDS.some(
         (field) => !isMissingField(field, row?.[field]),
       );
@@ -720,9 +746,9 @@ export default {
         if (!shouldProcessSection(sectionIndex, targetSectionSet)) return;
 
         section.rows.forEach((row, rowIndex) => {
-          const normalized = normalizeEducationBackgroundRow(row);
-          if (isEmptyEducationRow(normalized)) return;
           if (!isRowChangedFromBaseline(sectionIndex, row)) return;
+
+          const normalized = normalizeEducationBackgroundRow(row);
 
           const missingFields = REQUIRED_EDUCATION_FIELDS.filter((field) =>
             isMissingField(field, normalized[field]),
@@ -832,6 +858,7 @@ export default {
         sections.value[sectionIndex].rows.push({
           id: record.id,
           _key: `row-${++rowSeed}`,
+          _draftPending: false,
           education_level: educationLevelForSection(sectionIndex),
           place_name: record.place_name || "",
           location: record.location || "",
@@ -1011,6 +1038,30 @@ export default {
         return;
       }
 
+      const validation = buildEducationBackgroundPayload(targetSectionIndexes);
+      if (!validation.valid) {
+        const firstError = validation.errors[0];
+        if (firstError?.sectionIndex >= 0) {
+          selectedSectionIndex.value = firstError.sectionIndex;
+        }
+
+        const details = validation.errors
+          .map((error) => {
+            const fieldLabels = error.missingFields
+              .map((field) => FIELD_LABELS[field] || field)
+              .join(", ");
+            return `ជួរទី ${khmerNumber(error.rowIndex + 1)}: ${fieldLabels}`;
+          })
+          .join(" | ");
+
+        notify.warning({
+          title: "សូមបំពេញព័ត៌មានឲ្យគ្រប់",
+          description: details || "សូមបំពេញព័ត៌មានឲ្យគ្រប់មុនរក្សាទុក។",
+          duration: 4000,
+        });
+        return false;
+      }
+
       const { records } = buildEducationPayload(targetSectionIndexes);
       const deletedIds = collectDeletedRecordIds(targetSectionIndexes);
 
@@ -1133,6 +1184,26 @@ export default {
   border-radius: 4px;
   font-size: 13px;
   background: white;
+  min-height: 34px;
+}
+
+.education-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4l4-4' stroke='%2364758B' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px 16px;
+}
+
+.pending-row > td {
+  background: #fee2e2;
+}
+
+.pending-row > td:first-child {
+  box-shadow: inset 4px 0 0 #dc2626;
 }
 
 .action-toolbar {

@@ -1,5 +1,5 @@
 ﻿<template>
-<section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+<section class="mb-10 bg-white border rounded-sm">
 
 <!-- HEADER -->
 <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
@@ -48,7 +48,7 @@ class="th"
 <tr
 v-for="(row,index) in rows"
 :key="row._key"
-:class="rowEdited(row) ? 'bg-[#FEE2E2]' : 'bg-white'"
+:class="rowEdited(row) ? 'pending-row' : 'bg-white'"
 >
 
 <!-- Language name -->
@@ -119,6 +119,12 @@ v-for="level in levels"
 import { ref, watch } from "vue"
 import { useStore } from "vuex"
 import DeleteConfirmButtonComponent from "./delete-confirm-button.vue"
+import {
+buildRowsSnapshot,
+buildTrackedRowsPayload,
+findIncompleteRows,
+rowHasAnyInput
+} from "./row-save-helpers"
 
 export default {
 
@@ -158,6 +164,13 @@ const columns = [
 ]
 
 const levels = ["ល្អ","មធ្យម","ខ្សោយ"]
+const trackedFields = ["name", "reading", "speaking", "writing"]
+const requiredFields = [
+{ key: "name", label: "ភាសាបរទេស" },
+{ key: "reading", label: "ការអាន" },
+{ key: "speaking", label: "ការសន្ទនា" },
+{ key: "writing", label: "ការសរសេរ" }
+]
 
 
 /* --------------------------------
@@ -227,7 +240,11 @@ PAYLOAD
 -------------------------------- */
 
 function toPayload(){
-return rows.value.map(({_key,...item})=>({ ...item }))
+return buildTrackedRowsPayload(
+rows.value,
+({ _key, ...item }) => ({ ...item }),
+trackedFields
+)
 }
 
 
@@ -236,8 +253,7 @@ SNAPSHOT
 -------------------------------- */
 
 function markSaved(){
-const payload = toPayload()
-savedSnapshot.value = JSON.stringify(payload)
+savedSnapshot.value = buildRowsSnapshot(rows.value, normalizeRow)
 const mapped = {}
 rows.value.forEach((row) => {
 mapped[row._key] = JSON.stringify(normalizeRow(row))
@@ -254,8 +270,8 @@ EDIT CHECK
 
 function rowEdited(row){
 const snapshotRow = savedRowsByKey.value[row._key]
-if (snapshotRow === undefined) return true
-return JSON.stringify(normalizeRow(row)) !== snapshotRow
+ if (snapshotRow === undefined) return true
+ return JSON.stringify(normalizeRow(row)) !== snapshotRow
 }
 
 
@@ -264,7 +280,7 @@ DIRTY CHECK
 -------------------------------- */
 
 function notifyDirty(){
-emit("changed", JSON.stringify(toPayload()) !== savedSnapshot.value)
+emit("changed", buildRowsSnapshot(rows.value, normalizeRow) !== savedSnapshot.value)
 }
 
 function cancelChanges(){
@@ -275,11 +291,26 @@ async function persistChanges(){
 const peopleId = parseInt(props.officer?.people?.id || props.officer?.people_id || 0)
 if (peopleId <= 0) return false
 
+const incompleteRows = findIncompleteRows(rows.value, {
+activityFields: trackedFields,
+requiredFields,
+includeBlankRows: true,
+shouldValidateRow: (row) => rowEdited(row)
+})
+
+if (incompleteRows.length > 0) {
+return false
+}
+
 for (const id of deletedIds.value) {
 await store.dispatch('spokenlanguage/delete', { id })
 }
 
 for (const row of rows.value) {
+if (!rowEdited(row) || !rowHasAnyInput(row, trackedFields)) {
+continue
+}
+
 const payload = {
 people_id: peopleId,
 name: row.name || "",
@@ -354,6 +385,26 @@ padding:6px;
 border-radius:4px;
 font-size:13px;
 background:white;
+min-height:34px;
+}
+
+select.input{
+appearance:none;
+-webkit-appearance:none;
+-moz-appearance:none;
+padding-right:32px;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4l4-4' stroke='%2364758B' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+background-repeat:no-repeat;
+background-position:right 10px center;
+background-size:16px 16px;
+}
+
+.pending-row > td{
+background:#FEE2E2;
+}
+
+.pending-row > td:first-child{
+box-shadow:inset 4px 0 0 #DC2626;
 }
 
 </style>

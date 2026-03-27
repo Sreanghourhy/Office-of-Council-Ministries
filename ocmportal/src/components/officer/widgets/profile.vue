@@ -230,7 +230,7 @@ export default {
       formData.append('id', user.value.id )
       formData.append('files',files.value[0],files.value[0].name)
       
-      store.dispatch('user/upload', formData ).then( res => {
+      store.dispatch('user/uploadProfilePicture', formData ).then( res => {
         notify.success({
           title: 'ដាក់រូបភាពអ្នកប្រើប្រាស់' ,
           description: 'កំពុងរក្សាទុករូបភាព។' ,

@@ -1889,6 +1889,83 @@ class OfficerController extends Controller
             'message' => 'ជោគជ័យ !' 
         ], 200);
     }
+    public function officersOfGeneralDepartment(Request $request){
+        $search = isset( $request->search ) && strlen( $request->search ) > 0 ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && intval( $request->perPage ) > 0 ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && intval( $request->page ) > 0 ? $request->page : 1 ;
+
+        $positions = isset( $request->positions ) ? explode(',',$request->positions) : false ;
+        if( is_array( $positions ) && !empty( $positions ) ){
+            $positions = array_filter( $positions, function($position){
+                return intval( $position ) > 0 ;
+            } );
+        }
+
+        $organizations = isset( $request->organizations ) ? explode(',',$request->organizations) : false ;
+        if( is_array( $organizations ) && !empty( $organizations ) ){
+            $organizations = array_filter( $organizations , function($organization){
+                return intval( $organization ) > 0 ;
+            } );
+        }
+
+        $organizationStructure = \App\Models\Organization\OrganizationStructure::whereIn('organization_id', $organizations)->first();
+        if( $organizationStructure == null ){
+            return response()->json([
+                'message'=> 'áž¢áž„áŸ’áž‚áž—áž¶áž–áž“áŸáŸ‡áž˜áž·áž“áž˜áž¶áž“áž¡áž¾áž™áŸ”'
+            ],500);
+        }
+
+        $totalOfficersWithInPosition = [];
+        $totalOfficers = 0;
+        $organizationsList = collect();
+        $organizationStructure->organization;
+        if( $organizationStructure->structurePositions()->count() ){
+            $organizationStructure->structure_positions = $organizationStructure->structurePositions()->whereHas('officerJobs')->orderby('index','asc')->get()->map(function ($organizationStructurePosition ) use( &$totalOfficersWithInPosition , &$totalOfficers ) {
+                if( isset( $totalOfficersWithInPosition[ $organizationStructurePosition->position->name ] ) ){
+                    $totalOfficersWithInPosition[ $organizationStructurePosition->position->name ] += $organizationStructurePosition->officerJobs()->count() ;
+                }else{
+                    $totalOfficersWithInPosition[ $organizationStructurePosition->position->name ] = $organizationStructurePosition->officerJobs()->count() ;
+                }
+                $totalOfficers += $organizationStructurePosition->officerJobs()->count();
+                if( $organizationStructurePosition->officerJobs()->count() ){
+                    $organizationStructurePosition->officer_jobs = $organizationStructurePosition->officerJobs()->get()->map(function ($officerJob) {
+                        $officerJob->unofficialPosition;
+                        if ($officerJob->officer) {
+                            $officerJob->officer->current_job = $officerJob->officer->getCurrentJob();
+                            if( $officerJob->officer->current_job != null ){
+                                if( $officerJob->officer->current_job->organizationStructurePosition ){
+                                    $officerJob->officer->current_job->organizationStructurePosition->position;
+                                }
+                            }
+                            if( $officerJob->officer->people ){
+                                $officerJob->officer->people->certificates;
+                            }
+                        }
+                        return $officerJob;
+                    });
+                }
+                return $organizationStructurePosition;
+            });
+        }
+        $organizationsList->push($organizationStructure);
+
+        return response()->json([
+            'ok' => true ,
+            'message' => 'ážšáž½აჟšáž¶áž›áŸ‹' ,
+            'records' => $organizationsList ,
+            'pagination' => [
+                'perPage' => $perPage ,
+                'page' => $page ,
+                'totalRecords' => $totalOfficers ,
+                'totalPages' => 1 ,
+            ] ,
+            'report' => [
+                'search' => $search ,
+                'total_officers' => $totalOfficers ,
+                'total_officers_within_position' => $totalOfficersWithInPosition ,
+            ]
+        ],200);
+    }
     public function mybackground(Request $request){
         $personalOnly = trim( (string) $request->query('section','') ) === 'personal';
         if( !isset( $request->id ) || $request->id < 0 ){

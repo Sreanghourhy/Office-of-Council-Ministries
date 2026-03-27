@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AuthenticationCenter\People;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\SyncsPrimaryKeySequence;
 use Illuminate\Http\Request;
 use App\Models\People\Certificate as RecordModel;
 use App\Http\Controllers\CrudController;
@@ -18,6 +19,8 @@ use FilippoToso\PdfWatermarker\Support\Position;
 
 class CertificateController extends Controller
 {
+    use SyncsPrimaryKeySequence;
+
     private $selectFields = [
         'id',
         'field_name' ,
@@ -253,6 +256,7 @@ class CertificateController extends Controller
                 'message' => 'សូមបញ្ជាក់ម្ចាស់ឯកសារ'
             ],500);
         }
+        $this->syncPrimaryKeySequence(new RecordModel());
         $record = RecordModel::create([
             'people_id' => $request->people_id ,
             'field_name' => $request->field_name?? ''  ,

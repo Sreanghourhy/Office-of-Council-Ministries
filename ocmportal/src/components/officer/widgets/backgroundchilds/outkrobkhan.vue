@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+  <section class="mb-10 bg-white border rounded-sm">
     <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
       <h3 class="text-[15px] font-semibold text-[#1E3A8A]">ច.៤.ស្ថានភាពស្ថិតនៅក្រៅក្របខ័ណ្ឌដើម / ទំនេរពីមុខងារ</h3>
       <button
@@ -27,7 +27,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, index) in rows" :key="row._key" :class="rowEdited(row) ? 'bg-[#FEE2E2]' : 'bg-white'">
+          <tr v-for="(row, index) in rows" :key="row._key" :class="rowEdited(row) ? 'pending-row' : 'bg-white'">
             <td class="p-2 border-b border-[#E5E7EB]">
               <input v-model="row.start" type="date" class="field-input w-full border border-[#D8DEE8] rounded px-2 text-[13px] bg-white" />
             </td>
@@ -99,6 +99,12 @@ import PdfDownloadActionButton from './pdf-download-action-button.vue'
 import PdfPreviewActionButton from './pdf-preview-action-button.vue'
 import PdfPreview from './pdfpreview.vue'
 import { useRowDocumentUpload } from './use-row-document-upload'
+import {
+  buildRowsSnapshot,
+  buildTrackedRowsPayload,
+  findIncompleteRows,
+  rowHasAnyInput
+} from './row-save-helpers'
 
 export default {
   emits: ['changed'],
@@ -149,6 +155,14 @@ export default {
         maxWidth: '80vw'
       }
     }
+    const trackedFields = ['start', 'end', 'organization', 'position', 'pdf']
+    const requiredFields = [
+      { key: 'start', label: 'ថ្ងៃចាប់ផ្តើម' },
+      { key: 'end', label: 'ថ្ងៃបញ្ចប់' },
+      { key: 'organization', label: 'ស្ថាប័ន' },
+      { key: 'position', label: 'មុខតំណែង' },
+      { key: 'total_months', label: 'ចំនួនខែ' }
+    ]
     const model = reactive({
       name: 'officerpendingwork',
       module: 'officerpendingwork',
@@ -212,7 +226,11 @@ export default {
     }
 
     function toPayload() {
-      return rows.value.map(({ _key, _storedPdf, ...item }) => ({ ...item }))
+      return buildTrackedRowsPayload(
+        rows.value,
+        ({ _key, _storedPdf, ...item }) => ({ ...item }),
+        trackedFields
+      )
     }
 
     function normalizeRow(row) {
@@ -221,8 +239,7 @@ export default {
     }
 
     function markSaved() {
-      const payload = toPayload()
-      savedSnapshot.value = JSON.stringify(payload)
+      savedSnapshot.value = buildRowsSnapshot(rows.value, normalizeRow)
       const mapped = {}
       rows.value.forEach((row) => {
         mapped[row._key] = JSON.stringify(normalizeRow(row))
@@ -240,7 +257,7 @@ export default {
     }
 
     function notifyDirty() {
-      emit('changed', JSON.stringify(toPayload()) !== savedSnapshot.value)
+      emit('changed', buildRowsSnapshot(rows.value, normalizeRow) !== savedSnapshot.value)
     }
 
     function cancelChanges() {
@@ -265,18 +282,32 @@ export default {
       const officerId = parseInt(props.officer?.id || 0)
       if (officerId <= 0) return false
 
+      const incompleteRows = findIncompleteRows(rows.value, {
+        activityFields: trackedFields,
+        requiredFields: requiredFields.filter((field) => field.key !== 'total_months'),
+        includeBlankRows: true,
+        shouldValidateRow: (row) => rowEdited(row)
+      })
+
+      if (incompleteRows.length > 0) {
+        return false
+      }
+
       for (const id of deletedIds.value) {
         await store.dispatch('officerpendingwork/delete', { id })
       }
 
       for (const row of rows.value) {
+        if (!rowEdited(row) || !rowHasAnyInput(row, trackedFields)) {
+          continue
+        }
+
         const payload = {
           officer_id: officerId,
           start: row.start || '',
           end: row.end || '',
           organization: row.organization || '',
           position: row.position || '',
-          total_months: Number(row.total_months || 0),
           pdf: row.pdf || '',
           clear_pdf: shouldClearStoredPdf(row._key) ? 1 : 0,
           type: 0
@@ -288,7 +319,7 @@ export default {
           })
         } else {
           const res = await store.dispatch('officerpendingwork/create', payload)
-          row.id = parseInt(res?.data?.record?.id || 0) || null
+          row.id = parseInt(res?.data?.record?.id || res?.data?.id || 0) || null
         }
         await uploadDocumentIfNeeded(row.id, row)
         row._storedPdf = row.pdf || ''
@@ -399,5 +430,13 @@ export default {
 :deep(.uniform-select .n-base-selection-label) {
   height: 100%;
   background-color: #fff !important;
+}
+
+.pending-row > td {
+  background-color: #fee2e2;
+}
+
+.pending-row > td:first-child {
+  box-shadow: inset 4px 0 0 #dc2626;
 }
 </style>

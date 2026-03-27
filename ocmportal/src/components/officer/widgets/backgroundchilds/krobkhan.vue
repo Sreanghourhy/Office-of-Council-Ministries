@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+  <section class="mb-10 bg-white border rounded-sm">
     <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
       <h3 class="text-[15px] font-semibold text-[#1E3A8A]">ប្រវត្តិក្របខ័ណ្ឌ</h3>
     </div>
@@ -204,23 +204,11 @@ export default {
       if (officerId <= 0) return null
 
       const row = rows.value[0] || emptyRow()
-      const rankData = resolveCurrentRankDataFromDb()
-      if (rankData.id <= 0) {
-        throw new Error('krobkhan-rank-missing')
-      }
 
       return {
-        id: rankData.id,
-        rank_id: rankData.id,
-        officer_id: officerId,
+        id: officerId,
         unofficial_date: row.start || null,
-        official_date: row.end || null,
-        ank: rankData.ank || undefined,
-        krobkhan: rankData.krobkhan || undefined,
-        rank: rankData.rank || undefined,
-        thnak: rankData.thnak || undefined,
-        officer_type: normalizeSelection(props.officer?.officer_type || rankData.krobkhan),
-        salary_rank: normalizeSelection(rankData.prefix || '')
+        official_date: row.end || null
       }
     }
 
@@ -235,30 +223,32 @@ export default {
           return true
         }
 
-        const res = await store.dispatch('rank/update', payload)
+        const res = await store.dispatch('officer/update', payload)
         if (!(res?.data?.ok === true || res?.status === 200)) {
           throw new Error('krobkhan-update-failed')
         }
 
         const record = res?.data?.record || {}
-        props.officer.unofficial_date = record.unofficial_date || payload.unofficial_date
-        props.officer.official_date = record.official_date || payload.official_date
-        props.officer.officer_type = record.officer_type || payload.officer_type
-        props.officer.salary_rank = record.salary_rank || payload.salary_rank
-        props.officer.current_salary_rank = record.prefix || record.current_salary_rank || ''
-        props.officer.rank_id = parseInt(record.rank_id || payload.rank_id || props.officer.rank_id || 0) || null
-
-        if (!props.officer.rank || typeof props.officer.rank !== 'object') {
-          props.officer.rank = {}
+        props.officer.unofficial_date = record.unofficial_date ?? payload.unofficial_date
+        props.officer.official_date = record.official_date ?? payload.official_date
+        if (record.officer_type !== undefined) {
+          props.officer.officer_type = record.officer_type
         }
-
-        props.officer.rank.id = parseInt(record.rank_id || payload.rank_id || 0) || null
-        props.officer.rank.ank = record.ank || payload.ank || props.officer.rank.ank
-        props.officer.rank.krobkhan = record.krobkhan || payload.krobkhan || props.officer.rank.krobkhan
-        props.officer.rank.rank = record.rank || payload.rank || props.officer.rank.rank
-        props.officer.rank.thnak = record.thnak || payload.thnak || props.officer.rank.thnak
-        props.officer.rank.prefix = record.prefix || record.current_salary_rank || props.officer.rank.prefix
-        props.officer.current_rank_ank = props.officer.rank.ank || record.current_rank_ank || props.officer.current_rank_ank
+        if (record.salary_rank !== undefined) {
+          props.officer.salary_rank = record.salary_rank
+        }
+        if (record.current_salary_rank !== undefined) {
+          props.officer.current_salary_rank = record.current_salary_rank
+        }
+        if (record.current_rank_ank !== undefined) {
+          props.officer.current_rank_ank = record.current_rank_ank
+        }
+        if (record.rank_id !== undefined) {
+          props.officer.rank_id = parseInt(record.rank_id || 0) || null
+        }
+        if (record.rank && typeof record.rank === 'object') {
+          props.officer.rank = record.rank
+        }
 
         hydrateRows()
         markSaved()

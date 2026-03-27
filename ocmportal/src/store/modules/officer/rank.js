@@ -75,6 +75,12 @@ const actions = {
       )
     )
   },
+  async update ({ state, commit, rootState }, params) {
+    return await crud.update(
+      import.meta.env.VITE_API_SERVER + "/" + state.model.module + "/update",
+      params
+    )
+  },
   async structure ({ state, commit, rootState }) {
     return await crud.list(import.meta.env.VITE_API_SERVER+"/"+state.model.name + '/structure' )
   }

@@ -27,10 +27,29 @@ const actions = {
     return await crud.list(import.meta.env.VITE_API_SERVER+"/"+state.model.name + "?" + new URLSearchParams({
         search: params.search ,
         perPage: params.perPage ,
+        page: params.page,
+        wild_search: params.wild_search == true ? 1 : 0 ,
+        positions: params.positions ,
+        organizations: params.organizations,
+        education_levels: params.educatoin_levels,
+        unofficial_position_ids: params.unofficial_position_ids,
+        rank_ids : params.ranks ,
+        ids: params.ids,
+        officer_types : params.officer_types ,
+        dob: params.dob,
+        unofficial_date: params.unofficial_date,
+        official_date : params.official_date
+      }).toString()
+    )
+  },
+  async officersunderorganization ({ state, commit, rootState },params) {
+    return await crud.list(import.meta.env.VITE_API_SERVER+"/"+state.model.name + "/reports/officersunderorganization?" + new URLSearchParams({
+        search: params.search ,
+        perPage: params.perPage ,
         page: params.page ,
         positions: params.positions ,
         organizations: params.organizations ,
-        ids: params.ids
+        ids: params.ids ,
       }).toString()
     )
   },
@@ -68,6 +87,9 @@ const actions = {
   async upload({ state, commit, rootState },formData) {    
     return await crud.upload(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/upload",formData)
   },
+  async setDocumentFocal ({ state, commit, rootState },params) {
+    return await crud.create(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/setfocaldocument",params)
+  }
 }
 
 // mutations

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AuthenticationCenter\Officer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\SyncsPrimaryKeySequence;
 use Illuminate\Http\Request;
 use App\Models\Officer\OfficerWorkPending as RecordModel;
 use App\Models\Officer\Officer ;
@@ -18,6 +19,8 @@ use FilippoToso\PdfWatermarker\Support\Position;
 
 class OfficerPendingWorkController extends Controller
 {
+    use SyncsPrimaryKeySequence;
+
     private $selectFields = [
         'id' ,
         'officer_id' , 
@@ -279,6 +282,7 @@ class OfficerPendingWorkController extends Controller
                 'message' => 'សូមបញ្ជាក់ម្ចាស់ឯកសារ'
             ],500);
         }
+        $this->syncPrimaryKeySequence(new RecordModel());
         $record = RecordModel::create([
             'officer_id' => $officer->id ,
             'organization' => $request->organization?? '' ,

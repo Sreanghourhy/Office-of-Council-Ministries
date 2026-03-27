@@ -1,5 +1,5 @@
 <template>
-    <section class="mb-10 bg-white border border-[#D8DEE8] rounded-sm">
+    <section class="mb-10 bg-white border rounded-sm">
         <div v-if="officer != undefined && officer.people != undefined " class="w-full" >
             <div class="flex items-center justify-between px-4 py-3 border-b border-[#D8DEE8]">
                 <h3 class="text-[15px] font-semibold text-[#1E3A8A]">ក. ព័ត៌មានផ្ទាល់ខ្លួន</h3>
@@ -850,8 +850,8 @@ export default {
         const uploadPhoto = async () => {
             if (!selectedFile.value || !props.officer) return
 
-            const targetPeopleId = props.officer.people?.id
-            if (!targetPeopleId) {
+            const targetUserId = props.officer.user?.id
+            if (!targetUserId) {
                 notify.error({
                     title: 'មានបញ្ហា',
                     content: 'រកមិនឃើញគណនីអ្នកប្រើប្រាស់សម្រាប់ដាក់រូបភាព។',
@@ -864,10 +864,10 @@ export default {
 
             try {
                 const formData = new FormData()
-                formData.append('id', targetPeopleId)
+                formData.append('id', targetUserId)
                 formData.append('files', selectedFile.value, selectedFile.value.name)
 
-                const response = await store.dispatch('people/upload', formData)
+                const response = await store.dispatch('user/uploadProfilePicture', formData)
 
                 if (response.data && response.data.record) {
                     const record = response.data.record
@@ -878,12 +878,12 @@ export default {
                         duration: 2000
                     })
 
-                    const imageUrl = record.image || null
-                    if (imageUrl) {
-                        if (props.officer.people) {
-                            props.officer.people.image = imageUrl
+                    const avatarUrl = record.avatar_url || null
+                    if (avatarUrl) {
+                        if (props.officer.user) {
+                            props.officer.user.avatar_url = avatarUrl
                         }
-                        props.officer.image = imageUrl
+                        props.officer.image = avatarUrl
                     }
 
                     cancelFileSelect()

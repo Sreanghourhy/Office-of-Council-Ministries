@@ -5,6 +5,9 @@
         <div class="font-moul w-full leading-6 text-center" >ព្រះរាជាណាចក្រកម្ពុជា</div>
         <div class="font-moul w-full leading-6 text-center" >ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
         <div class="font-tacteing w-full  text-center h-10 -mt-2 " style="font-size: 2rem; " >3</div>
+        <div v-if="todayKhLunarText" class="w-full text-center text-xs mt-1">
+          {{ todayKhLunarText }}
+        </div>
         <div class="organization w-1/2 relative my-2 pt-6 text-left -mt-2" >
           <div class="font-moul w-full leading-6" >ទីស្ដីការគណៈរដ្ឋមន្ត្រី</div>
           <div v-if="officer.organization != undefined " class="font-moul w-full leading-6" >{{ officer.organization.name }}</div>
@@ -53,7 +56,7 @@
                   <td colspan="3" >{{ ( ( officer != null && officer.people != undefined && officer.people != null && officer.people.current_address != null  ) ? $toKhmer( officer.people.current_address ) : '' ) }}</td>
                 </tr>
                 <tr>
-                  <td >លេខទូរសព្ទ</td>
+                  <td >លេខទូរស័ព្ទ</td>
                   <td >{{ $toKhmer( officer.people.mobile_phone ) }}</td>
                   <td class="" colspan="2" >អ៉ីមែល៖ {{ officer.people.email }}</td>
                 </tr>
@@ -64,8 +67,8 @@
                 <tr v-if="officer.people.passports != null && officer.people.passports != undefined && officer.people.passports.length > 0" >
                   <td >លេខអត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ</td>
                   <td>{{ $toKhmer( officer.people.passports[0].number ) }}</td>
-                  <td class="">សុពលភាព ៖ {{ $toKhmer( dateFormat( new Date( officer.people.passports[0].effective_date ) , 'dd-mm-yyyy' ) ) }}</td>
-                  <td class="">ដល់ថ្ងៃ ៖ {{ $toKhmer( dateFormat( new Date( officer.people.passports[0].expired_date ) , 'dd-mm-yyyy' ) ) }}</td>
+                  <td class="">សុពលភាព ៖ {{ $toKhmer( formatDateSafe( officer.people.passports[0].effective_date ) ) }}</td>
+                  <td class="">ដល់ថ្ងៃ ៖ {{ $toKhmer( formatDateSafe( officer.people.passports[0].expired_date ) ) }}</td>
                 </tr>
                 <tr>
                   <td >កាយសម្បទា</td>
@@ -215,7 +218,7 @@
                                   <td class="w-24 " >{{ $toKhmer( i + 1 ) }}. </td>
                                   <td>{{ o.lastname + ' ' + o.firstname }}</td>
                                   <td>{{ o.gender == "male" ? 'ប្រុស' : 'ស្រី' }}</td>
-                                  <td>{{ $toKhmer( dateFormat( new Date( o.dob ) , 'dd-mm-yyyy' ) ) }}</td>
+                                  <td>{{ $toKhmer( formatDateSafe( o.dob ) ) }}</td>
                                   <td>{{ o.profession }}</td>
                                 </tr>
                               </tbody>
@@ -307,7 +310,7 @@
             <table class="w-full" >
               <tbody>
                 <tr>
-                  <td >ឈ្មោះជាភាសារខ្មែរ ៖ </td>
+                  <td >ឈ្មោះជាភាសាខ្មែរ ៖ </td>
                   <td >{{ officer.people.emergency_lastname }}</td>
                   <td>{{ officer.people.emergency_firstname }}</td>
                   <td >{{ officer.people.emergency_gender == 0 ? 'ស្រី' : 'ប្រុស' }}</td>
@@ -323,7 +326,7 @@
                   <td colspan="3" >{{ officer.people.emergency_address }}</td>
                 </tr>
                 <tr>
-                  <td >លេខទូរសព្ទ ៖ </td>
+                  <td >លេខទូរស័ព្ទ ៖ </td>
                   <td >{{ $toKhmer( officer.people.emergency_phone ) }}</td>
                   <td >អ៉ីមែល ៖ </td>
                   <td >{{ officer.people.emergency_email }}</td>
@@ -377,7 +380,7 @@
                             <td class="border-b border-gray-100" >{{ $toKhmer( certificate.end ) }}</td>
                           </tr>
                           <tr>
-                            <td colspan="7" class="border-b border-gray-100 font-btb-black" >៣. វគ្គបណ្ដុះបណ្ដាលបន្ត និងវគ្គសិក្សា (សូមបំពេញវគ្គសក្សាថ្មី សំខាន់ និងចាំបាច់)</td>
+                            <td colspan="7" class="border-b border-gray-100 font-btb-black" >៣. វគ្គបណ្ដុះបណ្ដាលផ្សេងៗ (សូមបំពេញវគ្គសក្សាថ្មី សំខាន់ៗ និងចាំបាច់)</td>
                           </tr>
                           <tr v-for="(certificate , index) in officer.people.certificates.others" :key="index" >
                             <td class="border-b border-gray-100" >{{ certificate.place_name }}</td>
@@ -428,15 +431,15 @@
                     <table class="w-full " >
                       <tbody>
                         <tr>
-                          <td class="" >- ថ្ងៃខែឆ្នាំចូលបម្រើក្របខណ្ឌរដ្ឋ ៖ </td>
+                          <td class="" >- ថ្ងៃខែឆ្នាំចូលបម្រើក្របខ័ណ្ឌរដ្ឋ ៖ </td>
                           <td class="" >{{ officer.unofficial_date != undefined && officer.unofficial_date.length > 0 ? $toKhmer( dateFormat( new Date( officer.unofficial_date ) , 'dd-mm-yyyy' ) ) : '' }}</td>
                           <td class="" >ថ្ងៃខែឆ្នាំតាំងស៊ុប់ក្នុងក្របខ័ណ្ឌរដ្ឋ ៖ </td>
                           <td class="" >{{ officer.official_date != undefined && officer.official_date.length > 0 ? $toKhmer( dateFormat( new Date( officer.official_date) , 'dd-mm-yyyy' ) ) : '' }}</td>
                         </tr>
                         <tr>
-                          <td class="" >- ឈ្មោះក្របខណ្ឌ ៖ </td>
+                          <td class="" >- ឈ្មោះក្របខ័ណ្ឌ ៖ </td>
                           <td class="" >{{ officer.officer_type }}</td>
-                          <td class="" >ក្របខណ្ឌ ឋានន្តរស័ក្ត និងថ្នាក់បច្ចុប្បន្ន ៖ </td>
+                          <td class="" >ក្របខ័ណ្ឌ ឋានន្តរស័ក្តិ និងថ្នាក់បច្ចុប្បន្ន ៖ </td>
                           <td class="" >{{ officer.salary_rank }}</td>
                         </tr>
                       </tbody>
@@ -460,8 +463,8 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(job,index) in officer.job_backgrounds.filter( (jb) => jb.sector == 0 )" :key="index" >
-                                    <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( job.start ) , 'dd-mm-yyyy' ) ) }}</td>
-                                    <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( job.end ) , 'dd-mm-yyyy' ) ) }}</td>
+                                    <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( job.start ) ) }}</td>
+                                    <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( job.end ) ) }}</td>
                                     <td class="border-b border-gray-100" >{{ $toKhmer( job.organization ) }}</td>
                                     <td class="border-b border-gray-100" >{{ $toKhmer( job.sub_organization ) }}</td>
                                     <td class="border-b border-gray-100" >{{ $toKhmer( job.position ) }}</td>
@@ -486,8 +489,8 @@
                       </thead>
                       <tbody>
                         <tr v-for="(job,index) in officer.job_backgrounds.filter( (jb) => jb.sector == 1 )" :key="index" >
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( job.start ) , 'dd-mm-yyyy' ) ) }}</td>
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( job.end ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( job.start ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( job.end ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( job.organization ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( job.position ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( job.skill_of_position ) }}</td>
@@ -513,13 +516,13 @@
                       </thead>
                       <tbody>
                         <tr v-for="(rank , index) in officer.ranking_by_workings " :key="index" >
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( rank.date ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( rank.date ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ rank.organization }}</td>
                           <td class="border-b border-gray-100" >{{ rank.sub_organization }}</td>
                           <td class="border-b border-gray-100" >{{ rank.sub_sub_organization }}</td>
-                          <td class="border-b border-gray-100" >{{ rank.previous_rank.name }}</td>
-                          <td class="border-b border-gray-100" >{{ rank.rank.name }}</td>
-                          <td class="border-b border-gray-100" >{{ changeTypes.find( (t) => t.key == rank.changing_type ).label }}</td>
+                          <td class="border-b border-gray-100" >{{ rank.previous_rank != null ? rank.previous_rank.name : '' }}</td>
+                          <td class="border-b border-gray-100" >{{ rank.rank != null ? rank.rank.name : '' }}</td>
+                          <td class="border-b border-gray-100" >{{ changeTypes.find( (t) => t.key == rank.changing_type ) != null ? changeTypes.find( (t) => t.key == rank.changing_type ).label : '' }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -541,12 +544,12 @@
                       </thead>
                       <tbody>
                         <tr v-for="(rank , index) in officer.ranking_by_certificates " :key="index" >
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( rank.date ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( rank.date ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ rank.organization }}</td>
                           <td class="border-b border-gray-100" >{{ rank.location }}</td>
                           <td class="border-b border-gray-100" >{{ rank.certificate }}</td>
-                          <td class="border-b border-gray-100" >{{ rank.previous_rank.name }}</td>
-                          <td class="border-b border-gray-100" >{{ rank.rank.name }}</td>
+                          <td class="border-b border-gray-100" >{{ rank.previous_rank != null ? rank.previous_rank.name : '' }}</td>
+                          <td class="border-b border-gray-100" >{{ rank.rank != null ? rank.rank.name : '' }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -566,8 +569,8 @@
                       </thead>
                       <tbody>
                         <tr v-for="(work , index) in officer.pending_works.filter( (w) => w.type == 0 ) " :key="index" >
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( work.start ) , 'dd-mm-yyyy' ) ) }}</td>
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( work.end ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( work.start ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( work.end ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( work.organization ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( work.position ) }}</td>
                         </tr>
@@ -589,8 +592,8 @@
                       </thead>
                       <tbody>
                         <tr v-for="(work , index) in officer.pending_works.filter( (w) => w.type == 1 ) " :key="index" >
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( work.start ) , 'dd-mm-yyyy' ) ) }}</td>
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( work.end ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( work.start ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( work.end ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( work.organization ) }}</td>
                           <td class="border-b border-gray-100" >{{ $toKhmer( work.total_months ) }}</td>
                         </tr>
@@ -624,7 +627,7 @@
                       <tbody>
                         <tr v-for="(medal , index) in officer.medal_histories " :key="index" >
                           <td class="border-b border-gray-100" >{{ $toKhmer( medal.fid ) }}</td>
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( medal.date ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( medal.date ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ medal.organization }}</td>
                           <td class="border-b border-gray-100" >{{ medal.desp }}</td>
                           <td class="border-b border-gray-100" >{{ medal.type }}</td>
@@ -649,7 +652,7 @@
                       <tbody>
                         <tr v-for="(penalty , index) in officer.panelty_histories " :key="index" >
                           <td class="border-b border-gray-100" >{{ $toKhmer( penalty.fid ) }}</td>
-                          <td class="border-b border-gray-100" >{{ $toKhmer( dateFormat( new Date( penalty.date ) , 'dd-mm-yyyy' ) ) }}</td>
+                          <td class="border-b border-gray-100" >{{ $toKhmer( formatDateSafe( penalty.date ) ) }}</td>
                           <td class="border-b border-gray-100" >{{ penalty.organization }}</td>
                           <td class="border-b border-gray-100" >{{ penalty.desp }}</td>
                           <td class="border-b border-gray-100" >{{ penalty.type }}</td>
@@ -703,13 +706,20 @@
         </div>
         <div class="w-full relative h-60" >
           <div class="absolute left-0 top-0 w-80" >
-            <p class="indent-4 leading-6 text-justify " ><span class="text-red-500 mr-1 " >*</span>អង្គភាព {{ officer.organization.name }}</p>
-            <p class="indent-4 leading-6 text-justify ">ខ្ញុំសូមធានាទទួលខុសត្រូវចំពោះមុខច្បាប់ថា ព័ត៌មាន រូបថត និងហត្ថលេខា ក្នុងជីវប្រវត្តិ{{ officer_type_name }}នេះ ពិតជារបស់ <span class="font-moul" >{{ officer.people.lastname + ' ' + officer.people.firstname }}</span> ដែលជាមន្ត្រីកំពុងបំរើការងារនៅក្នុងក្រសួង និងអង្គភាពក្រោមឪវាទរបស់ក្រសួងពិតប្រាកដមែន។</p>
+            <p class="indent-4 leading-6 text-justify " ><span class="text-red-500 mr-1 " >*</span>អង្គភាព {{ officer.organization != null ? officer.organization.name : '' }}</p>
+            <p class="indent-4 leading-6 text-justify ">ខ្ញុំសូមធានាទទួលខុសត្រូវចំពោះមុខច្បាប់ថា ព័ត៌មាន រូបថត និងហត្ថេខ្ជា ក្នុងជីវប្រវត្តិ{{ officer_type_name }}នេះ ពិតជារបស់ <span class="font-moul" >{{ officer.people.lastname + ' ' + officer.people.firstname }}</span> ដែលជាមន្ត្រីកំពុងបំរើការងារនៅក្នុងក្រសួង និងអង្គភាពក្រោមឪវាទរបស់ក្រសួងពិតប្រាកដមែន។</p>
+            <p class="text-center leading-6 whitespace-nowrap" >ថ្ងៃ <span class="signature-date-line"></span> ទី <span class="signature-date-line"></span> ខែ <span class="signature-date-line signature-date-line-month"></span> ឆ្នាំ <span class="signature-date-line signature-date-line-year"></span> ព.ស. {{ $toKhmer(String(today.getFullYear() + 543)) }}</p> 
+            <p class="text-center leading-6 " ><span class="signature-date-line signature-date-line-place"></span> ថ្ងៃទី <span class="signature-date-line"></span> ខែ <span class="signature-date-line signature-date-line-month"></span> ឆ្នាំ {{ $toKhmer(today.getFullYear()) }}</p>
+            <p class="text-center leading-6 font-moul mt-10" >ប្រធាននាយកដ្ឋាន</p>
           </div>
-          <div class="absolute right-0 top-0 w-80" >
+          <div class="absolute right-0 top-0 w-80 overflow-visible" >
             <p class="indent-4 leading-6 text-justify " ><span class="text-red-500 mr-1 " >*</span>សាមីខ្លួន</p>
             <p class="indent-4 leading-6 text-justify ">ខ្ញុំសូមធានាទទួលខុសត្រូវចំពោះមុខច្បាប់ ព័ត៌មានបានបំពេញក្នុងជីវប្រវត្តិនេះ ពិតជាត្រឹមត្រូវប្រាកដមែន។</p>
-            <p class="text-center mt-48" ><span class="font-moul" >{{ 
+            <div class="signature-date-lines-wrap">
+              <p class="text-center leading-6 whitespace-nowrap" >ថ្ងៃ {{ signatureDates.weekday }} ទី {{ signatureDates.day }} ខែ {{ signatureDates.month }} ឆ្នាំ {{ signatureDates.year || '' }} ព.ស. {{ $toKhmer(String(today.getFullYear() + 543)) }}</p>
+              <p class="text-center leading-6 " >{{ signatureDates.place || 'រាជធានីភ្នំពេញ' }} ថ្ងៃទី {{ signatureDates.day2 }} ខែ {{ signatureDates.month2 }} ឆ្នាំ {{ signatureDates.year2 ? $toKhmer(signatureDates.year2) : '' }}</p>
+            </div>
+            <p class="text-center mt-20" ><span class="font-moul" >{{ 
             // ( officer.countesy != undefined && officer.countesy != null ? officer.countesy.name + ' ' : '' ) + 
             officer.people.lastname + ' ' + officer.people.firstname }}</span></p>
           </div>
@@ -719,13 +729,14 @@
   </div>    
 </template>
 <script >
-import { ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter , useRoute } from 'vue-router'
 import { useNotification } from 'naive-ui'
 import ocmLogoUrl from '@assets/logo.svg'
 import pkachan from '@assets/pkachan.png'
 import dateFormat from 'dateformat'
+import { getKhmerDateParts } from '@utils/khmerLunar'
   export default {
       components: {
       },
@@ -736,10 +747,50 @@ import dateFormat from 'dateformat'
           const notify = useNotification()
           const officer = ref(null)
           const today = ref( new Date() )
+          const todayKhLunarText = ref('')
+          
+          function formatDateSafe(value) {
+            if (value == null || value === '') return ''
+            const d = new Date(value)
+            if (Number.isNaN(d.getTime())) return ''
+            try {
+              return dateFormat(d, 'dd-mm-yyyy')
+            } catch (e) {
+              return ''
+            }
+          }
+          let signatureDates = reactive({
+            weekday: '',
+            day: '',
+            month: '',
+            year: '',
+            place: '',
+            day2: '',
+            month2: '',
+            year2: ''
+          })
+
+          onMounted(() => {
+            todayKhLunarText.value = getKhmerDateParts(today.value).headerText
+          })
+          try {
+            const raw = localStorage.getItem('officerPrintSignatureDates')
+            if (raw) {
+              const parsed = JSON.parse(raw)
+              signatureDates.weekday = parsed.weekday != null ? String(parsed.weekday) : ''
+              signatureDates.day = parsed.day != null ? String(parsed.day) : ''
+              signatureDates.month = parsed.month != null ? String(parsed.month) : ''
+              signatureDates.year = parsed.year != null ? String(parsed.year) : ''
+              signatureDates.place = parsed.place != null ? String(parsed.place) : ''
+              signatureDates.day2 = parsed.day2 != null ? String(parsed.day2) : ''
+              signatureDates.month2 = parsed.month2 != null ? String(parsed.month2) : ''
+              signatureDates.year2 = parsed.year2 != null ? String(parsed.year2) : ''
+            }
+          } catch (e) {}
 
           if( parseInt( route.params.id ) <= 0 ){
             notify.warning({
-              title: 'បោះពុម្ភប្រវត្តិរូបមន្ត្រី' ,
+              title: 'បោះពុម្ពប្រវត្តិរូបមន្ត្រី' ,
               content: 'សូមបញ្ជាក់លេខមន្ត្រី។'
             })
             return false
@@ -756,7 +807,7 @@ import dateFormat from 'dateformat'
               },
               {
                   key : 2 ,
-                  label: 'ប្ដូរប្រភេទក្របខណ្ឌ' 
+                  label: 'ប្ដូរប្រភេទក្របខ័ណ្ឌ' 
               },
               {
                   key : 4 ,
@@ -797,8 +848,11 @@ import dateFormat from 'dateformat'
 
           return {
               today ,
+              todayKhLunarText ,
               officer ,
+              signatureDates ,
               dateFormat ,
+              formatDateSafe ,
               changeTypes ,
               ocmLogoUrl ,
               pkachan ,
@@ -825,4 +879,24 @@ import dateFormat from 'dateformat'
   table.inside tr td , table.inside tr th  {
     padding: 10px 5px ; 
   }
+  table.inside {
+    border-collapse: collapse;
+  }
+  table.inside th,
+  table.inside td {
+    border: 1px solid #000000;
+  }
+  table.inside td.border-b,
+  table.inside th.border-b {
+    border: 1px solid #000000;
+  }
+  .signature-date-line {
+    display: inline-block;
+    min-width: 5em;
+    border-bottom: 1px dotted #333;
+    vertical-align: bottom;
+  }
+  .signature-date-line-month { min-width: 5em; }
+  .signature-date-line-year { min-width: 7em; }
+  .signature-date-line-place { min-width: 7em; }
 </style>

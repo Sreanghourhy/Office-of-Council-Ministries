@@ -562,17 +562,23 @@ export default {
     const dob = ref( null )
     dob.value = props.record.people.dob != '' && props.record.people.dob != undefined
     ? (new Date( props.record.people.dob )).getTime()
-    : (new Date()).getTime()
+    : null
 
     const official_date = ref( null )
     official_date.value = props.record.official_date != '' && props.record.official_date != undefined
     ? (new Date( props.record.official_date )).getTime()
-    : (new Date()).getTime()
+    : null
 
     const unofficial_date = ref( null )
     unofficial_date.value = props.record.unofficial_date != '' && props.record.unofficial_date != undefined
     ? (new Date( props.record.unofficial_date )).getTime()
-    : (new Date()).getTime()
+    : null
+
+    function formatDateOrNull( value ){
+      return value != null && value != undefined && value !== ''
+        ? dateFormat( new Date( value ) , "yyyy-mm-dd" )
+        : null
+    }
 
     /**
      * Variables
@@ -671,10 +677,8 @@ export default {
 
     function create(){
       if( 
-        props.record.people.lastname == "" || 
-        props.record.people.firstname == "" ||
-        props.record.people.enlastname == "" || 
-        props.record.people.enfirstname == "" 
+        props.record.people.lastname.trim() == "" || 
+        props.record.people.firstname.trim() == ""
       ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
@@ -683,7 +687,7 @@ export default {
         })
         return false
       }
-      if( 
+      if( false && 
         props.record.people.mobile_phone == "" && props.record.people.email == ""
       ){
         notify.warning({
@@ -693,7 +697,7 @@ export default {
         })
         return false
       }
-      if( parseInt( selectedOrganization.value ) <= 0 ){
+      if( false && parseInt( selectedOrganization.value ) <= 0 ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមជ្រើសរើសអង្គភាព' ,
@@ -701,12 +705,13 @@ export default {
         })
       }
       
-      if( parseInt( selectedOrganizationStructurePosition.value) <= 0 ){
+      if( false && parseInt( selectedOrganizationStructurePosition.value) <= 0 ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមជ្រើសរើសតួនាទី' ,
           duration: 2000
         })
+        return false
       }
       // if( parseInt( selectedPosition.value) <= 0 ){
       //   notify.warning({
@@ -716,7 +721,7 @@ export default {
       //   })
       // }
 
-      if( props.record.people.mobile_phone == "" && props.record.people.email == "" ){
+      if( false && props.record.people.mobile_phone == "" && props.record.people.email == "" ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមបំពេញ លេខទូរសព្ទផ្ទាល់ខ្លួន ឬ អ៉ីមែល' ,
@@ -724,7 +729,7 @@ export default {
         })
         return false
       }
-      if( props.record.code == "" ){
+      if( false && props.record.code == "" ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមបំពេញលេខសម្គាល់មន្ត្រី' ,
@@ -732,7 +737,7 @@ export default {
         })
         return false
       }
-      if( props.record.people.nid == "" ){
+      if( false && props.record.people.nid == "" ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមបំពេញលេខអត្តសញ្ញាណបណ្ណសញ្ជាតិខ្មែរ' ,
@@ -740,12 +745,12 @@ export default {
         })
         return false
       }
-      if( 
+      if( false && (
         selectedAnk.value == "" || selectedAnk.value == null ||
         selectedKrobKhan.value == "" || selectedKrobKhan.value == null ||
         selectedRank.value == "" || selectedRank.value == null ||
         selectedThnak.value == "" || selectedThnak.value == null
-      ){
+      )){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមបំពេញព័ត៌មានពីក្របខ័ណ្ឌអោយបានពេញលេញ។' ,
@@ -762,17 +767,17 @@ export default {
         return false
       }
       
-      props.record.people.dob = dob.value != null && parseInt( dob.value ) > 0 ? dateFormat( new Date(dob.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" )
+      props.record.people.dob = formatDateOrNull( dob.value )
 
       store.dispatch( props.model.name+'/create',
         {
           'id' : props.record.id ,
-          'official_date' : official_date.value != null && parseInt( official_date.value ) > 0 ? dateFormat( new Date(official_date.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" ) ,
-          'unofficial_date' : unofficial_date.value != null && parseInt( unofficial_date.value ) > 0 ? dateFormat( new Date(unofficial_date.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" ) ,
+          'official_date' : formatDateOrNull( official_date.value ) ,
+          'unofficial_date' : formatDateOrNull( unofficial_date.value ) ,
           'organization_id' : selectedOrganization.value != null ? selectedOrganization.value : 0 ,
           'position_id' : parseInt( selectedPosition.value ) > 0 ? selectedPosition.value : 0 ,
           'unofficial_position_id' : parseInt( selectedUnofficialPosition.value ) > 0 ? selectedUnofficialPosition.value : 0 ,
-          'organization_structure_position_id' : selectedOrganizationStructurePosition.value != null ? selectedOrganizationStructurePosition.value : 0 ,
+          'organization_structure_position_id' : parseInt( selectedOrganizationStructurePosition.value ) > 0 ? selectedOrganizationStructurePosition.value : 0 ,
           'countesy_id' : selectedCountesies.value != null ? selectedCountesies.value[0] : 0 ,
           'officer_passport' : props.record.officer_passport ,
           'officer_email' : props.record.officer_email ,
@@ -790,7 +795,7 @@ export default {
           'email' : props.record.people.email ,
           'mobile_phone' : props.record.people.mobile_phone ,
           'office_phone' : props.record.people.office_phone ,
-          'dob' : dob.value != null ? dateFormat( new Date(dob.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" ) ,
+          'dob' : formatDateOrNull( dob.value ) ,
           'nid' : props.record.people.nid ,
           'passport' : props.record.people.passport ,
           'marry_status' : props.record.people.marry_status ,
@@ -808,10 +813,10 @@ export default {
           'pob_district_id' : parseInt( props.record.people.pob_district_id ) ,
           'pob_commune_id' : parseInt( props.record.people.pob_commune_id ) ,
           'pob_village_id' : parseInt( props.record.people.pob_village_id ) ,
-          'ank' : selectedAnk.value ,
-          'krobkhan' : selectedKrobKhan.value ,
-          'rank' : selectedRank.value ,
-          'thnak' : selectedThnak.value
+          'ank' : selectedAnk.value != null ? selectedAnk.value : '' ,
+          'krobkhan' : selectedKrobKhan.value != null ? selectedKrobKhan.value : '' ,
+          'rank' : selectedRank.value != null ? selectedRank.value : '' ,
+          'thnak' : selectedThnak.value != null ? selectedThnak.value : ''
         }
       ).then( res => {
         if( res.data.ok ){
@@ -829,9 +834,12 @@ export default {
           })
         }
       }).catch( err => {
-        message.error( err )
+        notify.error({
+          title: 'Save Officer' ,
+          description: err?.response?.data?.message ? err.response.data.message : ( err?.message ? err.message : 'There was a problem while saving the officer.' ) ,
+          duration: 3000
+        })
       })
-      clearRecord( 0 )
     }
     
     const selectedOrganizationStructurePosition = ref(null)
@@ -879,14 +887,23 @@ export default {
     const selectedKrobKhan = ref(null)
     const selectedRank = ref(null)
     const ranks = ref([])
+    function createEmptyThnaks(){
+      return {
+        key: '' ,
+        options: []
+      }
+    }
     function updateKrobKhan(){
       selectedKrobKhan.value = null
       selectedRank.value = null
       selectedThnak.value = null 
+      ranks.value = []
+      thnaks.value = createEmptyThnaks()
       let v = anks.value.find( ( v ) => v.ank == selectedAnk.value )
       if( v != undefined ){
-        krobkhans.value = v.krobkhans
+        krobkhans.value = Array.isArray( v.krobkhans ) ? v.krobkhans : []
       }else{
+        krobkhans.value = []
         notify.info({
           title: 'ព័ត៌មានក្របខ័ណ្ឌ' ,
           content : 'មិនមានព័ត៌មានក្របខ័ណ្ឌក្នុងវិស័យនេះ'  ,
@@ -922,7 +939,8 @@ export default {
       selectedRank.value = null
       selectedThnak.value = null 
       ranks.value = []
-      if( krobkhans.value.length > 0 ){
+      thnaks.value = createEmptyThnaks()
+      if( Array.isArray( krobkhans.value ) && krobkhans.value.length > 0 ){
         for( let i in krobkhans.value ){
           // if( krobkhans.value[i].krobkhan + "." + krobkhans.value[i].krobkhan_name == selectedKrobKhan.value ){
           if( krobkhans.value[i].krobkhan == selectedKrobKhan.value ){
@@ -944,14 +962,11 @@ export default {
       }
     }
     const selectedThnak = ref(null)
-    const thnaks = ref({
-      key: '' ,
-      options: []
-    })
+    const thnaks = ref(createEmptyThnaks())
     function updateThnaks(){
       selectedThnak.value = null 
-      thnaks.value = []
-      if( krobkhans.value.length > 0 ){
+      thnaks.value = createEmptyThnaks()
+      if( Array.isArray( krobkhans.value ) && krobkhans.value.length > 0 ){
         for( let i in krobkhans.value ){
           // if( krobkhans.value[i].krobkhan + "." + krobkhans.value[i].krobkhan_name == selectedKrobKhan.value ){
           if( krobkhans.value[i].krobkhan == selectedKrobKhan.value ){
@@ -984,8 +999,7 @@ export default {
       }
     }
     const thnakOptions = computed( () => {
-      if( thnaks.value.options.length > 0 ){
-        console.log( thnaks.value )
+      if( Array.isArray( thnaks.value.options ) && thnaks.value.options.length > 0 ){
         return thnaks.value.options
       }else{
         return [ { label: 'មិនមានថ្នាក់' , value : 0 } ]

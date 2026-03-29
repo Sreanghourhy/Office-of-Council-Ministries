@@ -6,11 +6,35 @@ export const authLogout = () => {
     console.log(error)
   }
 }
+const hasExpiredToken = (token) => {
+  if (!token || !token.access_token || !token.token_type) {
+    return true
+  }
+
+  if (!token.expires_at) {
+    return false
+  }
+
+  const expiresAt = new Date(token.expires_at)
+  if (Number.isNaN(expiresAt.getTime())) {
+    return false
+  }
+
+  return expiresAt < new Date()
+}
 export const isAuth = () => {
   try {
-    if( getAuthorization() != false && getUser() != null ){
+    const token = getToken()
+    const user = getUser()
+
+    if( user != null && !hasExpiredToken(token) ){
       return true
     }
+
+    if( token != null || user != null ){
+      authLogout()
+    }
+
     return false
   } catch (error) {
     console.log(error)
@@ -25,7 +49,16 @@ export const getToken = () => {
 }
 export const getAuthorization = () => {
   try {
-    return getToken() != null ? ( getToken().token_type + ' ' + getToken().access_token ) : false
+    const token = getToken()
+
+    if( hasExpiredToken(token) ){
+      if( token != null ){
+        authLogout()
+      }
+      return false
+    }
+
+    return token.token_type + ' ' + token.access_token
   } catch (error) {
     console.log(error)
   }
@@ -46,7 +79,8 @@ export const getAccessTokenType = () => {
 }
 export const getExpiresAt = () => {
   try {
-    return getToken().expires_at
+    const token = getToken()
+    return token != null ? token.expires_at : null
   } catch (error) {
     console.log(error)
   }

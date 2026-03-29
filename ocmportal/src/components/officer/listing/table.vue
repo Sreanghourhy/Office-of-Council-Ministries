@@ -78,6 +78,7 @@
             type="text"
             class="table-search-input"
             placeholder="Search for staff"
+            @input="filterRecords(false)"
             @keyup.enter="filterRecords(false)"
           />
         </div>
@@ -656,20 +657,19 @@ export default {
 
     function filterRecords(helper = true) {
       if (helper) {
-        table.records.matched = []
-        if (table.search !== '') {
-          for (const index in table.records.all) {
-            for (const field in table.records.all[index]) {
-              if ((`${table.records.all[index][field]}`).includes(table.search) !== false) {
-                table.records.matched.push(table.records.all[index])
-                break
-              }
-            }
-          }
+        if (table.search === '') {
+          table.records.matched = table.records.all
+          return
         }
 
-        if (table.records.matched.length <= 0) {
-          table.records.matched = table.records.all
+        table.records.matched = []
+        for (const index in table.records.all) {
+          for (const field in table.records.all[index]) {
+            if ((`${table.records.all[index][field]}`).includes(table.search) !== false) {
+              table.records.matched.push(table.records.all[index])
+              break
+            }
+          }
         }
         return
       }

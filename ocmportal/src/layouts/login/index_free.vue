@@ -67,7 +67,7 @@
   </div>
 </template>
 <script>
-import { getUser } from '@plugins/authentication'
+import { isAuth } from '@plugins/authentication'
 import { getMaxUploadFilesize, setMaxUploadFilesize } from '@plugins/file'
 import { getRoutes } from '@plugins/route'
 import FooterComponent from '@components/footer/copy-right.vue'
@@ -92,8 +92,8 @@ export default {
     const message = useMessage()
     const toggleLoginForm = ref(false)
 
-    if( getUser() !== undefined && getUser() !== null ){
-      router.push('/search')  
+    if( isAuth() ){
+      router.push('/')  
     }
     
     /**

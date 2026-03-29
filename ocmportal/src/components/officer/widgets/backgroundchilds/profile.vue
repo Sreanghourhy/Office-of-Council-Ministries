@@ -482,8 +482,25 @@ export default {
             return Number.isNaN(parsed) ? null : parsed
         }
 
+        const KHMER_DIGIT_MAP = {
+            '០': '0',
+            '១': '1',
+            '២': '2',
+            '៣': '3',
+            '៤': '4',
+            '៥': '5',
+            '៦': '6',
+            '៧': '7',
+            '៨': '8',
+            '៩': '9'
+        }
+
+        function toLatinDigits(value) {
+            return String(value ?? '').replace(/[០-៩]/g, (digit) => KHMER_DIGIT_MAP[digit] || digit)
+        }
+
         function sanitizeDigits(value) {
-            return String(value ?? '').replace(/\D+/g, '')
+            return toLatinDigits(value).replace(/\D+/g, '')
         }
 
         function sanitizeUppercaseLetters(value) {
@@ -1257,13 +1274,37 @@ export default {
                 const normalizedProvinceId = normalizeNullableNumber(birthCertData.province_id)
                 const normalizedDistrictId = normalizeNullableNumber(birthCertData.district_id)
                 const normalizedCommuneId = normalizeNullableNumber(birthCertData.commune_id)
+                const normalizedBirthNumber = sanitizeDigits(birthCertData.birth_number)
+                const normalizedBookNumber = sanitizeDigits(birthCertData.book_number)
+                const hasBirthCertContent = [
+                    normalizedBirthNumber,
+                    normalizedBookNumber,
+                    birthCertData.year,
+                    birthCertData.issued_date,
+                    normalizedProvinceId,
+                    normalizedDistrictId,
+                    normalizedCommuneId,
+                    birthCertData.pdf,
+                    birthCertFile.value
+                ].some((value) => value !== null && value !== undefined && value !== '')
+
                 birthCertData.province_id = normalizedProvinceId
                 birthCertData.district_id = normalizedDistrictId
                 birthCertData.commune_id = normalizedCommuneId
+                birthCertData.birth_number = normalizedBirthNumber
+                birthCertData.book_number = normalizedBookNumber
+
+                if (!existingBirthCertId && !hasBirthCertContent) {
+                    if (markSavedAfterSuccess) {
+                        markSaved()
+                    }
+                    return true
+                }
+
                 const payload = {
                     people_id: birthCertData.people_id,
-                    birth_number: birthCertData.birth_number,
-                    book_number: birthCertData.book_number,
+                    birth_number: normalizedBirthNumber,
+                    book_number: normalizedBookNumber,
                     year: birthCertData.year ? dateFormat(new Date(birthCertData.year), 'yyyy-mm-dd') : null,
                     issued_date: birthCertData.issued_date ? dateFormat(new Date(birthCertData.issued_date), 'yyyy-mm-dd') : null,
                     province_id: normalizedProvinceId,

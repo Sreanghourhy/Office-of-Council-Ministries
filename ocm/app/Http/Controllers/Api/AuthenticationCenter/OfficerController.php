@@ -399,19 +399,23 @@ class OfficerController extends Controller
         // $builder->doesntHave('jobs');
         // $builder->whereHas('jobs');
 
-        
-        $builder->whereHas('jobs',function($jobQuery) use( $organizations , $positions ) {
-            $jobQuery->whereHas('organizationStructurePosition',function($positionQuery)  use( $organizations , $positions ){
-                if( is_array( $positions ) && !empty( $positions ) ){
-                    $positionQuery->whereIn('position_id', $positions );
-                }
-                if( is_array( $organizations ) && !empty( $organizations ) ){
-                    $positionQuery->whereHas('organizationStructure',function($query) use($organizations){
-                        $query->whereIn('organization_id',$organizations);
-                    });
-                }
+        if(
+            ( is_array( $positions ) && !empty( $positions ) ) ||
+            ( is_array( $organizations ) && !empty( $organizations ) )
+        ){
+            $builder->whereHas('jobs',function($jobQuery) use( $organizations , $positions ) {
+                $jobQuery->whereHas('organizationStructurePosition',function($positionQuery)  use( $organizations , $positions ){
+                    if( is_array( $positions ) && !empty( $positions ) ){
+                        $positionQuery->whereIn('position_id', $positions );
+                    }
+                    if( is_array( $organizations ) && !empty( $organizations ) ){
+                        $positionQuery->whereHas('organizationStructure',function($query) use($organizations){
+                            $query->whereIn('organization_id',$organizations);
+                        });
+                    }
+                });
             });
-        });
+        }
 
         /**
          * Filter the officers to get only the officer that is not admin and super admin
@@ -550,16 +554,11 @@ class OfficerController extends Controller
      */
     public function storeOfficer(Request $request){
         $validated = $request->validate([
-            // 'code' => 'required|unique:officers|max:50',
-            'organization_structure_position_id' => 'required',
-            // 'nid' => 'required|unique:people|max:50' ,
-            // 'organization_id' => 'required',
-            // 'position_id' => 'required',
-            'firstname' => 'required' ,
-            'lastname' => 'required' ,
-            'enfirstname' => 'required' ,
-            'enlastname' => 'required'
+            'firstname' => 'required',
+            'lastname' => 'required'
         ]);
+
+        $dob = $this->optionalDate($request->dob);
 
 
         // Check the ranking of the officer
@@ -583,17 +582,14 @@ class OfficerController extends Controller
         $position = $organizationStructurePosition != null && $organizationStructurePosition->position != null ? $organizationStructurePosition->position : null ;
         $organization = $organizationStructurePosition != null && $organizationStructurePosition->organizationStructure != null && $organizationStructurePosition->organizationStructure->organization != null ? $organizationStructurePosition->organizationStructure->organization : null ;
 
-        $peopleWhereConditions = [
-            'nid' => $request->nid ,
-            'firstname' => $request->firstname ,
-            'lastname' => $request->lastname ,
-            'enfirstname' => $request->enfirstname ,
-            'enlastname' => $request->enlastname ,
-            'dob' => \Carbon\Carbon::parse( $request->dob )->format('Y-m-d')
-        ];
-        if( strlen( $request->mobile_phone ) > 0 ) $peopleWhereConditions['mobile_phone'] = $request->mobile_phone ;
-        if( strlen( $request->email ) > 0 ) $peopleWhereConditions['mobile_phone'] = $request->email ;
-        $people = \App\Models\People\People::where( $peopleWhereConditions )->first();
+        if( false && $organizationStructurePosition == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមជ្រើសរើសមុខតំណែង'
+            ], 422);
+        }
+
+        $people = $this->findExistingPeople($request, $dob);
 
         if( $people != null && $people->officer != null ){
             
@@ -615,37 +611,37 @@ class OfficerController extends Controller
                     $request->enfirstname . 
                     $request->enlastname . 
                     $request->gender .
-                    \Carbon\Carbon::parse( $request->dob )->format( 'Y-m-d' ) .
+                    ( $dob ?? '' ) .
                     $request->nid .
                     $request->mobile_phone .
                     $request->office_phone
                 ) ,
                 'firstname' => $request->firstname , 
                 'lastname' => $request->lastname , 
-                'enfirstname' => $request->enfirstname , 
-                'enlastname' => $request->enlastname , 
+                'enfirstname' => $this->normalizeInput($request->enfirstname) , 
+                'enlastname' => $this->normalizeInput($request->enlastname) , 
                 'gender' => $request->gender , 
-                'dob' => \Carbon\Carbon::parse( $request->dob )->format('Y-m-d') ,
-                'nid' => $request->nid , 
+                'dob' => $dob ,
+                'nid' => $this->normalizeInput($request->nid) , 
                 'marry_status' => $request->marry_status , 
-                'mobile_phone' => $request->mobile_phone ?? '' , 
-                'office_phone' => $request->office_phone ,
-                'email' => $request->email ?? '' ,
-                'body_condition' => $request->people['body_condition']?? 0 ,
-                'body_condition_desp' => $request->people['body_condition_desp']??'' ,
-                'nationality' => $request->people['nationality'] ?? '' ,
-                'national' => $request->people['national'] ?? '' ,
-                'address' => $request->address ?? '' ,
+                'mobile_phone' => $this->normalizeInput($request->mobile_phone) , 
+                'office_phone' => $this->normalizeInput($request->office_phone) ,
+                'email' => $this->normalizeInput($request->email) ,
+                'body_condition' => intval( $request->body_condition ) > 0 ? intval( $request->body_condition ) : 0 ,
+                'body_condition_desp' => $this->normalizeInput($request->body_condition_desp) ,
+                'nationality' => $this->normalizeInput($request->nationality) ,
+                'national' => $this->normalizeInput($request->national) ,
+                'address' => $this->normalizeInput($request->address) ,
                 'address_province_id' => intval( $request->address_province_id ) > 0 ? intval( $request->address_province_id ) : 0 ,
                 'address_district_id' => intval( $request->address_district_id ) > 0 ? intval( $request->address_district_id ) : 0 ,
                 'address_commune_id' => intval( $request->address_commune_id ) > 0 ? intval( $request->address_commune_id ) : 0 ,
                 'address_village_id' => intval( $request->address_village_id ) > 0 ? intval( $request->address_village_id ) : 0 ,
-                'current_address' => $request->current_address ?? '' ,
+                'current_address' => $this->normalizeInput($request->current_address) ,
                 'current_address_province_id' => intval( $request->current_address_province_id ) > 0 ? intval( $request->current_address_province_id ) : 0 ,
                 'current_address_district_id' => intval( $request->current_address_district_id ) > 0 ? intval( $request->current_address_district_id ) : 0 ,
                 'current_address_commune_id' => intval( $request->current_address_commune_id ) > 0 ? intval( $request->current_address_commune_id ) : 0 ,
                 'current_address_village_id' => intval( $request->current_address_village_id ) > 0 ? intval( $request->current_address_village_id ) : 0 ,
-                'pob' => $request->pob ?? '' ,
+                'pob' => $this->normalizeInput($request->pob) ,
                 'pob_province_id' => intval( $request->pob_province_id ) > 0 ? intval( $request->pob_province_id ) : 0 ,
                 'pob_district_id' => intval( $request->pob_district_id ) > 0 ? intval( $request->pob_district_id ) : 0 ,
                 'pob_commune_id' => intval( $request->pob_commune_id ) > 0 ? intval( $request->pob_commune_id ) : 0 ,
@@ -657,9 +653,9 @@ class OfficerController extends Controller
             ]);
         }
 
-        if( strlen( $request->email ) <= 0 ){
+        if( $this->normalizeInput($request->email) === '' && $this->normalizeInput($people->email) === '' ){
             $people->update([
-                'email' => strtolower( $request->enlastname.'.'.$request->enfirstname.str_pad( $people->id , 3 , '0' , STR_PAD_LEFT ).'@ocm.gov.kh' )
+                'email' => $this->buildGeneratedPeopleEmail($request, $people->id)
             ]);
         }
 
@@ -682,35 +678,36 @@ class OfficerController extends Controller
             'officer_type' => $request->ank?? '' ,
             'additional_officer_type' => $request->additional_officer_type?? '' ,
             'code' => strlen( $request->code ) > 0 ? $request->code : 'OCM-'.str_pad( $people->id.'-'.$people->officers->count() , 6 , '0' , STR_PAD_LEFT ) ,
-            'organization_id' => $organization->id ,
-            'position_id' => $position->id ,
+            'organization_id' => $organization != null ? $organization->id : 0 ,
+            'position_id' => $position != null ? $position->id : 0 ,
             'countesy_id' => $request->countesy_id?? 0  , 
             'rank_id' => $rank_object == null ? 0 : $rank_object->id ,
-            'unofficial_date' => strlen( $request->unofficial_date ) > 0 ? \Carbon\Carbon::parse( $request->unofficial_date )->format('Y-m-d') :\Carbon\Carbon::now()->format( 'Y-m-d' ),
-            'official_date' => strlen( $request->official_date ) > 0 ? \Carbon\Carbon::parse( $request->official_date )->format('Y-m-d') :\Carbon\Carbon::now()->format( 'Y-m-d' ),
+            'unofficial_date' => $this->optionalDate($request->unofficial_date),
+            'official_date' => $this->optionalDate($request->official_date),
             'leader' => 0 ,
-            'phone' => $people->officer_phone ?? $people->mobile_phone ,
-            'passport' => $request->officer_passport ?? '' ,
-            'email' => $request->officer_email ?? $people->email ,
+            'phone' => $this->normalizeInput($request->officer_phone) !== '' ? $this->normalizeInput($request->officer_phone) : $people->mobile_phone ,
+            'passport' => $this->normalizeInput($request->officer_passport) ,
+            'email' => $this->normalizeInput($request->officer_email) !== '' ? $this->normalizeInput($request->officer_email) : $people->email ,
             'created_by' => $user == null ? 0 : $user->id ,
             'updated_by' => $user == null ? 0 : $user->id ,
             'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
             'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
         ]);
 
-        
-        $officer->jobs()->create([
-            'organization_structure_position_id' => $organizationStructurePosition->id ,
-            'unofficial_position_id' => $unOfficialPosition == null ? 0 : $unOfficialPosition->id ,
-            'officer_id' => $officer->id ,
-            'countesy_id' => $request->countesy_id?? 0  , 
-            'start' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            'end' => null ,
-            'created_by' => $user == null ? 0 : $user->id ,
-            'updated_by' => $user == null ? 0 : $user->id ,
-            'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-        ]);
+        if( $organizationStructurePosition != null ){
+            $officer->jobs()->create([
+                'organization_structure_position_id' => $organizationStructurePosition->id ,
+                'unofficial_position_id' => $unOfficialPosition == null ? 0 : $unOfficialPosition->id ,
+                'officer_id' => $officer->id ,
+                'countesy_id' => $request->countesy_id?? 0  , 
+                'start' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'end' => null ,
+                'created_by' => $user == null ? 0 : $user->id ,
+                'updated_by' => $user == null ? 0 : $user->id ,
+                'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+        }
         
         // $card = $people->cards()->create([
         //     'number' => "OCM-". str_pad( $people->id , 4 , "0" , STR_PAD_LEFT ) ,
@@ -778,16 +775,11 @@ class OfficerController extends Controller
      */
     public function storeNonOfficer(Request $request){
         $validated = $request->validate([
-            // 'nid' => 'required|unique:people|max:50' ,
-            // 'code' => 'required|unique:officers|max:50',
-            'organization_structure_position_id' => 'required',
-            // 'organization_id' => 'required',
-            // 'position_id' => 'required',
-            'firstname' => 'required' ,
-            'lastname' => 'required' ,
-            'enfirstname' => 'required' ,
-            'enlastname' => 'required'
+            'firstname' => 'required',
+            'lastname' => 'required'
         ]);
+
+        $dob = $this->optionalDate($request->dob);
 
         // $validated = $request->validate([
         //     // 'nid' => 'required|unique:people|max:50',
@@ -822,18 +814,14 @@ class OfficerController extends Controller
         $position = $organizationStructurePosition != null && $organizationStructurePosition->position != null ? $organizationStructurePosition->position : null ;
         $organization = $organizationStructurePosition != null && $organizationStructurePosition->organizationStructure != null && $organizationStructurePosition->organizationStructure->organization != null ? $organizationStructurePosition->organizationStructure->organization : null ;
 
-        $peopleWhereConditions = [
-            'nid' => $request->nid ,
-            'firstname' => $request->firstname ,
-            'lastname' => $request->lastname ,
-            'enfirstname' => $request->enfirstname ,
-            'enlastname' => $request->enlastname ,
-            'dob' => \Carbon\Carbon::parse( $request->dob )->format('Y-m-d')
-        ];
-        if( strlen( $request->nid ) > 0 ) $peopleWhereConditions['nid'] = $request->nid ;
-        if( strlen( $request->mobile_phone ) > 0 ) $peopleWhereConditions['mobile_phone'] = $request->mobile_phone ;
-        if( strlen( $request->email ) > 0 ) $peopleWhereConditions['mobile_phone'] = $request->email ;
-        $people = \App\Models\People\People::where( $peopleWhereConditions )->first();
+        if( false && $organizationStructurePosition == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមជ្រើសរើសមុខតំណែង'
+            ], 422);
+        }
+
+        $people = $this->findExistingPeople($request, $dob);
 
         if( $people != null && $people->officer != null ){
             // អ្នកប្រើប្រាស់បានចុះឈ្មោះរួចរាល់ហើយ
@@ -855,23 +843,23 @@ class OfficerController extends Controller
                 $request->enfirstname . 
                 $request->enlastname . 
                 $request->gender .
-                \Carbon\Carbon::parse( $request->dob )->format( 'Y-m-d' ) .
+                ( $dob ?? '' ) .
                 $request->nid .
                 $request->mobile_phone .
                 $request->office_phone
             ) ,
             'firstname' => $request->firstname , 
             'lastname' => $request->lastname , 
-            'enfirstname' => $request->enfirstname , 
-            'enlastname' => $request->enlastname , 
+            'enfirstname' => $this->normalizeInput($request->enfirstname) , 
+            'enlastname' => $this->normalizeInput($request->enlastname) , 
             'gender' => $request->gender , 
-            'dob' => \Carbon\Carbon::parse( $request->dob )->format('Y-m-d') ,
-            'nid' => $request->nid , 
+            'dob' => $dob ,
+            'nid' => $this->normalizeInput($request->nid) , 
             'marry_status' => $request->marry_status , 
-            'mobile_phone' => $request->mobile_phone ?? '' , 
-            'office_phone' => $request->office_phone ,
-            'email' => $request->email ?? '' ,
-            'address' => $request->address ?? '' ,
+            'mobile_phone' => $this->normalizeInput($request->mobile_phone) , 
+            'office_phone' => $this->normalizeInput($request->office_phone) ,
+            'email' => $this->normalizeInput($request->email) ,
+            'address' => $this->normalizeInput($request->address) ,
             'address_province_id' => intval( $request->address_province_id ) > 0 ? intval( $request->address_province_id ) : 0 ,
             'address_district_id' => intval( $request->address_district_id ) > 0 ? intval( $request->address_district_id ) : 0 ,
             'address_commune_id' => intval( $request->address_commune_id ) > 0 ? intval( $request->address_commune_id ) : 0 ,
@@ -881,15 +869,15 @@ class OfficerController extends Controller
             'current_address_district_id' => intval( $request->current_address_district_id ) > 0 ? intval( $request->current_address_district_id ) : 0 ,
             'current_address_commune_id' => intval( $request->current_address_commune_id ) > 0 ? intval( $request->current_address_commune_id ) : 0 ,
             'current_address_village_id' => intval( $request->current_address_village_id ) > 0 ? intval( $request->current_address_village_id ) : 0 ,
-            'pob' => $request->pob ?? '' ,
+            'pob' => $this->normalizeInput($request->pob) ,
             'pob_province_id' => intval( $request->pob_province_id ) > 0 ? intval( $request->pob_province_id ) : 0 ,
             'pob_district_id' => intval( $request->pob_district_id ) > 0 ? intval( $request->pob_district_id ) : 0 ,
             'pob_commune_id' => intval( $request->pob_commune_id ) > 0 ? intval( $request->pob_commune_id ) : 0 ,
             'pob_village_id' => intval( $request->pob_village_id ) > 0 ? intval( $request->pob_village_id ) : 0 ,
-            'body_condition' => $request->body_condition?? 0 ,
-            'body_condition_desp' => $request->body_condition_desp??'' ,
-            'nationality' => $request->nationality?? '' ,
-            'national' => $request->national?? '' ,
+            'body_condition' => intval( $request->body_condition ) > 0 ? intval( $request->body_condition ) : 0 ,
+            'body_condition_desp' => $this->normalizeInput($request->body_condition_desp) ,
+            'nationality' => $this->normalizeInput($request->nationality) ,
+            'national' => $this->normalizeInput($request->national) ,
             'created_by' => $user == null ? 0 : $user->id ,
             'updated_by' => $user == null ? 0 : $user->id ,
             'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
@@ -897,13 +885,13 @@ class OfficerController extends Controller
             ]);
         }
 
-        if( strlen( $request->email ) <= 0 ){
+        if( $this->normalizeInput($request->email) === '' && $this->normalizeInput($people->email) === '' ){
             $people->update([
                 'firstname' => $request->firstname , 
                 'lastname' => $request->lastname , 
-                'enfirstname' => $request->enfirstname , 
-                'enlastname' => $request->enlastname , 
-                'email' => strtolower( $request->enlastname.'.'.$request->enfirstname.str_pad( $people->id , 3 , '0' , STR_PAD_LEFT ).'@ocm.gov.kh' )
+                'enfirstname' => $this->normalizeInput($request->enfirstname) , 
+                'enlastname' => $this->normalizeInput($request->enlastname) , 
+                'email' => $this->buildGeneratedPeopleEmail($request, $people->id)
             ]);
         }
 
@@ -925,35 +913,36 @@ class OfficerController extends Controller
             'officer_type' => $request->officer_type?? '' ,
             'additional_officer_type' => $request->additional_officer_type?? '' ,
             'code' => 'OCM-'.str_pad( $people->id.'-'.$people->officers->count() , 6 , '0' , STR_PAD_LEFT ) ,
-            'organization_id' => $organization->id ,
-            'position_id' => $position->id ,
+            'organization_id' => $organization != null ? $organization->id : 0 ,
+            'position_id' => $position != null ? $position->id : 0 ,
             'countesy_id' => $request->countesy_id?? 0  , 
             'rank_id' => $rank_object == null ? 0 : $rank_object->id ,
-            'unofficial_date' => strlen( $request->unofficial_date ) > 0 ? \Carbon\Carbon::parse( $request->unofficial_date )->format('Y-m-d') :\Carbon\Carbon::now()->format( 'Y-m-d' ),
-            'official_date' => strlen( $request->official_date ) > 0 ? \Carbon\Carbon::parse( $request->official_date )->format('Y-m-d') :\Carbon\Carbon::now()->format( 'Y-m-d' ),
+            'unofficial_date' => $this->optionalDate($request->unofficial_date),
+            'official_date' => $this->optionalDate($request->official_date),
             'leader' => 0 ,
-            'phone' => $people->officer_phone ?? $people->mobile_phone ,
-            'passport' => $request->officer_passport ?? '' ,
-            'email' => $request->officer_email ?? $people->email ,
+            'phone' => $this->normalizeInput($request->officer_phone) !== '' ? $this->normalizeInput($request->officer_phone) : $people->mobile_phone ,
+            'passport' => $this->normalizeInput($request->officer_passport) ,
+            'email' => $this->normalizeInput($request->officer_email) !== '' ? $this->normalizeInput($request->officer_email) : $people->email ,
             'created_by' => $user == null ? 0 : $user->id ,
             'updated_by' => $user == null ? 0 : $user->id ,
             'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
             'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
         ]);
 
-        
-        $officer->jobs()->create([
-            'organization_structure_position_id' => $organizationStructurePosition->id ,
-            'unofficial_position_id' => $unOfficialPosition == null ? 0 : $unOfficialPosition->id ,
-            'officer_id' => $officer->id ,
-            'countesy_id' => $request->countesy_id?? 0  , 
-            'start' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            'end' => null ,
-            'created_by' => $user == null ? 0 : $user->id ,
-            'updated_by' => $user == null ? 0 : $user->id ,
-            'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-        ]);
+        if( $organizationStructurePosition != null ){
+            $officer->jobs()->create([
+                'organization_structure_position_id' => $organizationStructurePosition->id ,
+                'unofficial_position_id' => $unOfficialPosition == null ? 0 : $unOfficialPosition->id ,
+                'officer_id' => $officer->id ,
+                'countesy_id' => $request->countesy_id?? 0  , 
+                'start' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'end' => null ,
+                'created_by' => $user == null ? 0 : $user->id ,
+                'updated_by' => $user == null ? 0 : $user->id ,
+                'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+        }
         
         // $card = $people->cards()->create([
         //     'number' => "OCM-". str_pad( $people->id , 4 , "0" , STR_PAD_LEFT ) ,
@@ -2091,5 +2080,78 @@ class OfficerController extends Controller
                     ];
                 })
         ],200);
+    }
+    private function normalizeInput($value): string
+    {
+        return trim((string) ($value ?? ''));
+    }
+
+    private function optionalDate($value): ?string
+    {
+        $value = $this->normalizeInput($value);
+        return $value !== '' ? \Carbon\Carbon::parse($value)->format('Y-m-d') : null;
+    }
+
+    private function findExistingPeople(Request $request, ?string $dob)
+    {
+        $nid = $this->normalizeInput($request->nid);
+        if ($nid !== '') {
+            return \App\Models\People\People::where('nid', $nid)->first();
+        }
+
+        $email = $this->normalizeInput($request->email);
+        if ($email !== '') {
+            return \App\Models\People\People::where('email', $email)->first();
+        }
+
+        $mobilePhone = $this->normalizeInput($request->mobile_phone);
+        if ($mobilePhone !== '') {
+            return \App\Models\People\People::where('mobile_phone', $mobilePhone)->first();
+        }
+
+        $firstname = $this->normalizeInput($request->firstname);
+        $lastname = $this->normalizeInput($request->lastname);
+        if ($firstname !== '' && $lastname !== '' && $dob !== null) {
+            $query = \App\Models\People\People::where([
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'dob' => $dob,
+            ]);
+
+            $enfirstname = $this->normalizeInput($request->enfirstname);
+            $enlastname = $this->normalizeInput($request->enlastname);
+
+            if ($enfirstname !== '') {
+                $query->where('enfirstname', $enfirstname);
+            }
+
+            if ($enlastname !== '') {
+                $query->where('enlastname', $enlastname);
+            }
+
+            return $query->first();
+        }
+
+        return null;
+    }
+
+    private function buildGeneratedPeopleEmail(Request $request, int $peopleId): string
+    {
+        $fragments = [];
+
+        foreach ([$request->enlastname, $request->enfirstname] as $value) {
+            $fragment = strtolower($this->normalizeInput($value));
+            $fragment = str_replace(' ', '.', $fragment);
+            $fragment = trim((string) preg_replace('/[^a-z0-9.]+/', '', $fragment), '.');
+
+            if ($fragment !== '') {
+                $fragments[] = $fragment;
+            }
+        }
+
+        $suffix = str_pad((string) $peopleId, 3, '0', STR_PAD_LEFT);
+        $localPart = empty($fragments) ? 'person' . $suffix : implode('.', $fragments) . $suffix;
+
+        return $localPart . '@ocm.gov.kh';
     }
 }

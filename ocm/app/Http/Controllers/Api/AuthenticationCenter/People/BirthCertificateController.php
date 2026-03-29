@@ -641,7 +641,7 @@ class BirthCertificateController extends Controller
         }
 
         $normalizeDigits = function( $value ){
-            return preg_replace('/\D+/', '', (string) $value );
+            return preg_replace('/\D+/', '', \App\Utils\Helper::toLnumber( (string) $value ) );
         };
         $normalizeLocationId = function( $value ){
             return intval( $value ) > 0 ? intval( $value ) : 0;
@@ -751,7 +751,7 @@ class BirthCertificateController extends Controller
             : $record->wedding_certificate_id ;
 
         $normalizeDigits = function( $value ){
-            return preg_replace('/\D+/', '', (string) $value );
+            return preg_replace('/\D+/', '', \App\Utils\Helper::toLnumber( (string) $value ) );
         };
         $normalizeLocationId = function( $value ){
             return intval( $value ) > 0 ? intval( $value ) : 0;
@@ -848,8 +848,8 @@ class BirthCertificateController extends Controller
              * Save information of the regulator and its related information
              */
             if( $record->update([
-                'birth_number' => $request->has('birth_number') ? preg_replace('/\D+/', '', (string) ( $request->birth_number ?? '' ) ) : $record->birth_number ,
-                'book_number' => $request->has('book_number') ? preg_replace('/\D+/', '', (string) ( $request->book_number ?? '' ) ) : $record->book_number ,
+                'birth_number' => $request->has('birth_number') ? preg_replace('/\D+/', '', \App\Utils\Helper::toLnumber( (string) ( $request->birth_number ?? '' ) ) ) : $record->birth_number ,
+                'book_number' => $request->has('book_number') ? preg_replace('/\D+/', '', \App\Utils\Helper::toLnumber( (string) ( $request->book_number ?? '' ) ) ) : $record->book_number ,
                 'year' => $request->has('year') ? ( ( isset( $request->year ) && strlen( $request->year ) > 0 ) ? $request->year : \Carbon\Carbon::now()->format('Y') ) : $record->year ,
                 'province_id' => $request->has('province_id') ? ( $request->province_id ?? 0 ) : $record->province_id ,
                 'district_id' => $request->has('district_id') ? ( $request->district_id ?? 0 ) : $record->district_id ,

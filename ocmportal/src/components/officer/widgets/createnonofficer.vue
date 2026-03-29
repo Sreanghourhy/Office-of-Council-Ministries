@@ -549,12 +549,18 @@ export default {
     const dob = ref( null )
     dob.value = props.record.people.dob != '' && props.record.people.dob != undefined
     ? (new Date( props.record.people.dob )).getTime()
-    : (new Date()).getTime()
+    : null
 
     const officer_dob = ref( null )
     officer_dob.value = props.record.officer_dob != '' && props.record.officer_dob != undefined
     ? (new Date( props.record.officer_dob )).getTime()
-    : (new Date()).getTime()
+    : null
+
+    function formatDateOrNull( value ){
+      return value != null && value != undefined && value !== ''
+        ? dateFormat( new Date( value ) , "yyyy-mm-dd" )
+        : null
+    }
 
     /**
      * Variables
@@ -651,10 +657,8 @@ export default {
 
     function create(){
       if( 
-        props.record.people.lastname == "" || 
-        props.record.people.firstname == "" ||
-        props.record.people.enlastname == "" || 
-        props.record.people.enfirstname == "" 
+        props.record.people.lastname.trim() == "" || 
+        props.record.people.firstname.trim() == ""
       ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
@@ -663,7 +667,7 @@ export default {
         })
         return false
       }
-      if( 
+      if( false && 
         props.record.people.mobile_phone == "" && props.record.people.email == ""
       ){
         notify.warning({
@@ -673,7 +677,7 @@ export default {
         })
         return false
       }
-      if( 
+      if( false && 
         props.record.people.nid == ""
       ){
         notify.warning({
@@ -683,21 +687,22 @@ export default {
         })
         return false
       }
-      if( parseInt( selectedOrganization.value ) <= 0 ){
+      if( false && parseInt( selectedOrganization.value ) <= 0 ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមជ្រើសរើសអង្គភាព' ,
           duration: 2000
         })
       }
-      if( parseInt( selectedOrganizationStructurePosition.value) <= 0 ){
+      if( false && parseInt( selectedOrganizationStructurePosition.value) <= 0 ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមជ្រើសរើសតួនាទី' ,
           duration: 2000
         })
+        return false
       }
-      if( props.record.people.mobile_phone == "" && props.record.people.email == "" ){
+      if( false && props.record.people.mobile_phone == "" && props.record.people.email == "" ){
         notify.warning({
           title: 'ពិនិត្យព័ត៌មាន' ,
           description: 'សូមបំពេញ លេខទូរសព្ទផ្ទាល់ខ្លួន ឬ អ៉ីមែល' ,
@@ -714,7 +719,7 @@ export default {
         return false
       }
       
-      props.record.people.dob = dob.value != null && parseInt( dob.value ) > 0 ? dateFormat( new Date(dob.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" )
+      props.record.people.dob = formatDateOrNull( dob.value )
 
       store.dispatch( props.model.name+'/createNonOfficer',
         {
@@ -724,7 +729,7 @@ export default {
           'organization_id' : selectedOrganization.value != null ? selectedOrganization.value : 0 ,
           'position_id' : selectedPosition.value != null ? selectedPosition.value : 0 ,
           'unofficial_position_id' : parseInt( selectedUnofficialPosition.value ) > 0 ? selectedUnofficialPosition.value : 0 ,
-          'organization_structure_position_id' : selectedOrganizationStructurePosition.value != null ? selectedOrganizationStructurePosition.value : 0 ,
+          'organization_structure_position_id' : parseInt( selectedOrganizationStructurePosition.value ) > 0 ? selectedOrganizationStructurePosition.value : 0 ,
           'countesy_id' : selectedCountesies.value != null ? selectedCountesies.value[0] : 0 ,
           'officer_passport' : props.record.officer_passport ,
           'salary_rank' : props.record.salary_rank ,
@@ -741,7 +746,7 @@ export default {
           'email' : props.record.people.email ,
           'mobile_phone' : props.record.people.mobile_phone ,
           'office_phone' : props.record.people.office_phone ,
-          'dob' : dob.value != null ? dateFormat( new Date(dob.value) , "yyyy-mm-dd" ) : dateFormat( new Date() , "yyyy-mm-dd" ) ,
+          'dob' : formatDateOrNull( dob.value ) ,
           'nid' : props.record.people.nid ,
           'passport' : props.record.people.passport ,
           'marry_status' : props.record.people.marry_status ,
@@ -790,9 +795,12 @@ export default {
           })
         }
       }).catch( err => {
-        message.error( err )
+        notify.error({
+          title: 'Save Non-Officer' ,
+          description: err?.response?.data?.message ? err.response.data.message : ( err?.message ? err.message : 'There was a problem while saving the officer.' ) ,
+          duration: 3000
+        })
       })
-      clearRecord( 0 )
     }
     const selectedOrganizationStructurePosition = ref(null)
     const organizationStructurePositions = ref([])

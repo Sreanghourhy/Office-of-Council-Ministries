@@ -391,7 +391,7 @@ export const getRoutes = () => {
                     // transition: 'fade'
                 },
                 permissions: [
-                    'portal_staff_preview_card'
+                    'portal'
                 ],
             },
             {
@@ -415,6 +415,17 @@ export const getRoutes = () => {
                 permissions: [
                     'portal_regulator'
                 ]
+            },
+            {
+                name: 'OfficerCard',
+                path: '/officer/card/:id',
+                component: DetailCardComponent ,
+                meta: {
+                    // transition: 'fade'
+                },
+                permissions: [
+                    'portal_auth_login'
+                ],
             },
             {
                 name: 'QrCheckinAndCheckoutComponent',

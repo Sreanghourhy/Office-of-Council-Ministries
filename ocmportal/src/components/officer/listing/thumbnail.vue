@@ -4,20 +4,20 @@
       <div class="hero-copy">
         <span class="hero-mark"></span>
         <div>
-          <p class="hero-kicker">Card Directory</p>
+          <p class="hero-kicker">បង្ហាញជាកាត</p>
           <h1 class="hero-title">{{ model.title }}</h1>
         </div>
       </div>
 
       <div class="hero-actions">
-        <button type="button" class="hero-button hero-button-secondary" @click="tableView()">Table View</button>
+        <button type="button" class="hero-button hero-button-secondary" @click="tableView()">មើលជាតារាង</button>
         <button
           v-if="$hasPermission('portal_staff_creating')"
           type="button"
           class="hero-button hero-button-primary"
           @click="showCreateModal()"
         >
-          Add Officer
+          បន្ថែមមន្ត្រី
         </button>
         <button
           v-if="$hasPermission('portal_staff_creating')"
@@ -25,7 +25,7 @@
           class="hero-button hero-button-ghost"
           @click="showCreateNonOfficerModal()"
         >
-          Add Non-Officer
+          បន្ថែមមិនមែនមន្ត្រី
         </button>
       </div>
     </section>
@@ -49,7 +49,7 @@
             v-model="table.search"
             type="text"
             class="search-input"
-            placeholder="Search for staff"
+            placeholder="ស្វែងរកមន្ត្រី"
             @keyup.enter="filterRecords(false)"
           />
         </div>
@@ -64,7 +64,7 @@
             @update:value="goTo(1)"
           >
             <button type="button" class="toolbar-chip">
-              {{ $toKhmer(table.pagination.perPage) }} / page
+              {{ $toKhmer(table.pagination.perPage) }} / ទំព័រ
             </button>
           </n-popselect>
 
@@ -74,7 +74,7 @@
             :class="{ 'toolbar-chip-active': filter || activeFilterCount > 0 }"
             @click="toggleFilter()"
           >
-            Filters
+            តម្រង
             <span class="toolbar-chip-count">{{ $toKhmer(activeFilterCount) }}</span>
           </button>
         </div>
@@ -83,36 +83,36 @@
       <Transition name="slide-fade">
         <div v-if="filter" class="filter-row">
           <div class="filter-item">
-            <label class="filter-label">Positions</label>
+            <label class="filter-label">មុខតំណែង</label>
             <n-select
               v-model:value="selectedPositions"
               filterable
               clearable
               multiple
-              placeholder="Choose positions"
+              placeholder="ជ្រើសរើសមុខតំណែង"
               :options="optionPositions"
               @update:value="filterRecords(false)"
             />
           </div>
           <div class="filter-item">
-            <label class="filter-label">Organizations</label>
+            <label class="filter-label">អង្គភាព</label>
             <n-select
               v-model:value="selectedOrganizations"
               filterable
               clearable
               multiple
-              placeholder="Choose organizations"
+              placeholder="ជ្រើសរើសអង្គភាព"
               :options="optionOrganizations"
               @update:value="filterRecords(false)"
             />
           </div>
-          <button type="button" class="filter-reset" @click="resetFilters()">Clear</button>
+          <button type="button" class="filter-reset" @click="resetFilters()">សម្អាត</button>
         </div>
       </Transition>
 
       <div class="toolbar-meta">
-        <span>Showing {{ $toKhmer(Array.isArray(table.records.matched) ? table.records.matched.length : 0) }} of {{ $toKhmer(table.pagination.totalRecords || 0) }} records</span>
-        <span>Page {{ $toKhmer(table.pagination.page || 1) }} / {{ $toKhmer(table.pagination.totalPages || 1) }}</span>
+        <span>បង្ហាញ {{ $toKhmer(Array.isArray(table.records.matched) ? table.records.matched.length : 0) }} ក្នុងចំណោម {{ $toKhmer(table.pagination.totalRecords || 0) }} កំណត់ត្រា</span>
+        <span>ទំព័រ {{ $toKhmer(table.pagination.page || 1) }} / {{ $toKhmer(table.pagination.totalPages || 1) }}</span>
       </div>
 
       <Transition name="fade">
@@ -125,7 +125,7 @@
             <div class="thumb-head">
               <span class="thumb-index">#{{ $toKhmer(((table.pagination.page - 1) * table.pagination.perPage) + (index + 1)) }}</span>
               <span class="thumb-badge" :class="{ 'thumb-badge-card': hasCard(record) }">
-                {{ hasCard(record) ? $toKhmer(record.card.number) : `Code ${$toKhmer(getOfficerCode(record))}` }}
+                {{ hasCard(record) ? $toKhmer(record.card.number) : `កូដ ${$toKhmer(getOfficerCode(record))}` }}
               </span>
             </div>
 
@@ -158,19 +158,19 @@
 
             <div class="thumb-detail-grid">
               <div class="thumb-detail">
-                <span class="thumb-detail-label">National ID</span>
+                <span class="thumb-detail-label">អត្តលេខជាតិ</span>
                 <strong class="thumb-detail-value">{{ $toKhmer(getNationalId(record)) }}</strong>
               </div>
               <div class="thumb-detail">
-                <span class="thumb-detail-label">Official Date</span>
+                <span class="thumb-detail-label">ថ្ងៃក្របខ័ណ្ឌ</span>
                 <strong class="thumb-detail-value">{{ $toKhmer(formatDateLabel(record?.official_date)) }}</strong>
               </div>
               <div class="thumb-detail thumb-detail-wide">
-                <span class="thumb-detail-label">Position</span>
+                <span class="thumb-detail-label">មុខតំណែង</span>
                 <strong class="thumb-detail-value">{{ getPositionName(record) }}</strong>
               </div>
               <div class="thumb-detail thumb-detail-wide">
-                <span class="thumb-detail-label">Organization</span>
+                <span class="thumb-detail-label">អង្គភាព</span>
                 <strong class="thumb-detail-value">{{ getOrganizationName(record) }}</strong>
               </div>
             </div>
@@ -182,8 +182,8 @@
 
       <Transition name="fade">
         <div v-if="!table.loading && !hasRecords" class="empty-state">
-          <h3>No staff cards found</h3>
-          <p>Try a different search term or adjust the active filters.</p>
+          <h3>មិនមានទិន្នន័យមន្ត្រី</h3>
+          <p>សូមសាកល្បងពាក្យស្វែងរកផ្សេង ឬកែតម្រូវតម្រងដែលកំពុងប្រើ</p>
         </div>
       </Transition>
 
@@ -191,17 +191,17 @@
         <div v-if="table.loading" class="loading-shell">
           <div class="loading-card">
             <div class="loading-spinner"></div>
-            <p>Loading staff cards...</p>
+            <p>កំពុងផ្ទុកទិន្នន័យមន្ត្រី...</p>
           </div>
-          <button type="button" class="loading-close" @click="closeTableLoading">Close</button>
+          <button type="button" class="loading-close" @click="closeTableLoading">បិទ</button>
         </div>
       </Transition>
 
       <div v-if="table.pagination.totalPages > 1" class="footer-bar">
-        <button type="button" class="footer-nav" :disabled="table.pagination.page <= 1" @click="previous()">Previous</button>
+        <button type="button" class="footer-nav" :disabled="table.pagination.page <= 1" @click="previous()">មុន</button>
 
         <div class="footer-center">
-          <span class="footer-summary">{{ $toKhmer(table.pagination.totalRecords) }} records</span>
+          <span class="footer-summary">{{ $toKhmer(table.pagination.totalRecords) }} កំណត់ត្រា</span>
           <div class="footer-pages">
             <button
               v-for="(page, index) in table.pagination.buttons"
@@ -222,7 +222,7 @@
           :disabled="table.pagination.page >= table.pagination.totalPages"
           @click="next()"
         >
-          Next
+          បន្ទាប់
         </button>
       </div>
     </section>
@@ -318,10 +318,10 @@ export default {
 
     const summaryTabs = computed(() => {
       return [
-        { label: 'All Staff', value: table.pagination.totalRecords || 0 },
-        { label: 'Showing', value: Array.isArray(table.records.matched) ? table.records.matched.length : 0 },
-        { label: 'Positions', value: countSelectedEntries(selectedPositions.value) },
-        { label: 'Organizations', value: countSelectedEntries(selectedOrganizations.value) }
+        { label: 'មន្ត្រីទាំងអស់', value: table.pagination.totalRecords || 0 },
+        { label: 'កំពុងបង្ហាញ', value: Array.isArray(table.records.matched) ? table.records.matched.length : 0 },
+        { label: 'មុខតំណែង', value: countSelectedEntries(selectedPositions.value) },
+        { label: 'អង្គភាព', value: countSelectedEntries(selectedOrganizations.value) }
       ]
     })
 
@@ -788,6 +788,7 @@ export default {
 .thumbnail-page {
   width: 100%;
   padding: 24px;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .hero-shell,
@@ -827,7 +828,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .hero-title {
@@ -836,7 +837,7 @@ export default {
   font-size: 34px;
   line-height: 1.35;
   font-weight: 650;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .hero-actions,
@@ -855,7 +856,7 @@ export default {
   border: 1px solid #dbe4f0;
   cursor: pointer;
   transition: 0.2s ease;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .hero-button {
@@ -925,7 +926,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .stat-value {
@@ -935,7 +936,7 @@ export default {
   font-size: 24px;
   line-height: 1;
   font-weight: 700;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .card-shell {
@@ -963,7 +964,7 @@ export default {
   background: #f8fafc;
   color: #0f172a;
   font-size: 13px;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .search-input:focus {
@@ -1030,7 +1031,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .filter-row :deep(.n-base-selection) {
@@ -1047,7 +1048,7 @@ export default {
   margin: 14px 0 18px;
   color: #64748b;
   font-size: 12px;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .thumbnail-grid {
@@ -1106,7 +1107,7 @@ export default {
 .thumb-index {
   background: #eff6ff;
   color: #1d4ed8;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .thumb-badge {
@@ -1114,7 +1115,7 @@ export default {
   background: #ffffff;
   color: #475569;
   text-align: center;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .thumb-badge-card {
@@ -1186,7 +1187,7 @@ export default {
   color: #2563eb;
   font-size: 12px;
   font-weight: 700;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .thumb-name {
@@ -1195,7 +1196,7 @@ export default {
   font-size: 19px;
   line-height: 1.45;
   font-weight: 650;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .thumb-subtitle {
@@ -1203,13 +1204,13 @@ export default {
   color: #64748b;
   font-size: 12px;
   line-height: 1.6;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .rank-pill {
   background: #fef3c7;
   color: #854d0e;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .thumb-rank-row {
@@ -1242,7 +1243,7 @@ export default {
   line-height: 1.6;
   font-weight: 650;
   word-break: break-word;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .empty-state,
@@ -1264,14 +1265,14 @@ export default {
   color: #0f172a;
   font-size: 20px;
   font-weight: 700;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .empty-state p {
   margin: 10px 0 0;
   max-width: 360px;
   line-height: 1.7;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .loading-shell {
@@ -1287,7 +1288,7 @@ export default {
   color: #1e3a8a;
   font-size: 13px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .loading-spinner {
@@ -1337,7 +1338,7 @@ export default {
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .footer-pages {

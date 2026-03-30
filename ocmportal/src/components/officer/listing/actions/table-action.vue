@@ -36,7 +36,7 @@
             fill="currentColor"
           ></path>
         </svg>
-        <span>View</span>
+        <span>មើល</span>
       </button>
 
       <button
@@ -53,10 +53,10 @@
             ></path>
           </g>
         </svg>
-        <span>Edit</span>
+        <span>កែប្រែ</span>
       </button>
 
-      <button
+      <!-- <button
         v-if="$hasPermission('portal_staff_profile_photo_change')"
         type="button"
         class="action action-cyan"
@@ -73,7 +73,7 @@
           ></path>
         </svg>
         <span>Photo</span>
-      </button>
+      </button> -->
 
       <button
         v-if="$hasPermission('portal_staff_print_preview_officer_card')"
@@ -89,7 +89,7 @@
             ></path>
           </g>
         </svg>
-        <span>Card</span>
+        <span>ប័ណ្ណ</span>
       </button>
 
       <button
@@ -148,14 +148,14 @@
             d="M328 176l-8 224"
           ></path>
         </svg>
-        <span>Delete</span>
+        <span>លុប</span>
       </button>
     </div>
 
     <span
       v-if="record.card != undefined && record.card != null"
       class="action-status"
-      >Card Ready</span
+      >ប័ណ្ណរួចរាល់</span
     >
 
     <update-form
@@ -165,7 +165,7 @@
       v-bind:show="editModal.show"
       :onClose="closeUpdate"
     />
-    <detail-form
+    <print-profile-form
       v-if="detailModal.show"
       v-bind:model="model"
       v-bind:record="record"
@@ -205,8 +205,8 @@ import { useDialog, useMessage, useNotification } from "naive-ui";
 const UpdateForm = defineAsyncComponent(
   () => import("./../../widgets/update.vue"),
 );
-const DetailForm = defineAsyncComponent(
-  () => import("./../../widgets/detail.vue"),
+const PrintProfileForm = defineAsyncComponent(
+  () => import("./../../widgets/printprofile-popup.vue"),
 );
 const PreviewCardForm = defineAsyncComponent(
   () => import("./../../widgets/card1.vue"),
@@ -222,7 +222,7 @@ export default {
   name: "ThumbnailActions",
   components: {
     UpdateForm,
-    DetailForm,
+    PrintProfileForm,
     PreviewCardForm,
     OfficialCardForm,
     ProfileForm,
@@ -360,7 +360,7 @@ export default {
 .actions {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
   width: 100%;
   min-width: 0;
@@ -369,6 +369,7 @@ export default {
 .panel {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   flex-wrap: nowrap;
   white-space: nowrap;

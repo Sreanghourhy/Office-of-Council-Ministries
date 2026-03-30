@@ -1,131 +1,235 @@
 <template>
-  <div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto overflow-x-hidden bg-repeat bg-yellow-50" :style="'background-image: url('+ocmCardBackgroundImage+'); '"  >
-    <div class="relative p-2 mx-auto w-4/5 sm:w-3/5 md:w-2/5 lg:w-2/5 xl:w-2/5" >
-      <Transition name="slide-fade" >
-        <div v-if="officer!=null" class="mx-auto w-full p-0 flex flex-wrap " >
-          <div class="w-full mb-0" >
-            <div class=" mx-auto " ><img :src="ocmLogoUrl" class="mt-8 w-20 mx-auto" /></div>
-            <div class=" mx-auto my-2 font-moul text-yellow-500" >ទីស្ដីការគណៈរដ្ឋមន្ត្រី</div>
-            <div class=" mx-auto font-ktr text-yellow-800 font-bold" >Office of the Council of Ministers</div>
+  <div
+    class="min-h-screen bg-yellow-50 bg-repeat font-sr"
+    :style="'background-image: url(' + ocmCardBackgroundImage + ');'"
+  >
+    <div class="mx-auto max-w-md px-4 py-6 sm:py-10">
+      <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white/95 shadow-2xl backdrop-blur">
+        <div class="bg-slate-900 px-6 py-7 text-center text-white">
+          <img :src="ocmLogoUrl" class="mx-auto w-20" alt="OCM Logo" />
+          <div class="mt-4 font-moul text-lg text-amber-300">ទីស្តីការគណៈរដ្ឋមន្ត្រី</div>
+          <div class="mt-1 text-sm text-slate-200">Office of the Council of Ministers</div>
+        </div>
+
+        <div v-if="loading" class="px-6 py-16 text-center text-slate-600">
+          <div class="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-700"></div>
+          <div>កំពុងផ្ទុកព័ត៌មានមន្ត្រី...</div>
+        </div>
+
+        <div v-else-if="officer" class="px-6 pb-6">
+          <div class="flex justify-center">
+            <img
+              :src="officer.image || ocmLogoUrl"
+              class="-mt-14 h-28 w-28 rounded-3xl border-4 border-white bg-white object-cover shadow-lg"
+              alt="Officer Photo"
+              @error="setFallbackImage"
+            />
           </div>
-          <div class="w-full p-8" >
-            <img :src="(officer.image!=''&&officer.image!=null? officer.image: ocmLogoUrl )" class="rounded-lg overflow-hidden w-32 mx-auto border border-gray-300 p-0 bg-white" />
+
+          <div class="mt-4 text-center text-slate-900">
+            <div v-if="hasValue(officer.countesy_name)" class="font-moul text-base text-amber-700">
+              {{ officer.countesy_name }}
+            </div>
+            <h1 class="mt-2 font-moul text-xl leading-8">
+              {{ displayValue(officer.khmer_name) }}
+            </h1>
+            <p class="mt-1 text-sm text-slate-600">
+              {{ displayValue(officer.english_name) }}
+            </p>
           </div>
-          <div class="font-moul text-left w-full text-gray-800" >
-              <div class="font-btb font-bold pb-1 leading-6 text-center text-gray-700"  >{{ officer.card != undefined && officer.card != null && officer.card.id > 0 ? officer.card.number : 'OCM-ORG-' + officer.id }}</div>
-              <div v-if="officer.countesy!=undefined&&officer.countesy!=null" class="font-moul pb-1 leading-6 text-center" >{{ officer.countesy.name }}</div>
-              <div class="pb-1leading-7 text-center" >
-                <div class="w-full font-moul mb-1 " >{{ officer.people.lastname + " " + officer.people.firstname }}</div>
-                <div class="w-full" >{{ officer.people.enlastname + " " + officer.people.enfirstname }}</div>
-              </div>
-              <div class="py-4 w-full flex flex-wrap" >
-                <div v-if="officer != null && officer.position != undefined && officer.position != null " class="w-1/2 pb-1 font-moul leading-7 text-right pr-8" >{{ officer.position.name }}</div>
-                <div v-if="officer != null && officer.organization != undefined && officer.position != null " class="w-1/2 pb-1  font-moul leading-7 text-left pl-8" >{{ officer.organization.name }}</div>
-              </div>
-              <div v-if="officer != null && officer.organization_people != null && officer.organization_people != undefined && officer.organization_people.length > 0 " class="p-2" >
-                <div v-for="(organizationPivot, index) in officer.organization_people" :key="index"
-                style="vertical-align: top; text-align: left;" class="p-2 leading-7 text-sm font-bold"  >{{ organizationPivot.organization.code != "" && organizationPivot.organization.code != undefined && organizationPivot.organization.code.length > 0 ? organizationPivot.organization.code : 'OCM' }}{{ organizationPivot.code != "" && organizationPivot.code != undefined && organizationPivot.code.length > 0 ? "-" + organizationPivot.code : '-' + officer.id }}</div>
-              </div>
+
+          <div class="mt-4 flex flex-wrap justify-center gap-2 text-sm">
+            <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700">
+              {{ displayValue(officer.card_number) }}
+            </span>
+            <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700">
+              {{ displayValue(officer.code) }}
+            </span>
+            <span
+              class="rounded-full border px-3 py-1"
+              :class="getCardStatusClass(officer)"
+            >
+              {{ getCardStatusLabel(officer) }}
+            </span>
           </div>
-          <div class="w-full my-2" >
-            <qrcode-vue :value="getPublicCardUrl(officer)" :size="100" level="H" class=" mx-auto p-1 border border-gray-300 rounded-md bg-white" :render-as="'svg'" />
+
+          <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">មុខតំណែង</div>
+              <div class="mt-2 text-slate-900">{{ displayValue(officer.position_name) }}</div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">អង្គភាព</div>
+              <div class="mt-2 text-slate-900">{{ displayValue(officer.organization_name) }}</div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">ថ្ងៃខែឆ្នាំកំណើត</div>
+              <div class="mt-2 text-slate-900">{{ $toKhmer(formatDateLabel(officer.dob)) }}</div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">ភេទ</div>
+              <div class="mt-2 text-slate-900">{{ getGenderLabel(officer.gender) }}</div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">ថ្ងៃចូលបម្រើការងារ</div>
+              <div class="mt-2 text-slate-900">{{ $toKhmer(formatDateLabel(officer.unofficial_date)) }}</div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="font-moul text-sm text-slate-700">ថ្ងៃក្របខ័ណ្ឌ</div>
+              <div class="mt-2 text-slate-900">{{ $toKhmer(formatDateLabel(officer.official_date)) }}</div>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            ព័ត៌មាននេះបង្ហាញសម្រាប់ផ្ទៀងផ្ទាត់អត្តសញ្ញាណមន្ត្រីតាម QR កាតមន្ត្រី។
           </div>
         </div>
-      </Transition>
-      <Transition name="slide-fade" >
-        <div v-if="officer == null && officerNotFound == true" class="mx-auto w-full p-0 flex flex-wrap " >
-          <div class="w-full mb-0" >
-            <div class=" mx-auto " ><img :src="ocmLogoUrl" class="mt-8 w-20 mx-auto" /></div>
-            <div class=" mx-auto my-2 font-moul text-yellow-500" >ទីស្ដីការគណៈរដ្ឋមន្ត្រី</div>
-            <div class=" mx-auto font-ktr text-yellow-800 font-bold" >Office of the Council of Ministers</div>
-          </div>
-          <div class="w-full p-8" >
-            មិនមានព័ត៌មានបង្ហាញឡើយ។
+
+        <div v-else class="px-6 py-16 text-center text-slate-700">
+          <div class="font-moul text-lg text-slate-900">រកមិនឃើញព័ត៌មានមន្ត្រី</div>
+          <div class="mt-2 text-sm text-slate-600">
+            QR នេះមិនមានទិន្នន័យ ឬតំណមិនត្រឹមត្រូវទេ។
           </div>
         </div>
-      </Transition>
-    </div>
-    <div class="fixed bottom-0 left-0 right-0 ">
-      <div class="w-full my-2 leading-8">
-        <div class="text-center copy-right text-gray-700">ទីស្ដីការគណៈរដ្ឋមន្ត្រី &copy; រក្សារសិទ្ធិគ្រប់យ៉ាង ២០២៤</div>
+      </div>
+
+      <div class="py-4 text-center text-xs text-slate-600">
+        ទីស្តីការគណៈរដ្ឋមន្ត្រី
       </div>
     </div>
   </div>
-
 </template>
+
 <script>
-  import { reactive , ref , onMounted , computed , watch } from 'vue'
-  import { useStore } from 'vuex'
-  import { useMessage, useNotification } from 'naive-ui'
-  import { useRouter, useRoute } from 'vue-router'
-  import QrcodeVue from 'qrcode.vue'
-  import ocmLogoUrl from '@assets/logo.svg'
-  import ocmLogoEnUrl from '@assets/logo.png'
-  import ocmCardBackgroundImage from '@assets/pkachan.png'
+import { ref, onMounted, watch } from "vue";
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
+import ocmLogoUrl from "@assets/logo.svg";
+import ocmCardBackgroundImage from "@assets/pkachan.png";
 
-  export default {
-    name: "CardComponent" ,
-    components: {
-      QrcodeVue ,
-      ocmCardBackgroundImage
-    },
-    setup(props){
-      const router = useRouter()
-      const store = useStore()
-      const route = useRoute()
-      const message = useMessage()
-      const notify = useNotification()
-      const officer = ref(null)
+export default {
+  name: "CardComponent",
+  setup() {
+    const store = useStore();
+    const route = useRoute();
 
-      const userCountesies = computed( () => {
-        return officer != undefined && Array.isArray( officer.value.countesies ) ? officer.value.countesies.map( ( c ) => c.name ).join(', ') : ''
-      })
-      
-      watch( () => route.params.id, (newValue, oldValue) => {
-        readOfficer( )
-      })
+    const officer = ref(null);
+    const loading = ref(false);
 
-      const officerNotFound = ref(false)
-      function readOfficer(){
-        if( route.params != undefined && route.params != null && parseInt( route.params.id ) > 0 ) {
-          store.dispatch('officer/read',{id:parseInt( route.params.id )}).then( res => {
-            if( res.data.ok == true ){
-              // officer.value = res.data.record
-              if( res.data.record != undefined && res.data.record.public_key != undefined && res.data.record.public_key.length > 0 ){
-                window.location.replace( 'https://hr.ocm.gov.kh/#/officer/card/'+res.data.record.public_key )
-              }else{
-                officerNotFound.value = true
-              }
-            }else{
-              console.log( res )
-            }
-          }).catch( err => {
-            console.log( err )
-          })
-        }
-      }
-
-      onMounted(()=>{
-        readOfficer()
-      })
-
-      function getPublicCardUrl(record){
-        return window.location.origin+'/#/officer/card/'+record.id
-      }
-
-      return {
-        userCountesies ,
-        getPublicCardUrl ,
-        officer ,
-        ocmLogoUrl ,
-        ocmCardBackgroundImage ,
-        ocmLogoEnUrl ,
-        officerNotFound
-      } 
+    function hasValue(value) {
+      return `${value ?? ""}`.trim().length > 0;
     }
-  }
+
+    function displayValue(value) {
+      return hasValue(value) ? value : "មិនមានទិន្នន័យ";
+    }
+
+    function formatDateLabel(value) {
+      const normalized = `${value ?? ""}`.trim();
+      return normalized.length > 0 ? normalized.slice(0, 10) : "មិនមានទិន្នន័យ";
+    }
+
+    function getGenderLabel(value) {
+      if (`${value ?? ""}`.trim().length === 0) {
+        return "មិនមានទិន្នន័យ";
+      }
+
+      return Number(value) === 1 ? "ប្រុស" : "ស្រី";
+    }
+
+    function isCardActive(record) {
+      if (record == null) {
+        return false;
+      }
+
+      if (Number(record.card_active) === 0) {
+        return false;
+      }
+
+      const endDate = `${record.card_end ?? ""}`.trim();
+      if (endDate.length === 0) {
+        return true;
+      }
+
+      const parsedEndDate = new Date(`${endDate.slice(0, 10)}T23:59:59`);
+      if (Number.isNaN(parsedEndDate.getTime())) {
+        return true;
+      }
+
+      return parsedEndDate >= new Date();
+    }
+
+    function getCardStatusLabel(record) {
+      return isCardActive(record) ? "កាតមានសុពលភាព" : "កាតមិនមានសុពលភាព";
+    }
+
+    function getCardStatusClass(record) {
+      return isCardActive(record)
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+        : "border-rose-200 bg-rose-50 text-rose-700";
+    }
+
+    function setFallbackImage(event) {
+      if (event?.target) {
+        event.target.onerror = null;
+        event.target.src = ocmLogoUrl;
+      }
+    }
+
+    function readOfficer() {
+      const key = `${route.params.id ?? ""}`.trim();
+
+      if (key.length === 0) {
+        officer.value = null;
+        return;
+      }
+
+      loading.value = true;
+
+      store
+        .dispatch("officer/readCardPublic", { key })
+        .then((res) => {
+          officer.value = res?.data?.ok === true ? res.data.record : null;
+        })
+        .catch(() => {
+          officer.value = null;
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    }
+
+    watch(
+      () => route.params.id,
+      () => {
+        readOfficer();
+      },
+    );
+
+    onMounted(() => {
+      readOfficer();
+    });
+
+    return {
+      officer,
+      loading,
+      hasValue,
+      displayValue,
+      formatDateLabel,
+      getGenderLabel,
+      getCardStatusLabel,
+      getCardStatusClass,
+      setFallbackImage,
+      ocmLogoUrl,
+      ocmCardBackgroundImage,
+    };
+  },
+};
 </script>
-  
-<style scoped>
-  
-</style>
+
+<style scoped></style>

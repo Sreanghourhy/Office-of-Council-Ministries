@@ -4,7 +4,10 @@
       <div class="table-hero-copy">
         <div class="table-hero-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
-            <path d="M17.254 11a2.25 2.25 0 0 1 2.25 2.25v6.249a5.501 5.501 0 0 1-11.002 0V13.25a2.25 2.25 0 0 1 2.25-2.25h6.502zm0 1.5h-6.502a.75.75 0 0 0-.75.75v6.249a4.001 4.001 0 0 0 8.002 0V13.25a.75.75 0 0 0-.75-.75zM4.25 11h4.156a3.243 3.243 0 0 0-.817 1.5H4.25a.75.75 0 0 0-.75.75v5.249a3.001 3.001 0 0 0 4.238 2.735c.133.49.324.956.564 1.392A4.501 4.501 0 0 1 2 18.499V13.25A2.25 2.25 0 0 1 4.25 11zm19.5 0A2.25 2.25 0 0 1 26 13.25v5.25a4.5 4.5 0 0 1-6.298 4.127l.056-.102c.214-.406.387-.837.511-1.289A3 3 0 0 0 24.5 18.5v-5.25a.75.75 0 0 0-.749-.75h-3.333A3.242 3.242 0 0 0 19.6 11h4.151zM14 3a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zm8.003 1a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM5.997 4a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM14 4.5a2 2 0 1 0 0 4a2 2 0 0 0 0-4zm8.003 1a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-16.006 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3z" fill="currentColor"></path>
+            <path
+              d="M17.254 11a2.25 2.25 0 0 1 2.25 2.25v6.249a5.501 5.501 0 0 1-11.002 0V13.25a2.25 2.25 0 0 1 2.25-2.25h6.502zm0 1.5h-6.502a.75.75 0 0 0-.75.75v6.249a4.001 4.001 0 0 0 8.002 0V13.25a.75.75 0 0 0-.75-.75zM4.25 11h4.156a3.243 3.243 0 0 0-.817 1.5H4.25a.75.75 0 0 0-.75.75v5.249a3.001 3.001 0 0 0 4.238 2.735c.133.49.324.956.564 1.392A4.501 4.501 0 0 1 2 18.499V13.25A2.25 2.25 0 0 1 4.25 11zm19.5 0A2.25 2.25 0 0 1 26 13.25v5.25a4.5 4.5 0 0 1-6.298 4.127l.056-.102c.214-.406.387-.837.511-1.289A3 3 0 0 0 24.5 18.5v-5.25a.75.75 0 0 0-.749-.75h-3.333A3.242 3.242 0 0 0 19.6 11h4.151zM14 3a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zm8.003 1a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM5.997 4a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM14 4.5a2 2 0 1 0 0 4a2 2 0 0 0 0-4zm8.003 1a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-16.006 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3z"
+              fill="currentColor"
+            ></path>
           </svg>
         </div>
         <div class="table-hero-heading">
@@ -14,11 +17,18 @@
       </div>
 
       <div class="table-hero-actions">
-        <button type="button" class="table-hero-button table-hero-button-secondary" @click="thumbnailView()">
+        <button
+          type="button"
+          class="table-hero-button table-hero-button-secondary"
+          @click="thumbnailView()"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-            <path d="M8 30H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM18 30h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM28 30h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM8 20H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM18 20h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM28 20h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM8 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zM4 4v4h4V4zM18 10h-4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4V4zM28 10h-4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4V4z" fill="currentColor"></path>
+            <path
+              d="M8 30H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM18 30h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM28 30h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM8 20H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM18 20h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM28 20h-4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4v-4zM8 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zM4 4v4h4V4zM18 10h-4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4V4zM28 10h-4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2zm-4-6v4h4V4z"
+              fill="currentColor"
+            ></path>
           </svg>
-          Card View
+          មើលជាកាត
         </button>
 
         <button
@@ -28,13 +38,19 @@
           @click="showCreateModal()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <g
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            >
               <circle cx="12" cy="12" r="9"></circle>
               <path d="M9 12h6"></path>
               <path d="M12 9v6"></path>
             </g>
           </svg>
-          Add Officer
+          បន្ថែមមន្ត្រី
         </button>
 
         <button
@@ -44,13 +60,19 @@
           @click="showCreateNonOfficerModal()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <g
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            >
               <circle cx="12" cy="12" r="9"></circle>
               <path d="M9 12h6"></path>
               <path d="M12 9v6"></path>
             </g>
           </svg>
-          Add Non-Officer
+          បន្ថែមមិនមែនមន្ត្រី
         </button>
       </div>
     </div>
@@ -70,14 +92,21 @@
     <div class="vcb-table-panel relative staff-table-card">
       <div class="table-toolbar">
         <div class="table-search-shell">
-          <svg class="table-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M8.5 3a5.5 5.5 0 0 1 4.227 9.02l4.127 4.126a.5.5 0 0 1-.638.765l-.07-.057l-4.126-4.127A5.5 5.5 0 1 1 8.5 3zm0 1a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9z" fill="currentColor"></path>
+          <svg
+            class="table-search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M8.5 3a5.5 5.5 0 0 1 4.227 9.02l4.127 4.126a.5.5 0 0 1-.638.765l-.07-.057l-4.126-4.127A5.5 5.5 0 1 1 8.5 3zm0 1a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9z"
+              fill="currentColor"
+            ></path>
           </svg>
           <input
             v-model="table.search"
             type="text"
             class="table-search-input"
-            placeholder="Search for staff"
+            placeholder="ស្វែងរកមន្ត្រី"
             @input="filterRecords(false)"
             @keyup.enter="filterRecords(false)"
           />
@@ -94,21 +123,28 @@
           >
             <button type="button" class="table-toolbar-chip">
               <span>{{ $toKhmer(table.pagination.perPage) }}</span>
-              <span>/ page</span>
+              <span>/ ទំព័រ</span>
             </button>
           </n-popselect>
 
           <button
             type="button"
             class="table-toolbar-chip"
-            :class="{ 'table-toolbar-chip-active': filter || activeFilterCount > 0 }"
+            :class="{
+              'table-toolbar-chip-active': filter || activeFilterCount > 0,
+            }"
             @click="toggleFilter()"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-              <path d="M18 28h-4a2 2 0 0 1-2-2v-7.59L4.59 11A2 2 0 0 1 4 9.59V6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v3.59a2 2 0 0 1-.59 1.41L20 18.41V26a2 2 0 0 1-2 2zM6 6v3.59l8 8V26h4v-8.41l8-8V6z" fill="currentColor"></path>
+              <path
+                d="M18 28h-4a2 2 0 0 1-2-2v-7.59L4.59 11A2 2 0 0 1 4 9.59V6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v3.59a2 2 0 0 1-.59 1.41L20 18.41V26a2 2 0 0 1-2 2zM6 6v3.59l8 8V26h4v-8.41l8-8V6z"
+                fill="currentColor"
+              ></path>
             </svg>
-            <span>Filters</span>
-            <span class="table-toolbar-chip-count">{{ $toKhmer(activeFilterCount) }}</span>
+            <span>តម្រង</span>
+            <span class="table-toolbar-chip-count">{{
+              $toKhmer(activeFilterCount)
+            }}</span>
           </button>
 
           <n-popover trigger="click" placement="bottom-end">
@@ -116,7 +152,10 @@
               <button
                 type="button"
                 class="table-toolbar-chip"
-                :class="{ 'table-toolbar-chip-active': visibleColumnCount < columnOptions.length }"
+                :class="{
+                  'table-toolbar-chip-active':
+                    visibleColumnCount < columnOptions.length,
+                }"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path
@@ -124,24 +163,36 @@
                     fill="currentColor"
                   ></path>
                 </svg>
-                <span>Table View</span>
-                <span class="table-toolbar-chip-count">{{ $toKhmer(visibleColumnCount) }}</span>
+                <span>ទិដ្ឋភាពតារាង</span>
+                <span class="table-toolbar-chip-count">{{
+                  $toKhmer(visibleColumnCount)
+                }}</span>
               </button>
             </template>
 
             <div class="table-view-panel">
               <div class="table-view-header">
-                <strong>Choose Columns</strong>
-                <button type="button" class="table-view-reset" @click="resetColumnVisibility()">
-                  Show All
+                <strong>ជ្រើសរើសជួរឈរ</strong>
+                <button
+                  type="button"
+                  class="table-view-reset"
+                  @click="resetColumnVisibility()"
+                >
+                  បង្ហាញទាំងអស់
                 </button>
               </div>
 
               <div class="table-view-list">
-                <label v-for="column in columnOptions" :key="column.key" class="table-view-option">
+                <label
+                  v-for="column in columnOptions"
+                  :key="column.key"
+                  class="table-view-option"
+                >
                   <n-checkbox
                     v-model:checked="columnVisibility[column.key]"
-                    :disabled="visibleColumnCount === 1 && columnVisibility[column.key]"
+                    :disabled="
+                      visibleColumnCount === 1 && columnVisibility[column.key]
+                    "
                   >
                     {{ column.label }}
                   </n-checkbox>
@@ -155,38 +206,56 @@
       <Transition name="slide-fade">
         <div v-if="filter" class="table-inline-filters">
           <div class="table-filter-item">
-            <label class="table-filter-label">Positions</label>
+            <label class="table-filter-label">មុខតំណែង</label>
             <n-select
               v-model:value="selectedPositions"
               filterable
               clearable
               multiple
-              placeholder="Choose positions"
+              placeholder="ជ្រើសរើសមុខតំណែង"
               :options="optionPositions"
               @update:value="filterRecords(false)"
             />
           </div>
           <div class="table-filter-item">
-            <label class="table-filter-label">Organizations</label>
+            <label class="table-filter-label">អង្គភាព</label>
             <n-select
               v-model:value="selectedOrganizations"
               filterable
               clearable
               multiple
-              placeholder="Choose organizations"
+              placeholder="ជ្រើសរើសអង្គភាព"
               :options="optionOrganizations"
               @update:value="filterRecords(false)"
             />
           </div>
-          <button type="button" class="table-filter-reset" @click="resetFilters()">
-            Clear
+          <button
+            type="button"
+            class="table-filter-reset"
+            @click="resetFilters()"
+          >
+            សម្អាត
           </button>
         </div>
       </Transition>
 
       <div class="table-toolbar-meta">
-        <span>Showing {{ $toKhmer(Array.isArray(table.records.matched) ? table.records.matched.length : 0) }} of {{ $toKhmer(table.pagination.totalRecords || 0) }} records</span>
-        <span>Page {{ $toKhmer(table.pagination.page || 1) }} / {{ $toKhmer(table.pagination.totalPages || 1) }}</span>
+        <span
+          >បង្ហាញ
+          {{
+            $toKhmer(
+              Array.isArray(table.records.matched)
+                ? table.records.matched.length
+                : 0,
+            )
+          }}
+          ក្នុងចំណោម
+          {{ $toKhmer(table.pagination.totalRecords || 0) }} កំណត់ត្រា</span
+        >
+        <span
+          >ទំព័រ {{ $toKhmer(table.pagination.page || 1) }} /
+          {{ $toKhmer(table.pagination.totalPages || 1) }}</span
+        >
       </div>
 
       <Transition name="fade">
@@ -194,22 +263,47 @@
           <table class="otc-table">
             <thead>
               <tr class="otc-header-row">
-                <th v-if="columnVisibility.serial" class="w-16">No.</th>
-                <th v-if="columnVisibility.staff" class="text-center">Staff</th>
-                <th v-if="columnVisibility.nationalId" class="text-center">National ID</th>
-                <th v-if="columnVisibility.birthDate" class="text-center">Birth Date</th>
-                <th v-if="columnVisibility.startDate" class="text-center">Start Date</th>
-                <th v-if="columnVisibility.officialDate" class="text-center">Official Date</th>
-                <th v-if="columnVisibility.rank" class="text-center">Rank</th>
-                <th v-if="columnVisibility.organization" class="text-center">Organization / Position</th>
-                <th v-if="columnVisibility.email" class="text-center">Email</th>
-                <th v-if="columnVisibility.actions" class="w-24 text-center">Actions</th>
+                <th v-if="columnVisibility.serial" class="w-16">ល.រ</th>
+                <th v-if="columnVisibility.staff" class="text-center">
+                  មន្ត្រី
+                </th>
+                <th v-if="columnVisibility.nationalId" class="text-center">
+                  អត្តលេខជាតិ
+                </th>
+                <th v-if="columnVisibility.birthDate" class="text-center">
+                  ថ្ងៃខែឆ្នាំកំណើត
+                </th>
+                <th v-if="columnVisibility.startDate" class="text-center">
+                  ថ្ងៃចូលបម្រើការងារ
+                </th>
+                <th v-if="columnVisibility.officialDate" class="text-center">
+                  ថ្ងៃក្របខ័ណ្ឌ
+                </th>
+                <th v-if="columnVisibility.rank" class="text-center">ឋានៈ</th>
+                <th v-if="columnVisibility.organization" class="text-center">
+                  អង្គភាព / មុខតំណែង
+                </th>
+                <th v-if="columnVisibility.email" class="text-center">
+                  អ៊ីមែល
+                </th>
+                <th v-if="columnVisibility.actions" class="w-24 text-center">
+                  សកម្មភាព
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(record, index) in table.records.matched" :key="record?.id ?? index" class="otc-body-row">
+              <tr
+                v-for="(record, index) in table.records.matched"
+                :key="record?.id ?? index"
+                class="otc-body-row"
+              >
                 <td v-if="columnVisibility.serial" class="serial-cell">
-                  {{ $toKhmer(((table.pagination.page - 1) * table.pagination.perPage) + (index + 1)) }}
+                  {{
+                    $toKhmer(
+                      (table.pagination.page - 1) * table.pagination.perPage +
+                        (index + 1),
+                    )
+                  }}
                 </td>
                 <td v-if="columnVisibility.staff" class="text-center">
                   <div class="person-cell">
@@ -218,29 +312,47 @@
                         :src="getAvatarUrl(record)"
                         :alt="getKhmerName(record)"
                         class="person-avatar-image"
-                        :class="{ 'person-avatar-image-default': !hasAvatar(record) }"
+                        :class="{
+                          'person-avatar-image-default': !hasAvatar(record),
+                        }"
                         @error="setFallbackAvatar"
                       />
                     </div>
                     <div class="person-copy">
                       <div class="person-name">{{ getKhmerName(record) }}</div>
-                      <div class="person-meta">{{ getEnglishName(record) }}</div>
+                      <div class="person-meta">
+                        {{ getEnglishName(record) }}
+                      </div>
                       <div class="person-tags">
-                        <span class="person-tag">Code {{ $toKhmer(getOfficerCode(record)) }}</span>
+                        <span class="person-tag"
+                          >កូដ {{ $toKhmer(getOfficerCode(record)) }}</span
+                        >
                       </div>
                     </div>
                   </div>
                 </td>
-                <td v-if="columnVisibility.nationalId" class="text-center cell-quiet">
+                <td
+                  v-if="columnVisibility.nationalId"
+                  class="text-center cell-quiet"
+                >
                   {{ $toKhmer(getNationalId(record)) }}
                 </td>
-                <td v-if="columnVisibility.birthDate" class="text-center cell-quiet">
+                <td
+                  v-if="columnVisibility.birthDate"
+                  class="text-center cell-quiet"
+                >
                   {{ $toKhmer(formatDateLabel(record?.people?.dob)) }}
                 </td>
-                <td v-if="columnVisibility.startDate" class="text-center cell-quiet">
+                <td
+                  v-if="columnVisibility.startDate"
+                  class="text-center cell-quiet"
+                >
                   {{ $toKhmer(formatDateLabel(record?.unofficial_date)) }}
                 </td>
-                <td v-if="columnVisibility.officialDate" class="text-center cell-quiet">
+                <td
+                  v-if="columnVisibility.officialDate"
+                  class="text-center cell-quiet"
+                >
                   {{ $toKhmer(formatDateLabel(record?.official_date)) }}
                 </td>
                 <td v-if="columnVisibility.rank" class="text-center">
@@ -248,13 +360,29 @@
                 </td>
                 <td v-if="columnVisibility.organization" class="text-center">
                   <div class="job-cell">
-                    <div class="job-primary">{{ getOrganizationName(record) }}</div>
-                    <div class="job-secondary">{{ getPositionName(record) }}</div>
+                    <div class="job-primary">
+                      {{ getOrganizationName(record) }}
+                    </div>
+                    <div class="job-secondary">
+                      {{ getPositionName(record) }}
+                    </div>
                   </div>
                 </td>
-                <td v-if="columnVisibility.email" class="text-center cell-quiet email-cell">{{ getEmail(record) }}</td>
-                <td v-if="columnVisibility.actions" class="text-center action-cell">
-                  <table-actions-form v-bind:model="model" v-bind:record="record" :onClose="closeActions" />
+                <td
+                  v-if="columnVisibility.email"
+                  class="text-center cell-quiet email-cell"
+                >
+                  {{ getEmail(record) }}
+                </td>
+                <td
+                  v-if="columnVisibility.actions"
+                  class="text-center action-cell"
+                >
+                  <table-actions-form
+                    v-bind:model="model"
+                    v-bind:record="record"
+                    :onClose="closeActions"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -266,27 +394,61 @@
         <div v-if="!table.loading && !hasRecords" class="table-empty-state">
           <div class="table-empty-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
-              <path d="M17.254 11a2.25 2.25 0 0 1 2.25 2.25v6.249a5.501 5.501 0 0 1-11.002 0V13.25a2.25 2.25 0 0 1 2.25-2.25h6.502zm0 1.5h-6.502a.75.75 0 0 0-.75.75v6.249a4.001 4.001 0 0 0 8.002 0V13.25a.75.75 0 0 0-.75-.75zM4.25 11h4.156a3.243 3.243 0 0 0-.817 1.5H4.25a.75.75 0 0 0-.75.75v5.249a3.001 3.001 0 0 0 4.238 2.735c.133.49.324.956.564 1.392A4.501 4.501 0 0 1 2 18.499V13.25A2.25 2.25 0 0 1 4.25 11zm19.5 0A2.25 2.25 0 0 1 26 13.25v5.25a4.5 4.5 0 0 1-6.298 4.127l.056-.102c.214-.406.387-.837.511-1.289A3 3 0 0 0 24.5 18.5v-5.25a.75.75 0 0 0-.749-.75h-3.333A3.242 3.242 0 0 0 19.6 11h4.151zM14 3a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zm8.003 1a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM5.997 4a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM14 4.5a2 2 0 1 0 0 4a2 2 0 0 0 0-4zm8.003 1a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-16.006 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3z" fill="currentColor"></path>
+              <path
+                d="M17.254 11a2.25 2.25 0 0 1 2.25 2.25v6.249a5.501 5.501 0 0 1-11.002 0V13.25a2.25 2.25 0 0 1 2.25-2.25h6.502zm0 1.5h-6.502a.75.75 0 0 0-.75.75v6.249a4.001 4.001 0 0 0 8.002 0V13.25a.75.75 0 0 0-.75-.75zM4.25 11h4.156a3.243 3.243 0 0 0-.817 1.5H4.25a.75.75 0 0 0-.75.75v5.249a3.001 3.001 0 0 0 4.238 2.735c.133.49.324.956.564 1.392A4.501 4.501 0 0 1 2 18.499V13.25A2.25 2.25 0 0 1 4.25 11zm19.5 0A2.25 2.25 0 0 1 26 13.25v5.25a4.5 4.5 0 0 1-6.298 4.127l.056-.102c.214-.406.387-.837.511-1.289A3 3 0 0 0 24.5 18.5v-5.25a.75.75 0 0 0-.749-.75h-3.333A3.242 3.242 0 0 0 19.6 11h4.151zM14 3a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 1 0-7zm8.003 1a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM5.997 4a3 3 0 1 1 0 6a3 3 0 0 1 0-6zM14 4.5a2 2 0 1 0 0 4a2 2 0 0 0 0-4zm8.003 1a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3zm-16.006 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3z"
+                fill="currentColor"
+              ></path>
             </svg>
           </div>
-          <h3>No staff records found</h3>
-          <p>Try a different search term or adjust the active filters.</p>
+          <h3>មិនមានទិន្នន័យមន្ត្រី</h3>
+          <p>សូមសាកល្បងពាក្យស្វែងរកផ្សេង ឬកែតម្រូវតម្រងដែលកំពុងប្រើ។</p>
         </div>
       </Transition>
 
       <Transition name="slide-fade">
         <div v-if="table.loading" class="table-loading">
           <div class="spinner">
-            <svg class="animate-spin w-16 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-              <path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48s21.49-48 48-48s48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48s48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.491-48-48-48z" fill="currentColor"></path>
+            <svg
+              class="animate-spin w-16 mx-auto text-blue-500"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+            >
+              <path
+                d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48s21.49-48 48-48s48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48s48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48s48-21.49 48-48s-21.491-48-48-48z"
+                fill="currentColor"
+              ></path>
             </svg>
-            <p class="table-loading-text">Loading staff records...</p>
+            <p class="table-loading-text">កំពុងផ្ទុកទិន្នន័យមន្ត្រី...</p>
           </div>
-          <button type="button" class="table-loading-close" @click="closeTableLoading">
+          <button
+            type="button"
+            class="table-loading-close"
+            @click="closeTableLoading"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-              <path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"></path>
-              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M320 320L192 192"></path>
-              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M192 320l128-128"></path>
+              <path
+                d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192z"
+                fill="none"
+                stroke="currentColor"
+                stroke-miterlimit="10"
+                stroke-width="32"
+              ></path>
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="32"
+                d="M320 320L192 192"
+              ></path>
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="32"
+                d="M192 320l128-128"
+              ></path>
             </svg>
           </button>
         </div>
@@ -300,20 +462,27 @@
           @click="previous()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M14.71 15.88L10.83 12l3.88-3.88a.996.996 0 1 0-1.41-1.41L8.71 11.3a.996.996 0 0 0 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0c.38-.39.39-1.03 0-1.42z" fill="currentColor"></path>
+            <path
+              d="M14.71 15.88L10.83 12l3.88-3.88a.996.996 0 1 0-1.41-1.41L8.71 11.3a.996.996 0 0 0 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0c.38-.39.39-1.03 0-1.42z"
+              fill="currentColor"
+            ></path>
           </svg>
-          Previous
+          មុន
         </button>
 
         <div class="table-footer-center">
-          <span class="table-footer-summary">{{ $toKhmer(table.pagination.totalRecords) }} records</span>
+          <span class="table-footer-summary"
+            >{{ $toKhmer(table.pagination.totalRecords) }} កំណត់ត្រា</span
+          >
           <div class="table-page-list">
             <button
               v-for="(page, index) in table.pagination.buttons"
               :key="index"
               type="button"
               class="table-page-button"
-              :class="{ 'table-page-button-active': table.pagination.page == page }"
+              :class="{
+                'table-page-button-active': table.pagination.page == page,
+              }"
               @click="table.pagination.page == page ? false : goTo(page)"
             >
               {{ $toKhmer(page) }}
@@ -327,15 +496,23 @@
           :disabled="table.pagination.page >= table.pagination.totalPages"
           @click="next()"
         >
-          Next
+          បន្ទាប់
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M9.29 15.88L13.17 12L9.29 8.12a.996.996 0 1 1 1.41-1.41l4.59 4.59c.39.39.39 1.02 0 1.41L10.7 17.3a.996.996 0 0 1-1.41 0c-.38-.39-.39-1.03 0-1.42z" fill="currentColor"></path>
+            <path
+              d="M9.29 15.88L13.17 12L9.29 8.12a.996.996 0 1 1 1.41-1.41l4.59 4.59c.39.39.39 1.02 0 1.41L10.7 17.3a.996.996 0 0 1-1.41 0c-.38-.39-.39-1.03 0-1.42z"
+              fill="currentColor"
+            ></path>
           </svg>
         </button>
       </div>
     </div>
 
-    <create-form v-if="createModal.show" v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal" />
+    <create-form
+      v-if="createModal.show"
+      v-bind:model="model"
+      v-bind:show="createModal.show"
+      :onClose="closeCreateModal"
+    />
     <create-non-officer-form
       v-if="createNonOfficerModal.show"
       v-bind:model="model"
@@ -346,67 +523,79 @@
 </template>
 
 <script>
-import { reactive, ref, computed, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter, useRoute } from 'vue-router'
-import { useNotification } from 'naive-ui'
-import dateFormat from 'dateformat'
+import {
+  reactive,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  defineAsyncComponent,
+} from "vue";
+import { useStore } from "vuex";
+import { useRouter, useRoute } from "vue-router";
+import { useNotification } from "naive-ui";
+import dateFormat from "dateformat";
 
-import defaultOfficerAvatar from './../../../assets/logo copy.png'
-import TableActionsForm from './actions/table-action.vue'
+import defaultOfficerAvatar from "./../../../assets/logo copy.png";
+import TableActionsForm from "./actions/table-action.vue";
 
-const CreateForm = defineAsyncComponent(() => import('./../widgets/create.vue'))
-const CreateNonOfficerForm = defineAsyncComponent(() => import('./../widgets/createnonofficer.vue'))
+const CreateForm = defineAsyncComponent(
+  () => import("./../widgets/create.vue"),
+);
+const CreateNonOfficerForm = defineAsyncComponent(
+  () => import("./../widgets/createnonofficer.vue"),
+);
 
 export default {
-  name: 'People',
+  name: "People",
   components: {
     CreateForm,
     CreateNonOfficerForm,
-    TableActionsForm
+    TableActionsForm,
   },
   setup() {
-    const store = useStore()
-    const route = useRoute()
-    const notify = useNotification()
-    const router = useRouter()
+    const store = useStore();
+    const route = useRoute();
+    const notify = useNotification();
+    const router = useRouter();
 
     const peopleIds = ref(
-      typeof route.params.ids === 'string' && route.params.ids.trim().length > 0
-        ? route.params.ids.split(',')
-        : null
-    )
+      typeof route.params.ids === "string" && route.params.ids.trim().length > 0
+        ? route.params.ids.split(",")
+        : null,
+    );
 
     const model = reactive({
-      name: 'officer',
-      module: 'officers',
-      title: 'មន្ត្រីរាជការមុខងារសាធារណៈ'
-    })
+      name: "officer",
+      module: "officers",
+      title: "មន្ត្រីរាជការមុខងារសាធារណៈ",
+    });
 
     const table = reactive({
       loading: false,
-      search: '',
+      search: "",
       records: {
         all: [],
-        matched: []
+        matched: [],
       },
       columns: {
         searchable: {
-          username: '',
-          firstname: '',
-          lastname: '',
-          email: '',
-          phone: '',
-          active: ''
+          username: "",
+          firstname: "",
+          lastname: "",
+          email: "",
+          phone: "",
+          active: "",
         },
         format: {
-          username: '',
-          firstname: '',
-          lastname: '',
-          email: '',
-          phone: '',
-          active: ''
-        }
+          username: "",
+          firstname: "",
+          lastname: "",
+          email: "",
+          phone: "",
+          active: "",
+        },
       },
       pagination: {
         perPage: 20,
@@ -415,32 +604,34 @@ export default {
         totalRecords: 0,
         start: 0,
         end: 0,
-        buttons: []
-      }
-    })
+        buttons: [],
+      },
+    });
 
-    const perPageOptions = [5, 10, 20, 30, 40, 50, 100, 200, 500].map((value) => ({
-      label: value,
-      value
-    }))
+    const perPageOptions = [5, 10, 20, 30, 40, 50, 100, 200, 500].map(
+      (value) => ({
+        label: value,
+        value,
+      }),
+    );
 
-    const avatarRefreshKey = ref(Date.now())
-    const selectedPositions = ref([])
-    const selectedOrganizations = ref([])
-    const filter = ref(false)
-    const columnStorageKey = 'officer-listing-table-columns'
+    const avatarRefreshKey = ref(Date.now());
+    const selectedPositions = ref([]);
+    const selectedOrganizations = ref([]);
+    const filter = ref(false);
+    const columnStorageKey = "officer-listing-table-columns";
     const columnOptions = [
-      { key: 'serial', label: 'No.' },
-      { key: 'staff', label: 'Staff' },
-      { key: 'nationalId', label: 'National ID' },
-      { key: 'birthDate', label: 'Birth Date' },
-      { key: 'startDate', label: 'Start Date' },
-      { key: 'officialDate', label: 'Official Date' },
-      { key: 'rank', label: 'Rank' },
-      { key: 'organization', label: 'Organization / Position' },
-      { key: 'email', label: 'Email' },
-      { key: 'actions', label: 'Actions' }
-    ]
+      { key: "serial", label: "ល.រ" },
+      { key: "staff", label: "មន្ត្រី" },
+      { key: "nationalId", label: "អត្តលេខជាតិ" },
+      { key: "birthDate", label: "ថ្ងៃខែឆ្នាំកំណើត" },
+      { key: "startDate", label: "ថ្ងៃចូលបម្រើការងារ" },
+      { key: "officialDate", label: "ថ្ងៃក្របខ័ណ្ឌ" },
+      { key: "rank", label: "ឋានៈ" },
+      { key: "organization", label: "អង្គភាព / មុខតំណែង" },
+      { key: "email", label: "អ៊ីមែល" },
+      { key: "actions", label: "សកម្មភាព" },
+    ];
     const defaultColumnVisibility = {
       serial: true,
       staff: true,
@@ -451,132 +642,164 @@ export default {
       rank: true,
       organization: true,
       email: true,
-      actions: true
-    }
-    const columnVisibility = reactive({ ...defaultColumnVisibility })
-    let filterTimeout = null
+      actions: true,
+    };
+    const columnVisibility = reactive({ ...defaultColumnVisibility });
+    let filterTimeout = null;
 
     function countSelectedEntries(values) {
       return Array.isArray(values)
-        ? values.filter((value) => value !== null && value !== undefined && `${value}`.trim() !== '').length
-        : 0
+        ? values.filter(
+            (value) =>
+              value !== null && value !== undefined && `${value}`.trim() !== "",
+          ).length
+        : 0;
     }
 
-    const hasRecords = computed(() => Array.isArray(table.records.matched) && table.records.matched.length > 0)
+    const hasRecords = computed(
+      () =>
+        Array.isArray(table.records.matched) &&
+        table.records.matched.length > 0,
+    );
     const columnVisibilityState = computed(() =>
       columnOptions.reduce((state, column) => {
-        state[column.key] = columnVisibility[column.key]
-        return state
-      }, {})
-    )
+        state[column.key] = columnVisibility[column.key];
+        return state;
+      }, {}),
+    );
     const visibleColumnCount = computed(() => {
-      return columnOptions.filter((column) => columnVisibility[column.key]).length
-    })
+      return columnOptions.filter((column) => columnVisibility[column.key])
+        .length;
+    });
 
     const activeFilterCount = computed(() => {
-      return countSelectedEntries(selectedPositions.value) + countSelectedEntries(selectedOrganizations.value)
-    })
+      return (
+        countSelectedEntries(selectedPositions.value) +
+        countSelectedEntries(selectedOrganizations.value)
+      );
+    });
 
     const summaryTabs = computed(() => {
       return [
-        { label: 'All Staff', value: table.pagination.totalRecords || 0 },
-        { label: 'Showing', value: Array.isArray(table.records.matched) ? table.records.matched.length : 0 },
-        { label: 'Positions', value: countSelectedEntries(selectedPositions.value) },
-        { label: 'Organizations', value: countSelectedEntries(selectedOrganizations.value) }
-      ]
-    })
+        { label: "មន្ត្រីទាំងអស់", value: table.pagination.totalRecords || 0 },
+        {
+          label: "កំពុងបង្ហាញ",
+          value: Array.isArray(table.records.matched)
+            ? table.records.matched.length
+            : 0,
+        },
+        {
+          label: "មុខតំណែង",
+          value: countSelectedEntries(selectedPositions.value),
+        },
+        {
+          label: "អង្គភាព",
+          value: countSelectedEntries(selectedOrganizations.value),
+        },
+      ];
+    });
 
     const optionPositions = computed(() => {
       let positions =
-        Array.isArray(store.getters['position/getRecords']) && store.getters['position/getRecords'].length > 0
-          ? store.getters['position/getRecords']
-          : []
+        Array.isArray(store.getters["position/getRecords"]) &&
+        store.getters["position/getRecords"].length > 0
+          ? store.getters["position/getRecords"]
+          : [];
       positions = positions.map((position) => {
-        return { label: position.name, value: position.id }
-      })
-      return positions
-    })
+        return { label: position.name, value: position.id };
+      });
+      return positions;
+    });
 
     const optionOrganizations = computed(() => {
       let organizations =
-        Array.isArray(store.getters['organization/getRecords']) && store.getters['organization/getRecords'].length > 0
-          ? store.getters['organization/getRecords']
-          : []
+        Array.isArray(store.getters["organization/getRecords"]) &&
+        store.getters["organization/getRecords"].length > 0
+          ? store.getters["organization/getRecords"]
+          : [];
       organizations = organizations.map((organization) => {
-        return { label: organization.name, value: organization.id }
-      })
-      return organizations
-    })
+        return { label: organization.name, value: organization.id };
+      });
+      return organizations;
+    });
 
-    function normalizeText(value, fallback = '--') {
+    function normalizeText(value, fallback = "--") {
       if (value === null || value === undefined) {
-        return fallback
+        return fallback;
       }
 
-      const text = `${value}`.trim()
-      return text.length > 0 ? text : fallback
+      const text = `${value}`.trim();
+      return text.length > 0 ? text : fallback;
     }
 
     function getKhmerName(record) {
-      const parts = [record?.countesy?.name, record?.people?.lastname, record?.people?.firstname].filter(
-        (value) => typeof value === 'string' && value.trim().length > 0
-      )
-      return parts.length > 0 ? parts.join(' ') : '--'
+      const parts = [
+        record?.countesy?.name,
+        record?.people?.lastname,
+        record?.people?.firstname,
+      ].filter((value) => typeof value === "string" && value.trim().length > 0);
+      return parts.length > 0 ? parts.join(" ") : "--";
     }
 
     function getEnglishName(record) {
-      const parts = [record?.people?.enlastname, record?.people?.enfirstname].filter(
-        (value) => typeof value === 'string' && value.trim().length > 0
-      )
-      return parts.length > 0 ? parts.join(' ') : '--'
+      const parts = [
+        record?.people?.enlastname,
+        record?.people?.enfirstname,
+      ].filter((value) => typeof value === "string" && value.trim().length > 0);
+      return parts.length > 0 ? parts.join(" ") : "--";
     }
 
     function getOfficerCode(record) {
-      return normalizeText(record?.code)
+      return normalizeText(record?.code);
     }
 
     function getNationalId(record) {
-      return normalizeText(record?.people?.nid)
+      return normalizeText(record?.people?.nid);
     }
 
     function getRankName(record) {
-      return normalizeText(record?.rank?.name)
+      return normalizeText(record?.rank?.name);
     }
 
     function getOrganizationName(record) {
-      return normalizeText(record?.current_job?.organization_structure_position?.organization_structure?.organization?.name)
+      return normalizeText(
+        record?.current_job?.organization_structure_position
+          ?.organization_structure?.organization?.name,
+      );
     }
 
     function getPositionName(record) {
-      return normalizeText(record?.current_job?.organization_structure_position?.position?.name)
+      return normalizeText(
+        record?.current_job?.organization_structure_position?.position?.name,
+      );
     }
 
     function getEmail(record) {
-      return normalizeText(record?.email)
+      return normalizeText(record?.email);
     }
 
     function formatDateLabel(value) {
       if (!value) {
-        return '--'
+        return "--";
       }
 
-      const parsedDate = new Date(value)
+      const parsedDate = new Date(value);
       if (Number.isNaN(parsedDate.getTime())) {
-        return '--'
+        return "--";
       }
 
-      return dateFormat(parsedDate, 'dd-mm-yyyy')
+      return dateFormat(parsedDate, "dd-mm-yyyy");
     }
 
     function getInitials(record) {
-      const englishName = getEnglishName(record)
+      const englishName = getEnglishName(record);
       const khmerName = [record?.people?.lastname, record?.people?.firstname]
-        .filter((value) => typeof value === 'string' && value.trim().length > 0)
-        .join(' ')
+        .filter((value) => typeof value === "string" && value.trim().length > 0)
+        .join(" ");
 
-      const source = englishName !== '--' ? englishName : khmerName
+      const source = englishName !== "--" ? englishName : khmerName;
       if (!source) {
-        return 'OC'
+        return "OC";
       }
 
       const initials = source
@@ -584,162 +807,183 @@ export default {
         .filter(Boolean)
         .slice(0, 2)
         .map((part) => part.charAt(0))
-        .join('')
-        .toUpperCase()
+        .join("")
+        .toUpperCase();
 
-      return initials || 'OC'
+      return initials || "OC";
     }
 
     function resolveAvatarUrl(record) {
-      const candidates = [record?.image, record?.avatar_url, record?.people?.avatar_url, record?.user?.avatar_url]
-      return candidates.find((value) => typeof value === 'string' && value.trim().length > 0) || null
+      const candidates = [
+        record?.image,
+        record?.avatar_url,
+        record?.people?.avatar_url,
+        record?.user?.avatar_url,
+      ];
+      return (
+        candidates.find(
+          (value) => typeof value === "string" && value.trim().length > 0,
+        ) || null
+      );
     }
 
     function withAvatarVersion(url, record) {
-      if (typeof url !== 'string' || url.trim().length <= 0 || url.startsWith('data:')) {
-        return url
+      if (
+        typeof url !== "string" ||
+        url.trim().length <= 0 ||
+        url.startsWith("data:")
+      ) {
+        return url;
       }
       const version =
-        record?.updated_at || record?.user?.updated_at || record?.people?.updated_at || avatarRefreshKey.value
-      const separator = url.includes('?') ? '&' : '?'
-      return `${url}${separator}v=${encodeURIComponent(version)}`
+        record?.updated_at ||
+        record?.user?.updated_at ||
+        record?.people?.updated_at ||
+        avatarRefreshKey.value;
+      const separator = url.includes("?") ? "&" : "?";
+      return `${url}${separator}v=${encodeURIComponent(version)}`;
     }
 
     function hasAvatar(record) {
-      const avatarUrl = resolveAvatarUrl(record)
-      return typeof avatarUrl === 'string' && avatarUrl.trim().length > 0
+      const avatarUrl = resolveAvatarUrl(record);
+      return typeof avatarUrl === "string" && avatarUrl.trim().length > 0;
     }
 
     function getAvatarUrl(record) {
       return hasAvatar(record)
         ? withAvatarVersion(resolveAvatarUrl(record).trim(), record)
-        : defaultOfficerAvatar
+        : defaultOfficerAvatar;
     }
 
     function setFallbackAvatar(event) {
       if (event?.target) {
-        event.target.onerror = null
-        event.target.src = defaultOfficerAvatar
-        event.target.classList.add('person-avatar-image-default')
+        event.target.onerror = null;
+        event.target.src = defaultOfficerAvatar;
+        event.target.classList.add("person-avatar-image-default");
       }
     }
 
     function resetColumnVisibility() {
-      Object.assign(columnVisibility, defaultColumnVisibility)
+      Object.assign(columnVisibility, defaultColumnVisibility);
     }
 
     function loadColumnVisibility() {
-      if (typeof window === 'undefined') {
-        return
+      if (typeof window === "undefined") {
+        return;
       }
 
       try {
-        const storedValue = window.localStorage.getItem(columnStorageKey)
+        const storedValue = window.localStorage.getItem(columnStorageKey);
         if (!storedValue) {
-          return
+          return;
         }
 
-        const parsedValue = JSON.parse(storedValue)
+        const parsedValue = JSON.parse(storedValue);
         columnOptions.forEach((column) => {
-          if (typeof parsedValue?.[column.key] === 'boolean') {
-            columnVisibility[column.key] = parsedValue[column.key]
+          if (typeof parsedValue?.[column.key] === "boolean") {
+            columnVisibility[column.key] = parsedValue[column.key];
           }
-        })
+        });
 
         if (!columnOptions.some((column) => columnVisibility[column.key])) {
-          resetColumnVisibility()
+          resetColumnVisibility();
         }
       } catch (error) {
-        console.log(error)
-        resetColumnVisibility()
+        console.log(error);
+        resetColumnVisibility();
       }
     }
 
     function filterRecords(helper = true) {
       if (helper) {
-        if (table.search === '') {
-          table.records.matched = table.records.all
-          return
+        if (table.search === "") {
+          table.records.matched = table.records.all;
+          return;
         }
 
-        table.records.matched = []
+        table.records.matched = [];
         for (const index in table.records.all) {
           for (const field in table.records.all[index]) {
-            if ((`${table.records.all[index][field]}`).includes(table.search) !== false) {
-              table.records.matched.push(table.records.all[index])
-              break
+            if (
+              `${table.records.all[index][field]}`.includes(table.search) !==
+              false
+            ) {
+              table.records.matched.push(table.records.all[index]);
+              break;
             }
           }
         }
-        return
+        return;
       }
 
       if (filterTimeout) {
-        window.clearTimeout(filterTimeout)
+        window.clearTimeout(filterTimeout);
       }
 
       filterTimeout = window.setTimeout(() => {
-        table.pagination.page = 1
-        getRecords()
-      }, 350)
+        table.pagination.page = 1;
+        getRecords();
+      }, 350);
     }
 
     function buildPaginationButtons() {
-      const visibleButtons = 7
-      const halfWindow = Math.floor(visibleButtons / 2)
-      const totalPages = table.pagination.totalPages || 0
+      const visibleButtons = 7;
+      const halfWindow = Math.floor(visibleButtons / 2);
+      const totalPages = table.pagination.totalPages || 0;
 
       if (totalPages <= 0) {
-        table.pagination.start = 0
-        table.pagination.end = 0
-        table.pagination.buttons = []
-        return
+        table.pagination.start = 0;
+        table.pagination.end = 0;
+        table.pagination.buttons = [];
+        return;
       }
 
-      let start = table.pagination.page - halfWindow
-      let end = table.pagination.page + halfWindow
+      let start = table.pagination.page - halfWindow;
+      let end = table.pagination.page + halfWindow;
 
       if (start < 1) {
-        start = 1
-        end = Math.min(visibleButtons, totalPages)
+        start = 1;
+        end = Math.min(visibleButtons, totalPages);
       }
 
       if (end > totalPages) {
-        end = totalPages
-        start = Math.max(1, end - visibleButtons + 1)
+        end = totalPages;
+        start = Math.max(1, end - visibleButtons + 1);
       }
 
-      table.pagination.start = start
-      table.pagination.end = end
-      table.pagination.buttons = []
+      table.pagination.start = start;
+      table.pagination.end = end;
+      table.pagination.buttons = [];
 
       for (let page = start; page <= end; page += 1) {
-        table.pagination.buttons.push(page)
+        table.pagination.buttons.push(page);
       }
     }
 
     function getRecords() {
       if (filterTimeout) {
-        window.clearTimeout(filterTimeout)
-        filterTimeout = null
+        window.clearTimeout(filterTimeout);
+        filterTimeout = null;
       }
 
-      table.loading = true
+      table.loading = true;
 
       store
-        .dispatch(model.name + '/list', {
+        .dispatch(model.name + "/list", {
           search: table.search,
           perPage: table.pagination.perPage,
           page: table.pagination.page,
           positions: selectedPositions.value,
           organizations: selectedOrganizations.value,
-          ids: peopleIds.value
+          ids: peopleIds.value,
         })
         .then((res) => {
-          table.records.all = Array.isArray(res?.data?.records) ? res.data.records : []
-          table.records.matched = table.records.all
+          table.records.all = Array.isArray(res?.data?.records)
+            ? res.data.records
+            : [];
+          table.records.matched = table.records.all;
 
-          const pagination = res?.data?.pagination || {}
+          const pagination = res?.data?.pagination || {};
           table.pagination = {
             ...table.pagination,
             ...pagination,
@@ -749,246 +993,257 @@ export default {
             totalRecords: pagination.totalRecords ?? 0,
             start: 0,
             end: 0,
-            buttons: []
-          }
+            buttons: [],
+          };
 
           if (table.pagination.totalPages <= 0) {
-            table.pagination.page = 1
+            table.pagination.page = 1;
           }
 
-          buildPaginationButtons()
-          closeTableLoading()
+          buildPaginationButtons();
+          closeTableLoading();
         })
         .catch((err) => {
-          console.log(err)
-          closeTableLoading()
-        })
+          console.log(err);
+          closeTableLoading();
+        });
     }
 
     function closeTableLoading() {
-      table.loading = false
+      table.loading = false;
     }
 
     function maxPage() {
-      return table.pagination.totalPages > 0 ? table.pagination.totalPages : 1
+      return table.pagination.totalPages > 0 ? table.pagination.totalPages : 1;
     }
 
     function previous() {
-      goTo(table.pagination.page <= 1 ? 1 : table.pagination.page - 1)
+      goTo(table.pagination.page <= 1 ? 1 : table.pagination.page - 1);
     }
 
     function next() {
-      goTo(table.pagination.page >= maxPage() ? maxPage() : table.pagination.page + 1)
+      goTo(
+        table.pagination.page >= maxPage()
+          ? maxPage()
+          : table.pagination.page + 1,
+      );
     }
 
     function goTo(page) {
-      table.pagination.page = page > maxPage() ? maxPage() : page < 1 ? 1 : page
-      getRecords()
+      table.pagination.page =
+        page > maxPage() ? maxPage() : page < 1 ? 1 : page;
+      getRecords();
     }
 
-    const createModal = reactive({ show: false })
+    const createModal = reactive({ show: false });
 
     function showCreateModal() {
-      ensureCreateLookups()
-      createModal.show = true
+      ensureCreateLookups();
+      createModal.show = true;
     }
 
     function closeCreateModal(actionStatus) {
-      createModal.show = false
+      createModal.show = false;
       if (parseInt(actionStatus, 10) > 0) {
-        getRecords()
+        getRecords();
       }
     }
 
-    const createNonOfficerModal = reactive({ show: false })
+    const createNonOfficerModal = reactive({ show: false });
 
     function showCreateNonOfficerModal() {
-      ensureCreateLookups()
-      createNonOfficerModal.show = true
+      ensureCreateLookups();
+      createNonOfficerModal.show = true;
     }
 
     function closeCreateNonOfficerModal(actionStatus) {
-      createNonOfficerModal.show = false
+      createNonOfficerModal.show = false;
       if (parseInt(actionStatus, 10) > 0) {
-        getRecords()
+        getRecords();
       }
     }
 
     function closeActions(actionStatus) {
       if (parseInt(actionStatus, 10) > 0) {
-        avatarRefreshKey.value = Date.now()
-        getRecords()
+        avatarRefreshKey.value = Date.now();
+        getRecords();
       }
     }
 
     function ensureFilterLookups() {
-      if (!Array.isArray(store.getters['position/getRecords']) || store.getters['position/getRecords'].length <= 0) {
-        getPositions()
+      if (
+        !Array.isArray(store.getters["position/getRecords"]) ||
+        store.getters["position/getRecords"].length <= 0
+      ) {
+        getPositions();
       }
 
       if (
-        !Array.isArray(store.getters['organization/getRecords']) ||
-        store.getters['organization/getRecords'].length <= 0
+        !Array.isArray(store.getters["organization/getRecords"]) ||
+        store.getters["organization/getRecords"].length <= 0
       ) {
-        getOrganizations()
+        getOrganizations();
       }
     }
 
     function ensureCreateLookups() {
-      ensureFilterLookups()
-      if (!Array.isArray(store.getters['countesy/getRecords']) || store.getters['countesy/getRecords'].length <= 0) {
-        getCountesies()
+      ensureFilterLookups();
+      if (
+        !Array.isArray(store.getters["countesy/getRecords"]) ||
+        store.getters["countesy/getRecords"].length <= 0
+      ) {
+        getCountesies();
       }
-      getRankStructure()
-      getPdcv()
+      getRankStructure();
+      getPdcv();
     }
 
     function getPositions() {
       store
-        .dispatch('position/structurePosition', {
+        .dispatch("position/structurePosition", {
           page: 1,
           perPage: 1000,
-          search: ''
+          search: "",
         })
         .then((res) => {
-          store.commit('position/setRecords', res.data.records)
+          store.commit("position/setRecords", res.data.records);
         })
         .catch((err) => {
           notify.error({
-            title: 'Load Positions',
-            description: 'There was a problem while loading positions.'
-          })
-          console.log(err)
-        })
+            title: "Load Positions",
+            description: "There was a problem while loading positions.",
+          });
+          console.log(err);
+        });
     }
 
     function getOrganizations() {
       store
-        .dispatch('organization/organizationStructure', {
+        .dispatch("organization/organizationStructure", {
           page: 1,
           perPage: 1000,
-          search: '',
-          id: 0
+          search: "",
+          id: 0,
         })
         .then((res) => {
-          store.commit('organization/setRecords', res.data.records)
+          store.commit("organization/setRecords", res.data.records);
         })
         .catch((err) => {
           notify.error({
-            title: 'Load Organizations',
-            description: 'There was a problem while loading organizations.'
-          })
-          console.log(err)
-        })
+            title: "Load Organizations",
+            description: "There was a problem while loading organizations.",
+          });
+          console.log(err);
+        });
     }
 
     function getCountesies() {
       store
-        .dispatch('countesy/list', {
+        .dispatch("countesy/list", {
           page: 1,
           perPage: 1000,
-          search: ''
+          search: "",
         })
         .then((res) => {
-          store.commit('countesy/setRecords', res.data.records)
+          store.commit("countesy/setRecords", res.data.records);
         })
         .catch((err) => {
           notify.error({
-            title: 'Load Courtesy Titles',
-            description: 'There was a problem while loading courtesy titles.'
-          })
-          console.log(err)
-        })
+            title: "Load Courtesy Titles",
+            description: "There was a problem while loading courtesy titles.",
+          });
+          console.log(err);
+        });
     }
 
     function closeFilter() {
-      filter.value = false
+      filter.value = false;
     }
 
     function openFilter() {
-      filter.value = true
-      ensureFilterLookups()
+      filter.value = true;
+      ensureFilterLookups();
     }
 
     function toggleFilter() {
-      filter.value ? closeFilter() : openFilter()
+      filter.value ? closeFilter() : openFilter();
     }
 
     function resetFilters() {
-      selectedPositions.value = []
-      selectedOrganizations.value = []
-      table.pagination.page = 1
-      getRecords()
+      selectedPositions.value = [];
+      selectedOrganizations.value = [];
+      table.pagination.page = 1;
+      getRecords();
     }
 
     function handleKeydown(event) {
-      if (event.key === 'Escape') {
-        closeFilter()
+      if (event.key === "Escape") {
+        closeFilter();
       }
     }
 
     function getRankStructure() {
-      if (store.getters['rank/records'].all.length <= 0) {
+      if (store.getters["rank/records"].all.length <= 0) {
         store
-          .dispatch('rank/structure')
+          .dispatch("rank/structure")
           .then((res) => {
             if (res.data.ok) {
-              store.commit('rank/setAllRecords', res.data.records)
+              store.commit("rank/setAllRecords", res.data.records);
             } else {
               notify.info({
-                title: 'Load Ranks',
-                description: res.data.message
-              })
+                title: "Load Ranks",
+                description: res.data.message,
+              });
             }
           })
           .catch((err) => {
-            console.log(err)
-          })
+            console.log(err);
+          });
       }
     }
 
     function getPdcv() {
-      if (store.getters['province/records'].all.length <= 0) {
+      if (store.getters["province/records"].all.length <= 0) {
         store
-          .dispatch('province/pdcv')
+          .dispatch("province/pdcv")
           .then((res) => {
-            store.commit('province/setAllRecords', res.data.provinces)
-            store.commit('district/setAllRecords', res.data.districts)
-            store.commit('commune/setAllRecords', res.data.communes)
-            store.commit('village/setAllRecords', res.data.villages)
+            store.commit("province/setAllRecords", res.data.provinces);
+            store.commit("district/setAllRecords", res.data.districts);
+            store.commit("commune/setAllRecords", res.data.communes);
+            store.commit("village/setAllRecords", res.data.villages);
           })
           .catch((err) => {
-            console.log(err)
-          })
+            console.log(err);
+          });
       }
     }
 
     function thumbnailView() {
-      router.push('/hr/officer')
+      router.push("/hr/officer");
     }
 
     watch(
       columnVisibilityState,
       (value) => {
-        if (typeof window === 'undefined') {
-          return
+        if (typeof window === "undefined") {
+          return;
         }
 
-        window.localStorage.setItem(columnStorageKey, JSON.stringify(value))
+        window.localStorage.setItem(columnStorageKey, JSON.stringify(value));
       },
-      { deep: true }
-    )
+      { deep: true },
+    );
 
     onMounted(() => {
-      loadColumnVisibility()
-      window.addEventListener('keydown', handleKeydown)
-    })
+      loadColumnVisibility();
+      window.addEventListener("keydown", handleKeydown);
+    });
 
     onBeforeUnmount(() => {
-      window.removeEventListener('keydown', handleKeydown)
-    })
+      window.removeEventListener("keydown", handleKeydown);
+    });
 
-    getRecords()
+    getRecords();
 
     return {
       model,
@@ -1034,16 +1289,17 @@ export default {
       hasAvatar,
       getAvatarUrl,
       setFallbackAvatar,
-      resetColumnVisibility
-    }
-  }
-}
+      resetColumnVisibility,
+    };
+  },
+};
 </script>
 
 <style type="text/css" scoped>
 .staff-directory-page {
   width: 100%;
   padding: 24px;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-hero {
@@ -1106,7 +1362,7 @@ export default {
   line-height: 1.35;
   font-weight: 650;
   letter-spacing: 0.01em;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .table-hero-actions {
@@ -1197,7 +1453,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .table-stat-value {
@@ -1207,7 +1463,7 @@ export default {
   font-size: 24px;
   line-height: 1;
   font-weight: 700;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .staff-table-card {
@@ -1251,7 +1507,7 @@ export default {
   background: #f8fafc;
   color: #0f172a;
   font-size: 13px;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
   transition: 0.2s ease;
 }
 
@@ -1281,7 +1537,7 @@ export default {
   color: #334155;
   font-size: 13px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -1349,7 +1605,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
 }
@@ -1420,7 +1676,7 @@ export default {
   line-height: 1.6;
   font-weight: 650;
   letter-spacing: 0.01em;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .person-meta {
@@ -1428,7 +1684,7 @@ export default {
   color: #64748b;
   font-size: 12px;
   line-height: 1.5;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .person-tags {
@@ -1448,7 +1704,7 @@ export default {
   font-size: 11px;
   font-weight: 700;
   background: #eff6ff;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .cell-quiet {
@@ -1465,7 +1721,7 @@ export default {
   font-size: 12px;
   font-weight: 650;
   background: #fef3c7;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .job-cell {
@@ -1480,14 +1736,14 @@ export default {
   font-size: 13px;
   font-weight: 650;
   line-height: 1.6;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .job-secondary {
   color: #64748b;
   font-size: 12px;
   line-height: 1.5;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .email-cell {
@@ -1535,14 +1791,14 @@ export default {
   color: #0f172a;
   font-size: 20px;
   font-weight: 700;
-  font-family: "ktr", "btb", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .table-empty-state p {
   margin: 10px 0 0;
   max-width: 360px;
   line-height: 1.7;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-loading {
@@ -1562,7 +1818,7 @@ export default {
   font-size: 13px;
   font-weight: 700;
   text-align: center;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-loading-close {
@@ -1636,7 +1892,7 @@ export default {
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-page-list {
@@ -1656,7 +1912,7 @@ export default {
   color: #475569;
   font-size: 13px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -1696,7 +1952,7 @@ export default {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .table-filter-reset {
@@ -1714,7 +1970,7 @@ export default {
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-filter-reset:hover {
@@ -1749,7 +2005,7 @@ export default {
   color: #0f172a;
   font-size: 13px;
   font-weight: 700;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "moul", Arial, sans-serif;
 }
 
 .table-view-reset {
@@ -1760,7 +2016,7 @@ export default {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 .table-view-list {
@@ -1782,7 +2038,7 @@ export default {
 .table-view-panel :deep(.n-checkbox__label) {
   color: #334155;
   font-size: 13px;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "sr", Arial, sans-serif;
 }
 
 @media (max-width: 1100px) {

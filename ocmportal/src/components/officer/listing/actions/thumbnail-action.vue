@@ -78,7 +78,7 @@
           <span>Edit</span>
         </button>
 
-        <button
+        <!-- <button
           v-if="$hasPermission('portal_staff_profile_photo_change')"
           type="button"
           class="thumb-action thumb-action-cyan"
@@ -95,7 +95,7 @@
             ></path>
           </svg>
           <span>Photo</span>
-        </button>
+        </button> -->
 
         <button
           v-if="$hasPermission('portal_staff_print_preview_officer_card')"
@@ -182,7 +182,7 @@
       v-bind:show="editModal.show"
       :onClose="closeUpdate"
     />
-    <detail-form
+    <print-profile-form
       v-if="detailModal.show"
       v-bind:model="model"
       v-bind:record="record"
@@ -221,8 +221,8 @@ import { useDialog, useMessage, useNotification } from "naive-ui";
 const UpdateForm = defineAsyncComponent(
   () => import("./../../widgets/update.vue"),
 );
-const DetailForm = defineAsyncComponent(
-  () => import("./../../widgets/detail.vue"),
+const PrintProfileForm = defineAsyncComponent(
+  () => import("./../../widgets/printprofile-popup.vue"),
 );
 const OfficialCardForm = defineAsyncComponent(
   () => import("./../../widgets/officialcard.vue"),
@@ -235,7 +235,7 @@ export default {
   name: "ThumbnailActions",
   components: {
     UpdateForm,
-    DetailForm,
+    PrintProfileForm,
     OfficialCardForm,
     ProfileForm,
   },

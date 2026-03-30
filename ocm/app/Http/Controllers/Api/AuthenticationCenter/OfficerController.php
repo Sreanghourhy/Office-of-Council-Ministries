@@ -1696,6 +1696,105 @@ class OfficerController extends Controller
             'message' => 'រួចរាល់'
         ],200);
     }
+    public function readCardPublic(Request $request){
+
+        if( !isset( $request->key ) || strlen( $request->key ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ážŸáž¼áž˜áž”áž‰áŸ’áž‡áž¶áž€áŸ‹áž¢áŸ†áž–áž¸აჟ›áŸážაჟŸáž˜áŸ’áž‚ាž›áŸ‹áž‚ាžŽាž“ាž¸áŸ”'
+            ],422);
+        }
+
+        $record = RecordModel::where( 'public_key' , $request->key )->first();
+        if( $record == null && is_numeric( $request->key ) ){
+            $record = RecordModel::find( intval( $request->key ) );
+        }
+
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ážŸáŸ’ážœáŸ‚áž„ážšáž€აჟ‚ាžŽាž“ាž¸ាž˜ាž·ាž“ាžƒាž¾ាž‰ាž¡ាž¾ាž™ាŸ”'
+            ],403);
+        }
+
+        $record->user;
+        $record->card;
+        $record->countesy;
+        $record->position;
+        $record->organization;
+        $record->people;
+
+        $currentJob = $record->getCurrentJob();
+        if( $currentJob != null && $currentJob->organizationStructurePosition != null ){
+            $currentJob->organizationStructurePosition->position;
+            if( $currentJob->organizationStructurePosition->organizationStructure != null ){
+                $currentJob->organizationStructurePosition->organizationStructure->organization;
+            }
+        }
+
+        $organizationName = $currentJob != null &&
+            $currentJob->organizationStructurePosition != null &&
+            $currentJob->organizationStructurePosition->organizationStructure != null &&
+            $currentJob->organizationStructurePosition->organizationStructure->organization != null
+                ? $currentJob->organizationStructurePosition->organizationStructure->organization->name
+                : ( $record->organization != null ? $record->organization->name : '' );
+
+        $positionName = $currentJob != null &&
+            $currentJob->organizationStructurePosition != null &&
+            $currentJob->organizationStructurePosition->position != null
+                ? $currentJob->organizationStructurePosition->position->name
+                : ( $record->position != null ? $record->position->name : '' );
+
+        $image = $record->image != null && trim($record->image ) != "" && \Storage::disk('public')->exists( $record->image )
+            ? \Storage::disk('public')->url( $record->image )
+            : (
+                $record->people != null && $record->people->image != null && trim($record->people->image) != "" && \Storage::disk('public')->exists( $record->people->image )
+                ? \Storage::disk('public')->url( $record->people->image )
+                : (
+                    $record->user != null && $record->user->avatar_url != null && trim($record->user->avatar_url) != "" && \Storage::disk('public')->exists( $record->user->avatar_url )
+                    ? \Storage::disk('public')->url( $record->user->avatar_url )
+                    : false
+                )
+            );
+
+        $khmerName = trim( implode( ' ' , array_filter([
+            $record->people != null ? $record->people->lastname : '' ,
+            $record->people != null ? $record->people->firstname : ''
+        ]) ) );
+
+        $englishName = trim( implode( ' ' , array_filter([
+            $record->people != null ? $record->people->enlastname : '' ,
+            $record->people != null ? $record->people->enfirstname : ''
+        ]) ) );
+
+        return response()->json([
+            'record' => [
+                'id' => $record->id ,
+                'public_key' => $record->public_key ,
+                'code' => $record->code ,
+                'card_number' => $record->card != null && isset( $record->card->number ) && strlen( trim( $record->card->number ) ) > 0
+                    ? $record->card->number
+                    : 'OCM-ORG-'.$record->id ,
+                'card_active' => $record->card != null && isset( $record->card->active )
+                    ? intval( $record->card->active )
+                    : 1 ,
+                'card_start' => $record->card != null ? $record->card->start : null ,
+                'card_end' => $record->card != null ? $record->card->end : null ,
+                'image' => $image ,
+                'countesy_name' => $record->countesy != null ? $record->countesy->name : '' ,
+                'khmer_name' => $khmerName ,
+                'english_name' => $englishName ,
+                'gender' => $record->people != null ? $record->people->gender : null ,
+                'dob' => $record->people != null ? $record->people->dob : '' ,
+                'official_date' => $record->official_date ,
+                'unofficial_date' => $record->unofficial_date ,
+                'organization_name' => $organizationName ,
+                'position_name' => $positionName
+            ] ,
+            'ok' => true ,
+            'message' => 'ážšាជ½ា…ាžšា¶ាž›ាŸ‹'
+        ],200);
+    }
     public function readPublic(Request $request){
         
         if( !isset( $request->key ) || strlen( $request->key ) <= 0 ){

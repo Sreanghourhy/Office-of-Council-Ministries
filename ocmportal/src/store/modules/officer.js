@@ -56,6 +56,11 @@ const actions = {
   async read ({ state, commit, rootState },params) {
     return await crud.read(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+'/read')
   },
+  async readCardPublic ({ state, commit, rootState }, params) {
+    return await crud.read(
+      import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+encodeURIComponent(params.key)+'/card'
+    )
+  },
   async mybackground ({ state, commit, rootState },params) {
     const query = new URLSearchParams()
     if (params?.section) {

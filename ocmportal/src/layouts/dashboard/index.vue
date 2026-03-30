@@ -13,16 +13,16 @@
     <div class="relative w-full dashboard-page__content">
       <section class="dashboard-hero dashboard-reveal">
         <div class="dashboard-hero__copy">
-          <div class="dashboard-hero__eyebrow">Staff Analytics Dashboard</div>
+          <div class="dashboard-hero__eyebrow">ផ្ទាំងវិភាគបុគ្គលិក</div>
           <h1 class="dashboard-hero__title font-moul" v-html="model.title"></h1>
           <p class="dashboard-hero__description">
-            Central overview for staff totals, gender balance, departments, positions, and education distribution.
+            ទិដ្ឋភាពសរុបអំពីចំនួនបុគ្គលិក សមាមាត្រភេទ នាយកដ្ឋាន តួនាទី និងកម្រិតអប់រំ។
           </p>
           <div class="dashboard-chip-row">
-            <span class="dashboard-chip">Year {{ selectedYearDisplay }}</span>
-            <span class="dashboard-chip">Total {{ totalStaffFormatted }}</span>
-            <span class="dashboard-chip">Women {{ femaleSharePercent }}%</span>
-            <span class="dashboard-chip">Departments {{ departmentCountFormatted }}</span>
+            <span class="dashboard-chip">ឆ្នាំ {{ selectedYearDisplay }}</span>
+            <span class="dashboard-chip">សរុប {{ totalStaffFormatted }}</span>
+            <span class="dashboard-chip">ស្រី {{ femaleSharePercent }}%</span>
+            <span class="dashboard-chip">នាយកដ្ឋាន {{ departmentCountFormatted }}</span>
           </div>
         </div>
 
@@ -30,15 +30,15 @@
           <div class="dashboard-filter-card">
             <div class="dashboard-filter-card__top">
               <div>
-                <div class="dashboard-filter-card__label">Focus year</div>
-                <div class="dashboard-filter-card__hint">Update the dashboard view by year.</div>
+                <div class="dashboard-filter-card__label">ឆ្នាំផ្តោត</div>
+                <div class="dashboard-filter-card__hint">ជ្រើសឆ្នាំដើម្បីធ្វើបច្ចុប្បន្នភាពទិន្នន័យលើផ្ទាំងគ្រប់គ្រង។</div>
               </div>
               <div class="dashboard-filter-card__actions">
                 <n-select
                   v-model:value="selectedYear"
                   :options="yearOptions"
                   size="small"
-                  placeholder="Year"
+                  placeholder="ជ្រើសរើសឆ្នាំ"
                   clearable
                   class="dashboard-year-select"
                 />
@@ -48,32 +48,43 @@
                   size="small"
                   @click="clearYearFilter"
                 >
-                  Reset
+                  កំណត់ឡើងវិញ
                 </n-button>
               </div>
+            </div>
+            <div class="dashboard-filter-card__quick-years">
+              <button
+                v-for="item in quickYearOptions"
+                :key="item.value"
+                class="dashboard-year-pill"
+                :class="{ 'dashboard-year-pill--active': selectedYear === item.value }"
+                @click="setSelectedYear(item.value)"
+              >
+                {{ item.label }}
+              </button>
             </div>
           </div>
 
           <div class="dashboard-quick-grid">
             <article class="dashboard-quick-card">
-              <span class="dashboard-quick-card__label">Total staff</span>
+              <span class="dashboard-quick-card__label">បុគ្គលិកសរុប</span>
               <strong class="dashboard-quick-card__value">{{ totalStaffFormatted }}</strong>
               <span class="dashboard-quick-card__meta" :class="trendMetaClass">{{ trendSummaryText }}</span>
             </article>
             <article class="dashboard-quick-card">
-              <span class="dashboard-quick-card__label">Departments</span>
+              <span class="dashboard-quick-card__label">នាយកដ្ឋាន</span>
               <strong class="dashboard-quick-card__value">{{ departmentCountFormatted }}</strong>
-              <span class="dashboard-quick-card__meta">Tracked across the dashboard</span>
+              <span class="dashboard-quick-card__meta">បានតាមដានលើផ្ទាំងគ្រប់គ្រង</span>
             </article>
             <article class="dashboard-quick-card">
-              <span class="dashboard-quick-card__label">Positions</span>
+              <span class="dashboard-quick-card__label">តួនាទី</span>
               <strong class="dashboard-quick-card__value">{{ positionCountFormatted }}</strong>
-              <span class="dashboard-quick-card__meta">Visible in the position donut</span>
+              <span class="dashboard-quick-card__meta">បង្ហាញក្នុងក្រាហ្វដូណាត់តួនាទី</span>
             </article>
             <article class="dashboard-quick-card">
-              <span class="dashboard-quick-card__label">Gender mix</span>
+              <span class="dashboard-quick-card__label">សមាមាត្រភេទ</span>
               <strong class="dashboard-quick-card__value">{{ femaleSharePercent }}%</strong>
-              <span class="dashboard-quick-card__meta">Women, {{ maleSharePercent }}% men</span>
+              <span class="dashboard-quick-card__meta">ស្រី និង ប្រុស {{ maleSharePercent }}%</span>
             </article>
           </div>
         </div>
@@ -89,9 +100,9 @@
       <section class="dashboard-panel-shell">
         <div class="dashboard-panel-shell__header dashboard-reveal dashboard-delay-2">
           <div>
-            <h2 class="dashboard-panel-shell__title">Department Overview</h2>
+            <h2 class="dashboard-panel-shell__title">ទិដ្ឋភាពទូទៅតាមនាយកដ្ឋាន</h2>
             <p class="dashboard-panel-shell__description">
-              Staff distribution by department with current gender balance.
+              បែងចែកចំនួនបុគ្គលិកតាមនាយកដ្ឋានជាមួយសមាមាត្រភេទបច្ចុប្បន្ន។
             </p>
           </div>
         </div>
@@ -104,9 +115,9 @@
       <section class="dashboard-panel-shell">
         <div class="dashboard-panel-shell__header dashboard-reveal dashboard-delay-4">
           <div>
-            <h2 class="dashboard-panel-shell__title">Education And Positions</h2>
+            <h2 class="dashboard-panel-shell__title">កម្រិតអប់រំ និង តួនាទី</h2>
             <p class="dashboard-panel-shell__description">
-              Compare education levels with position distribution in the same view.
+              ប្រៀបធៀបកម្រិតអប់រំជាមួយការបែងចែកតួនាទីក្នុងទិដ្ឋភាពតែមួយ។
             </p>
           </div>
         </div>
@@ -160,6 +171,9 @@ export default {
     NButton
   },
   setup() {
+    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩']
+    const toKhmerNumeral = (value) => String(value ?? '').replace(/\d/g, (digit) => khmerDigits[Number(digit)])
+
     const dashboardTitle = decodeURIComponent('%E1%9E%9F%E1%9E%84%E1%9F%92%E1%9E%81%E1%9F%81%E1%9E%94%E1%9E%96%E1%9F%90%E1%9E%8F%E1%9F%8C%E1%9E%98%E1%9E%B6%E1%9E%93')
 
     const model = reactive({
@@ -173,9 +187,11 @@ export default {
 
     const yearOptions = computed(() =>
       totalEmployeeTrendMock
-        .map((entry) => ({ label: String(entry.year), value: Number(entry.year) }))
+        .map((entry) => ({ label: toKhmerNumeral(entry.year), value: Number(entry.year) }))
         .sort((a, b) => b.value - a.value)
     )
+
+    const quickYearOptions = computed(() => yearOptions.value.slice(0, 5))
 
     const latestYear = totalEmployeeTrendMock.length > 0
       ? Number(totalEmployeeTrendMock[totalEmployeeTrendMock.length - 1].year)
@@ -193,6 +209,10 @@ export default {
 
     function clearYearFilter() {
       selectedYear.value = latestYear
+    }
+
+    function setSelectedYear(year) {
+      selectedYear.value = year
     }
 
     const trendValueForSelectedYear = computed(() => {
@@ -250,9 +270,9 @@ export default {
       Object.values(filteredStaffTotals.value).reduce((sum, value) => sum + (Number(value) || 0), 0)
     )
 
-    const totalStaffFormatted = computed(() => totalStaffCount.value.toLocaleString('en-US'))
-    const departmentCountFormatted = computed(() => filteredEmployeesByDepartment.value.length.toLocaleString('en-US'))
-    const positionCountFormatted = computed(() => filteredEmployeesByPosition.value.length.toLocaleString('en-US'))
+    const totalStaffFormatted = computed(() => toKhmerNumeral(totalStaffCount.value.toLocaleString('en-US')))
+    const departmentCountFormatted = computed(() => toKhmerNumeral(filteredEmployeesByDepartment.value.length.toLocaleString('en-US')))
+    const positionCountFormatted = computed(() => toKhmerNumeral(filteredEmployeesByPosition.value.length.toLocaleString('en-US')))
 
     const femaleSharePercent = computed(() => {
       const female = Number(filteredGenderRatio.value.female) || 0
@@ -269,7 +289,7 @@ export default {
     })
 
     const selectedYearDisplay = computed(() =>
-      selectedYear.value == null ? 'All Years' : String(selectedYear.value)
+      selectedYear.value == null ? 'គ្រប់ឆ្នាំ' : toKhmerNumeral(selectedYear.value)
     )
 
     const trendPercentValue = computed(() => {
@@ -282,9 +302,9 @@ export default {
     })
 
     const trendSummaryText = computed(() => {
-      if (trendPercentValue.value > 0) return `+${trendPercentValue.value}% vs previous year`
-      if (trendPercentValue.value < 0) return `${trendPercentValue.value}% vs previous year`
-      return 'Stable against previous year'
+      if (trendPercentValue.value > 0) return `+${toKhmerNumeral(trendPercentValue.value)}% ប្រៀបធៀបនឹងឆ្នាំមុន`
+      if (trendPercentValue.value < 0) return `${toKhmerNumeral(trendPercentValue.value)}% ប្រៀបធៀបនឹងឆ្នាំមុន`
+      return 'មានស្ថិរភាពប្រៀបធៀបនឹងឆ្នាំមុន'
     })
 
     const trendMetaClass = computed(() => {
@@ -305,8 +325,10 @@ export default {
       filteredEmployeesByPosition,
       selectedYear,
       yearOptions,
+      quickYearOptions,
       showClearYearButton,
       clearYearFilter,
+      setSelectedYear,
       totalStaffFormatted,
       departmentCountFormatted,
       positionCountFormatted,
@@ -497,6 +519,35 @@ export default {
   gap: 0.55rem;
 }
 
+.dashboard-filter-card__quick-years {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-year-pill {
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  transition: all 0.2s ease;
+}
+
+.dashboard-year-pill:hover {
+  border-color: #93c5fd;
+  color: #0c4a6e;
+}
+
+.dashboard-year-pill--active {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
 .dashboard-quick-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -564,15 +615,16 @@ export default {
 
 .dashboard-panel-shell__header {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
 }
 
 .dashboard-panel-shell__title {
   color: #0f172a;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: clamp(1.22rem, 2vw, 1.55rem);
+  font-weight: 400;
+  text-align: left;
   line-height: 1.2;
 }
 

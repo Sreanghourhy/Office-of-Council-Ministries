@@ -34,7 +34,7 @@ Route::group([
     /**
      * Delete a record
      */
-    Route::delete('{id}/delete',[OfficerController::class,'delete']);
+    Route::delete('{id}/delete',[OfficerController::class,'destroy']);
 
     /**
      * Activate, Deactivate account

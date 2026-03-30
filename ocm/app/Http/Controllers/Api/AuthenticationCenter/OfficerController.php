@@ -1627,6 +1627,7 @@ class OfficerController extends Controller
                 $officer->people->deleted_at = \Carbon\Carbon::now() ;
                 $officer->people->save();
             }
+            $officer->delete();
             return response([
                 'ok' => true ,
                 'officer' => $officer ,

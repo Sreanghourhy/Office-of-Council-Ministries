@@ -75,6 +75,9 @@ const actions = {
   async createNonOfficer ({ state, commit, rootState },params) {
     return await crud.create(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/createnonofficer",params)
   },
+  async delete ({ state, commit, rootState },params) {
+    return await crud.delete(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/"+params.id+"/delete")
+  },
   async update ({ state, commit, rootState },params) {
     return await crud.update(import.meta.env.VITE_API_SERVER+"/"+state.model.name+"/update",params)
   },

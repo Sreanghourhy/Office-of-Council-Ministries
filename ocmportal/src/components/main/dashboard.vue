@@ -1,6 +1,6 @@
 <template >
-    <div class=" ocm-dashboard relative " >
-        <div class="dashboard-panel mt-12">
+    <div class="ocm-dashboard relative pt-12" >
+        <div class="dashboard-panel">
             <Transition name="slide-fade" >
                 <div class="fader flex flex-wrap" >
                     <div class="p-2" >

@@ -1,5 +1,5 @@
 <template>
-  <div class="ocm-float-menu-bottom fixed top-0 left-0 right-0 p-0 h-12 flex bg-blue-700" >
+  <div class="ocm-float-menu-bottom fixed top-0 left-0 right-0 z-50 p-0 h-12 flex bg-blue-700" >
     <div class="absolute left-0 right-0 h-12 p-2 leading-8 text-white font-moul " >{{ title != undefined && title != null && title.length > 0 ? title : ( $store.state.activePage.title != '' ? $store.state.activePage.title : 'មិនមានឈ្មោះ' ) }}</div>
     <!-- <div class="absolute right-0 h-12 p-2 w-12 sm:visible md:w-28 lg:w-28 xl:w-28 " >
       <digital-clock dgClass=" w-28 text-xxs pt-1" />

@@ -221,6 +221,25 @@ class OrganizationController extends Controller
                     }
                 )
                 ->first();
+
+        if( $id && $root == null ){
+            return response()->json([
+                'record' => null ,
+                'records' => [] ,
+                'message' => 'Organization not found.' ,
+                'ok' => false
+            ], 404);
+        }
+
+        if( $root == null ){
+            return response()->json([
+                'record' => null ,
+                'records' => [] ,
+                'message' => __("crud.read.success") ,
+                'ok' => true
+            ], 200);
+        }
+
         if( $root != null ){
             $root->totalChilds = $root->totalChildNodesOfAllLevels();
         }
@@ -436,7 +455,7 @@ class OrganizationController extends Controller
             'name' => $request->name,
             'desp' => $request->desp ,
             'pid' => $parentNode == null ? null : $parentNode->id ,
-            'tpid' => $parent != null ? ( $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : "0:".$parentNode->id ) : "0",
+            'tpid' => $parentNode != null ? ( $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : "0:".$parentNode->id ) : "0",
             'image' => null ,
             'prefix' => $request->prefix??''
         ]);

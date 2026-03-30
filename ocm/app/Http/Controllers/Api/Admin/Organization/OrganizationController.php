@@ -130,6 +130,25 @@ class OrganizationController extends Controller
                     }
                 )
                 ->first();
+
+        if( $id && $root == null ){
+            return response()->json([
+                'record' => null ,
+                'records' => [] ,
+                'message' => 'Organization not found.' ,
+                'ok' => false
+            ], 404);
+        }
+
+        if( $root == null ){
+            return response()->json([
+                'record' => null ,
+                'records' => [] ,
+                'message' => __("crud.read.success") ,
+                'ok' => true
+            ], 200);
+        }
+
         $root->totalChilds = $root->totalChildNodesOfAllLevels();
 
         $queryString = [
